@@ -1,0 +1,428 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════
+   Дизайн-система Bankai. Единый источник правды.
+   Донор — Osmo: тёплый near-black, крупный display с тугим
+   отрицательным трекингом, label-ярлыки, единый easing/duration.
+   Хардкода значений в компонентах нет — всё тянется отсюда.
+   ═══════════════════════════════════════════════════════════════ */
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+
+  /* ── Цвет: тёплая нейтраль (база stone, ink = Osmo near-black) ── */
+  --color-bg: #faf8f5; /* тёплый off-white — база страницы */
+  --color-surface: #f2f0ec; /* подложка чередующихся секций */
+  --color-surface-2: #e9e6e0; /* глубже */
+  --color-border: #e2dfd8;
+  --color-muted: #9c968c; /* подписи/плейсхолдеры */
+  --color-ink-2: #57534d; /* вторичный текст */
+  --color-ink: #1c1a18; /* near-black — основной текст */
+
+  /* Брендовый акцент (точечно: CTA, марка, маркер). */
+  --color-accent: #f14736; /* коралл */
+  --color-accent-fg: #ffffff; /* текст на акценте */
+
+  /* ── Типо-шкала (Inter, fluid clamp; иерархия размером+трекингом) ── */
+  /* lh 1.05: тугой display, но кириллице чуть больше воздуха, чем латинице
+     Osmo. Обрезку выносных «р/у/д» под masked-reveal решает .split-line ниже. */
+  --text-display: clamp(2.75rem, 5.5vw + 1rem, 6rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.03em;
+  --text-display--font-weight: 600;
+
+  --text-h1: clamp(2.25rem, 3.5vw + 1rem, 3.75rem);
+  --text-h1--line-height: 1.02;
+  --text-h1--letter-spacing: -0.025em;
+  --text-h1--font-weight: 600;
+
+  --text-h2: clamp(1.875rem, 2.5vw + 0.75rem, 3rem);
+  --text-h2--line-height: 1.05;
+  --text-h2--letter-spacing: -0.02em;
+  --text-h2--font-weight: 600;
+
+  --text-h3: clamp(1.375rem, 1.2vw + 0.9rem, 1.75rem);
+  --text-h3--line-height: 1.15;
+  --text-h3--letter-spacing: -0.015em;
+  --text-h3--font-weight: 600;
+
+  --text-lead: clamp(1.125rem, 0.6vw + 1rem, 1.375rem);
+  --text-lead--line-height: 1.5;
+  --text-lead--letter-spacing: -0.01em;
+  --text-lead--font-weight: 400;
+
+  /* label/eyebrow — Inter заменяет моно-ярлык капсом+трекингом
+     (используется вместе с utility `uppercase`) */
+  --text-label: 0.75rem;
+  --text-label--line-height: 1;
+  --text-label--letter-spacing: 0.08em;
+  --text-label--font-weight: 500;
+
+  /* ── Радиусы: ужаты к «точному» Osmo (сквозная консолидация) ── */
+  --radius-md: 0.375rem; /* 6px — кнопки */
+  --radius-lg: 0.375rem; /* 6px */
+  --radius-xl: 0.5rem; /* 8px — карточки */
+  --radius-2xl: 0.75rem;
+
+  /* ── Моторика: одна сигнатура (донор Osmo) ── */
+  --ease-osmo: cubic-bezier(0.625, 0.05, 0, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Длительности и вертикальный ритм секций — простые переменные
+   (используются в style/arbitrary и зеркалятся в lib/motion.ts). */
+:root {
+  --dur-fast: 0.3s;
+  --dur-base: 0.6s;
+  --dur-slow: 0.9s;
+  --section-y: clamp(4rem, 8vw, 8rem); /* порт 7.5em Osmo */
+}
+
+/* ── Инверсия секций (tone="ink"): локально переопределяем нейтрали,
+   и все utility text-ink/bg-surface/border-border внутри
+   инвертируются автоматически. Акцент не трогаем. ── */
+.tone-ink {
+  --color-bg: #1c1a18;
+  --color-surface: #232120;
+  --color-surface-2: #2c2a28;
+  --color-border: #38332f;
+  --color-muted: #8a857d;
+  --color-ink-2: #b8b3aa;
+  --color-ink: #f4f2ee;
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Плавный ховер ссылок шапки/подвала (на токенах моторики). */
+header a,
+footer a {
+  transition: color var(--dur-fast) var(--ease-osmo);
+}
+
+/* SplitText masked reveal: padding снизу даёт маске место под выносные
+   элементы кириллицы (р/у/д/ф), отрицательный margin сохраняет ритм строк. */
+.split-line {
+  padding-bottom: 0.18em;
+  margin-bottom: -0.18em;
+}
+
+/* Скролл отдаём Lenis (native smooth убран, чтобы не дублировать). */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Базовая типографика для контентных страниц (легал и т.п.) */
+.prose-legal h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.prose-legal p,
+.prose-legal li {
+  color: var(--color-ink-2);
+  line-height: 1.7;
+  margin-bottom: 0.75rem;
+}
+.prose-legal ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+/* ───────── Типографика гайдов (.guide-prose) ─────────
+   Длинный контент из markdown. Нейтральная палитра, иерархия
+   через размер и отступы. */
+.guide-prose {
+  color: var(--color-ink-2);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+.guide-prose > :first-child {
+  margin-top: 0;
+}
+.guide-prose h1 {
+  color: var(--color-ink);
+  font-size: 1.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+.guide-prose h2 {
+  color: var(--color-ink);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--color-border);
+  scroll-margin-top: 6rem;
+}
+.guide-prose h3 {
+  color: var(--color-ink);
+  font-size: 1.075rem;
+  font-weight: 600;
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--color-ink);
+}
+.guide-prose p {
+  margin-top: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+.guide-prose strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.guide-prose a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.guide-prose ul,
+.guide-prose ol {
+  margin: 0.85rem 0;
+  padding-left: 1.4rem;
+}
+.guide-prose ul {
+  list-style: disc;
+}
+.guide-prose ol {
+  list-style: decimal;
+}
+.guide-prose li {
+  margin: 0.35rem 0;
+}
+.guide-prose li::marker {
+  color: var(--color-muted);
+}
+/* Чек-листы (task-list из GFM) */
+.guide-prose ul.contains-task-list {
+  list-style: none;
+  padding-left: 0;
+}
+.guide-prose li.task-list-item {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+.guide-prose li.task-list-item input[type="checkbox"] {
+  margin-top: 0.45rem;
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: none;
+  accent-color: var(--color-ink);
+}
+/* Формулы и код */
+.guide-prose pre {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.6rem;
+  padding: 0.9rem 1.1rem;
+  overflow-x: auto;
+  margin: 1.1rem 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.guide-prose code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.guide-prose :not(pre) > code {
+  background: var(--color-surface-2);
+  border-radius: 0.3rem;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.875em;
+  color: var(--color-ink);
+}
+/* Таблицы */
+.guide-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  font-size: 0.9rem;
+}
+.guide-prose th,
+.guide-prose td {
+  border: 1px solid var(--color-border);
+  padding: 0.55rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+.guide-prose th {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.guide-prose hr {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  margin: 2.5rem 0;
+}
+.guide-prose blockquote {
+  border-left: 3px solid var(--color-border);
+  padding-left: 1rem;
+  color: var(--color-ink-2);
+  margin: 1.1rem 0;
+}
+
+/* ───────── Блоки-заметки (callout) внутри гайда ─────────
+   Группируются rehype-плагином по типу под-блока. Палитра
+   нейтральная: различаем структурой, фоном и меткой. */
+.guide-prose .gp-callout > :first-child {
+  margin-top: 0;
+}
+.guide-prose .gp-callout > :last-child {
+  margin-bottom: 0;
+}
+/* H3 внутри callout превращается в метку-ярлык (не заголовок) */
+.guide-prose .gp-callout h3 {
+  margin: 0 0 0.55rem;
+  padding: 0;
+  border: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* «Зачем бизнесу» и «Как работает» - лёгкие, с боковой линией */
+.guide-prose .gp-why,
+.guide-prose .gp-how {
+  margin: 1.4rem 0;
+  padding-left: 1rem;
+  border-left: 2px solid var(--color-border);
+}
+.guide-prose .gp-why p {
+  color: var(--color-ink);
+}
+
+/* «Сделай сам» - карточка-действие (основная мякоть раздела) */
+.guide-prose .gp-do {
+  margin: 1.6rem 0;
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-ink);
+  background: var(--color-surface);
+  border-radius: 0.7rem;
+  padding: 1.15rem 1.3rem;
+}
+
+/* «Где сливают» - заметка-предупреждение */
+.guide-prose .gp-warn {
+  margin: 1.6rem 0;
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-ink);
+  background: var(--color-surface-2);
+  border-radius: 0.7rem;
+  padding: 1.15rem 1.3rem;
+}
+.guide-prose .gp-warn h3 {
+  color: var(--color-ink);
+}
+.guide-prose .gp-warn h3::before {
+  content: "✕";
+  margin-right: 0.45rem;
+  font-weight: 700;
+}
+
+/* «Чек-лист раздела» - карточка чек-листа */
+.guide-prose .gp-checklist {
+  margin: 1.6rem 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: 0.7rem;
+  padding: 1.15rem 1.3rem;
+}
+
+/* внутри карточек код/таблицы/инлайн-код выводим на белый фон для контраста */
+.guide-prose .gp-do pre,
+.guide-prose .gp-warn pre,
+.guide-prose .gp-checklist pre {
+  background: var(--color-bg);
+}
+.guide-prose .gp-do th,
+.guide-prose .gp-checklist th {
+  background: var(--color-bg);
+}
+.guide-prose .gp-do :not(pre) > code,
+.guide-prose .gp-warn :not(pre) > code {
+  background: var(--color-bg);
+}
+
+/* ───────── Инфографика-цепочка: **A → B → C** ───────── */
+.guide-prose .gp-chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.4rem 0;
+}
+.guide-prose .gp-chain-step {
+  display: inline-block;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-ink);
+}
+.guide-prose .gp-chain-arrow {
+  color: var(--color-muted);
+  font-size: 1rem;
+}
+
+/* ───────── Ритм: разводим шаги/под-группы ─────────
+   Абзац, начинающийся с жирного (Шаг 1., «Индексация:», «Пример.») -
+   это под-заголовок: отступ сверху больше (отделяет от прошлого блока),
+   снизу меньше и прижат к своему списку. */
+.guide-prose p:has(> strong:first-child) {
+  margin-top: 1.7rem;
+  margin-bottom: 0.4rem;
+}
+.guide-prose p:has(> strong:first-child) > strong:first-child {
+  color: var(--color-ink);
+}
+.guide-prose p:has(> strong:first-child) + ul,
+.guide-prose p:has(> strong:first-child) + ol {
+  margin-top: 0.4rem;
+}
+.guide-prose .gp-callout > p:has(> strong:first-child):first-child {
+  margin-top: 0;
+}
+
+/* чуть больше воздуха в карточках и между пунктами */
+.guide-prose .gp-do,
+.guide-prose .gp-warn,
+.guide-prose .gp-checklist {
+  padding: 1.3rem 1.4rem;
+}
+.guide-prose li {
+  margin: 0.45rem 0;
+}
