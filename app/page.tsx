@@ -9,6 +9,7 @@ import { SystemSection } from "@/components/sections/SystemSection";
 import { FeatureGrid } from "@/components/sections/FeatureGrid";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
 import { CaseGrid } from "@/components/sections/CaseGrid";
+import { ServicesGrid } from "@/components/sections/ServicesGrid";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { Pricing } from "@/components/sections/Pricing";
 import { FAQ } from "@/components/sections/FAQ";
@@ -19,6 +20,7 @@ import {
   trustStats,
   problem,
   system,
+  servicesPreview,
   homeIncludes,
   process,
   companyBlock,
@@ -69,6 +71,18 @@ export default function Home() {
           <p className="max-w-3xl text-sm leading-relaxed text-ink-2">
             {system.targeted}
           </p>
+        </div>
+      </Section>
+
+      {/* Услуги - 3 канала (перелинковка на посадочные + выбор канала) */}
+      <Section>
+        <SectionHeader
+          eyebrow="Услуги"
+          title={servicesPreview.title}
+          lead={servicesPreview.lead}
+        />
+        <div className="mt-12">
+          <ServicesGrid cards={servicesPreview.cards} />
         </div>
       </Section>
 
