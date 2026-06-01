@@ -31,6 +31,16 @@ export const statusMeta: Record<
   add: { label: "Кандидат", tone: "add" },
 };
 
+/* Апруверы: пункт зачёркивается, когда все трое поставили галочку.
+   Состояние общее (в БД), видно всем. Без логина — колонки именные,
+   каждый ставит свою (доверие, внутренний инструмент). */
+export const approvers = [
+  { key: "artur", label: "Артур" },
+  { key: "daniyar", label: "Данияр" },
+  { key: "petr", label: "Пётр" },
+] as const;
+export type ApproverKey = (typeof approvers)[number]["key"];
+
 export const checklist: CheckPage[] = [
   {
     route: "/",

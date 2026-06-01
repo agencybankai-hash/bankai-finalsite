@@ -20,5 +20,15 @@ await sql`CREATE TABLE IF NOT EXISTS leads (
 await sql`CREATE INDEX IF NOT EXISTS leads_created_at_idx ON leads (created_at DESC)`;
 await sql`CREATE INDEX IF NOT EXISTS leads_source_idx ON leads (source)`;
 
+// Апрувы контент-чеклиста (страница /checklist). API создаёт таблицу сам,
+// здесь — для полноты схемы.
+await sql`CREATE TABLE IF NOT EXISTS checklist_approvals (
+  item_id    text PRIMARY KEY,
+  artur      boolean NOT NULL DEFAULT false,
+  daniyar    boolean NOT NULL DEFAULT false,
+  petr       boolean NOT NULL DEFAULT false,
+  updated_at timestamptz NOT NULL DEFAULT now()
+)`;
+
 const [{ count }] = await sql`SELECT count(*)::int AS count FROM leads`;
 console.log("OK: таблица leads готова, строк:", count);
