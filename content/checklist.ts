@@ -41,6 +41,26 @@ export const approvers = [
 ] as const;
 export type ApproverKey = (typeof approvers)[number]["key"];
 
+/* Секции сервисной страницы (ChannelPage) одинаковы для всех 3 каналов.
+   Свои id на канал → апрувим каждую страницу и секцию отдельно. */
+function channelItems(p: string): CheckItem[] {
+  return [
+    { id: `${p}-hero`, label: "Hero — H1 (ключ+гео) + подзаголовок + бейджи", source: "services.ts:hero", status: "done" },
+    { id: `${p}-metaphor`, label: "Метафора «по-простому»", source: "services.ts:metaphor", status: "done" },
+    { id: `${p}-audience`, label: "Кому подходит", source: "services.ts:audience", status: "done" },
+    { id: `${p}-notfor`, label: "Кому НЕ подойдёт", source: "services.ts:problem", status: "done" },
+    { id: `${p}-includes`, label: "Что мы делаем", source: "services.ts:includes", status: "done" },
+    { id: `${p}-process`, label: "Как мы работаем (процесс)", source: "services.ts:process", status: "done" },
+    { id: `${p}-funnel`, label: "Как даёт заявки (воронка)", source: "services.ts:funnel", status: "done" },
+    { id: `${p}-cases`, label: "Где это сработало (кейсы канала)", source: "cases.ts (фильтр)", status: "data", todo: "метрики кейсов [N]/[X]" },
+    { id: `${p}-pricing`, label: "Тарифы / тариф", source: "services.ts:plans/pricing", status: "done" },
+    { id: `${p}-partofsystem`, label: "Часть системы", source: "services.ts:partOfSystem", status: "done" },
+    { id: `${p}-guide`, label: "Гайд по каналу («нет секретов»)", source: "ссылка", status: "done" },
+    { id: `${p}-faq`, label: "FAQ канала", source: "services.ts:faq", status: "done" },
+    { id: `${p}-cta`, label: "Финальный CTA", status: "done" },
+  ];
+}
+
 export const checklist: CheckPage[] = [
   {
     route: "/",
@@ -66,25 +86,19 @@ export const checklist: CheckPage[] = [
     ],
   },
   {
-    route: "/services/seo · /context · /web",
-    title: "Услуги (3 канала)",
-    items: [
-      { id: "svc-hero", label: "Hero — H1 (ключ+гео) + подзаголовок + бейджи", source: "services.ts:hero", status: "done" },
-      { id: "svc-metaphor", label: "Метафора «по-простому»", source: "services.ts:metaphor", status: "done" },
-      { id: "svc-audience", label: "Кому подходит", source: "services.ts:audience", status: "done" },
-      { id: "svc-notfor", label: "Кому НЕ подойдёт", source: "services.ts:problem", status: "done" },
-      { id: "svc-includes", label: "Что мы делаем", source: "services.ts:includes", status: "done" },
-      { id: "svc-process", label: "Как мы работаем (процесс)", source: "services.ts:process", status: "done" },
-      { id: "svc-funnel", label: "Как даёт заявки (воронка)", source: "services.ts:funnel", status: "done" },
-      { id: "svc-cases", label: "Где это сработало (кейсы канала)", source: "cases.ts (фильтр)", status: "data", todo: "метрики кейсов [N]/[X]" },
-      { id: "svc-pricing", label: "Тарифы / тариф", source: "services.ts:plans/pricing", status: "done" },
-      { id: "svc-partofsystem", label: "Часть системы", source: "services.ts:partOfSystem", status: "done" },
-      { id: "svc-guide", label: "Гайд по каналу («нет секретов»)", source: "ссылка", status: "done" },
-      { id: "svc-faq", label: "FAQ канала", source: "services.ts:faq", status: "done" },
-      { id: "svc-cta", label: "Финальный CTA", status: "done" },
-      { id: "svc-meta", label: "Meta description (сейчас = подзаголовок)", status: "add", todo: "оптимизировать под SERP на этапе SEO" },
-      { id: "svc-social", label: "Отзыв/соц-доказательство по каналу", status: "add", todo: "решить, добавлять ли" },
-    ],
+    route: "/services/seo",
+    title: "Услуги · SEO продвижение",
+    items: channelItems("svc-seo"),
+  },
+  {
+    route: "/services/context",
+    title: "Услуги · Контекстная реклама",
+    items: channelItems("svc-context"),
+  },
+  {
+    route: "/services/web",
+    title: "Услуги · Разработка сайтов",
+    items: channelItems("svc-web"),
   },
   {
     route: "/cases",
