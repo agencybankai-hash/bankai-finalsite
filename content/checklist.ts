@@ -52,12 +52,39 @@ function channelItems(p: string): CheckItem[] {
     { id: `${p}-includes`, label: "Что мы делаем", source: "services.ts:includes", status: "done" },
     { id: `${p}-process`, label: "Как мы работаем (процесс)", source: "services.ts:process", status: "done" },
     { id: `${p}-funnel`, label: "Как даёт заявки (воронка)", source: "services.ts:funnel", status: "done" },
-    { id: `${p}-cases`, label: "Где это сработало (кейсы канала)", source: "cases.ts (фильтр)", status: "data", todo: "метрики кейсов [N]/[X]" },
+    { id: `${p}-cases`, label: "Где это сработало (кейсы канала)", source: "cases.ts (фильтр)", status: "data", todo: "2-3 кейса канала (из 5), метрики [N]/[X]" },
     { id: `${p}-pricing`, label: "Тарифы / тариф", source: "services.ts:plans/pricing", status: "done" },
     { id: `${p}-partofsystem`, label: "Часть системы", source: "services.ts:partOfSystem", status: "done" },
     { id: `${p}-guide`, label: "Гайд по каналу («нет секретов»)", source: "ссылка", status: "done" },
     { id: `${p}-faq`, label: "FAQ канала", source: "services.ts:faq", status: "done" },
     { id: `${p}-cta`, label: "Финальный CTA", status: "done" },
+  ];
+}
+
+/* Слот кейса (страница /cases/[slug]) — подбираем и наполняем. 5 флагманов;
+   каждый помечается каналом(ами), чтобы сервисные тянули по 2-3 своих. */
+function caseItems(p: string): CheckItem[] {
+  return [
+    { id: `${p}-pick`, label: "Подобрать кейс: клиент, ниша, гео, канал(ы)", status: "data" },
+    { id: `${p}-headline`, label: "Заголовок-результат + шапка (индустрия/гео/срок)", source: "c.headline/teaser", status: "data" },
+    { id: `${p}-visual`, label: "Превью / скриншоты проекта", status: "media" },
+    { id: `${p}-challenge`, label: "Задача + Стратегия", source: "c.challenge/strategy", status: "data" },
+    { id: `${p}-diagnosis`, label: "Диагностика (что было плохо)", source: "c.diagnosis", status: "data" },
+    { id: `${p}-thesis`, label: "Тезис-инсайт", source: "c.thesis", status: "data" },
+    { id: `${p}-work`, label: "Работа по каналам", source: "c.work", status: "data" },
+    { id: `${p}-results`, label: "Цифры до/после", source: "c.results", status: "data" },
+    { id: `${p}-honesty`, label: "Что не сработало / риски", source: "c.honesty", status: "data" },
+    { id: `${p}-conclusion`, label: "Вывод", source: "c.conclusion", status: "data" },
+    { id: `${p}-testimonial`, label: "Отзыв (+ согласие)", source: "c.testimonial", status: "data" },
+  ];
+}
+
+/* Гайд (статья) — тексты готовы; апрувим каждый отдельно. */
+function guideItems(p: string): CheckItem[] {
+  return [
+    { id: `${p}-article`, label: "Текст статьи (markdown)", status: "done" },
+    { id: `${p}-pdf`, label: "PDF чек-лист", status: "done" },
+    { id: `${p}-meta`, label: "Meta / SEO-заголовок", status: "add", todo: "оптимизировать на этапе SEO" },
   ];
 }
 
@@ -112,49 +139,24 @@ export const checklist: CheckPage[] = [
       { id: "caseslist-cta", label: "Финальный CTA", status: "done" },
     ],
   },
-  {
-    route: "/cases/[slug]",
-    title: "Кейс — деталь",
-    items: [
-      { id: "case-header", label: "Шапка: бейджи + H1 + headline + teaser + dl", status: "done" },
-      { id: "case-visual", label: "Превью проекта (визуал/скриншоты)", status: "media", todo: "образцы ✅ (SVG); реальным нужны скриншоты" },
-      { id: "case-challenge", label: "Задача + Стратегия", source: "c.challenge/strategy", status: "data", todo: "almaty-dental, almaty-renovation — пустые" },
-      { id: "case-diagnosis", label: "Диагностика (опц.)", source: "c.diagnosis", status: "done" },
-      { id: "case-thesis", label: "Тезис-инсайт (опц.)", source: "c.thesis", status: "done" },
-      { id: "case-work", label: "Работа по каналам", source: "c.work", status: "done" },
-      { id: "case-results", label: "Цифры проекта (до/после)", source: "c.results", status: "data", todo: "метрики [N]/[X] в реальных" },
-      { id: "case-honesty", label: "Что не сработало / риски (опц.)", source: "c.honesty", status: "done" },
-      { id: "case-conclusion", label: "Вывод (опц.)", source: "c.conclusion", status: "done" },
-      { id: "case-testimonial", label: "Отзыв (опц.)", source: "c.testimonial", status: "data", todo: "[Отзыв… согласовать] в реальных" },
-      { id: "case-related", label: "Похожие проекты", status: "done" },
-      { id: "case-cta", label: "Финальный CTA", status: "done" },
-      { id: "case-meta", label: "Meta каждого кейса", status: "add", todo: "довести до ключ+гео по нише на этапе SEO" },
-    ],
-  },
+  { route: "/cases/[slug] · слот 1", title: "Кейс 1 (подобрать)", items: caseItems("case1") },
+  { route: "/cases/[slug] · слот 2", title: "Кейс 2 (подобрать)", items: caseItems("case2") },
+  { route: "/cases/[slug] · слот 3", title: "Кейс 3 (подобрать)", items: caseItems("case3") },
+  { route: "/cases/[slug] · слот 4", title: "Кейс 4 (подобрать)", items: caseItems("case4") },
+  { route: "/cases/[slug] · слот 5", title: "Кейс 5 (подобрать)", items: caseItems("case5") },
   {
     route: "/guides",
-    title: "Гайды — список + статьи",
+    title: "Гайды — список",
     items: [
       { id: "guideslist-grid", label: "Сетка гайдов (4)", source: "guides.ts", status: "done" },
-      { id: "guide-marketing", label: "Гайд: Маркетинг под заявки (+PDF)", status: "done" },
-      { id: "guide-seo", label: "Гайд: SEO-продвижение 2026 (+PDF)", status: "done" },
-      { id: "guide-context", label: "Гайд: Контекстная реклама 2026 (+PDF)", status: "done" },
-      { id: "guide-landing", label: "Гайд: Конверсионный лендинг 2026 (+PDF)", status: "done" },
-      { id: "guides-intro", label: "Интро «зачем читать» на списке", status: "add", todo: "решить, нужно ли" },
-      { id: "guides-more", label: "Новые гайды/статьи под семантику", status: "add", todo: "контент-движок SEO (локальное, по нишам)" },
+      { id: "guides-intro", label: "Интро/лид-магнит на списке", status: "add", todo: "решить, нужно ли" },
+      { id: "guides-more", label: "Новые гайды под семантику", status: "add", todo: "контент-движок SEO (локальное, по нишам)" },
     ],
   },
-  {
-    route: "/guides/[slug]",
-    title: "Гайд — деталь",
-    items: [
-      { id: "guide-breadcrumb", label: "Хлебные крошки", status: "done" },
-      { id: "guide-toc", label: "Оглавление (авто из H2/H3)", status: "done" },
-      { id: "guide-body", label: "Тело статьи (markdown)", status: "done" },
-      { id: "guide-bonus", label: "Бонус-гейт (PDF чек-лист)", status: "done" },
-      { id: "guide-outro", label: "Outro + CTA-кнопки", status: "done" },
-    ],
-  },
+  { route: "/guides/marketing", title: "Гайд · Маркетинг под заявки", items: guideItems("guide-marketing") },
+  { route: "/guides/seo", title: "Гайд · SEO-продвижение", items: guideItems("guide-seo") },
+  { route: "/guides/context", title: "Гайд · Контекстная реклама", items: guideItems("guide-context") },
+  { route: "/guides/landing", title: "Гайд · Конверсионный лендинг", items: guideItems("guide-landing") },
   {
     route: "/about",
     title: "О нас",
