@@ -7,6 +7,7 @@ import {
   registerGsap,
   prefersReducedMotion,
   introReady,
+  onEnter,
   EASE,
   DUR,
   REVEAL,
@@ -31,9 +32,9 @@ type Props = {
 };
 
 /**
- * Переиспользуемая входная анимация по скроллу (GSAP ScrollTrigger).
- * Главный motion-примитив: серверные секции остаются серверными,
- * их контент оборачивается в <Reveal>. useGSAP применяет стартовое
+ * Переиспользуемая входная анимация. Триггер по скроллу — на
+ * IntersectionObserver (надёжно: срабатывает и для уже видимых блоков,
+ * не зависит от Lenis/ScrollTrigger). useGSAP применяет стартовое
  * состояние в layout-эффекте (до краски) — без вспышки.
  * prefers-reduced-motion → контент сразу видим, без движения.
  */
@@ -69,37 +70,26 @@ export function Reveal({
         return;
       }
 
+      const play = () =>
+        gsap.to(targets, {
+          autoAlpha: 1,
+          y: 0,
+          duration: DUR.base,
+          ease: EASE,
+          delay,
+          stagger: step,
+        });
+
+      gsap.set(targets, { autoAlpha: 0, y });
+
       if (trigger === "load") {
-        // спрятать до краски, раскрыть после прелоадера (синхрон с занавесом)
-        gsap.set(targets, { autoAlpha: 0, y });
-        introReady(() =>
-          gsap.to(targets, {
-            autoAlpha: 1,
-            y: 0,
-            duration: DUR.base,
-            ease: EASE,
-            delay,
-            stagger: step,
-          }),
-        );
+        // первый экран: раскрыть после прелоадера (синхрон с занавесом)
+        introReady(play);
         return;
       }
 
-      gsap.from(targets, {
-        autoAlpha: 0,
-        y,
-        duration: DUR.base,
-        ease: EASE,
-        delay,
-        stagger: step,
-        scrollTrigger: {
-          trigger: el,
-          start: "top 85%",
-          toggleActions: once
-            ? "play none none none"
-            : "play none none reverse",
-        },
-      });
+      // по входу в вьюпорт
+      return onEnter(el, play, { once });
     },
     { scope: ref },
   );

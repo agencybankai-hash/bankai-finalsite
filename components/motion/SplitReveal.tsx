@@ -8,6 +8,7 @@ import {
   registerGsap,
   prefersReducedMotion,
   introReady,
+  onEnter,
   EASE,
   DUR,
 } from "@/lib/motion";
@@ -21,17 +22,16 @@ type Props = {
   delay?: number;
   /** Шаг каскада между строками, сек. */
   stagger?: number;
-  /** load — играет сразу при монтаже; scroll — по входу в вьюпорт. */
+  /** load — играет после прелоадера; scroll — по входу в вьюпорт. */
   trigger?: "load" | "scroll";
 };
 
 /**
  * Masked line reveal (донор Osmo «Masked Text Reveal»): строки текста
- * выезжают снизу из-под маски каскадом. GSAP SplitText (mask:"lines")
- * сам оборачивает строки в overflow-hidden. Easing/длительности — из
- * lib/motion.ts. Сплит после fonts.ready, иначе строки бьются неверно.
- * До сплита элемент спрятан (autoAlpha:0 в layout-эффекте) — без вспышки.
- * reduced-motion → текст сразу видим, без движения.
+ * выезжают снизу из-под маски каскадом. GSAP SplitText (mask:"lines").
+ * Триггер scroll — на IntersectionObserver (надёжно). Сплит после
+ * fonts.ready (autoSplit). До раскрытия строки спрятаны под маской —
+ * без вспышки. reduced-motion → текст сразу видим.
  */
 export function SplitReveal({
   children,
@@ -55,6 +55,7 @@ export function SplitReveal({
       }
 
       gsap.set(el, { autoAlpha: 0 });
+      let ioStop: (() => void) | undefined;
 
       // autoSplit сам ждёт fonts.ready и пере-разбивает строки на resize,
       // заново проигрывая onSplit — строки всегда бьются по факт. ширине.
@@ -65,32 +66,29 @@ export function SplitReveal({
         autoSplit: true,
         onSplit: (self) => {
           gsap.set(el, { autoAlpha: 1 });
+          ioStop?.(); // снять прошлый обсёрвер при пере-сплите
+          gsap.set(self.lines, { yPercent: 110 });
+
+          const play = () =>
+            gsap.to(self.lines, {
+              yPercent: 0,
+              duration: DUR.base,
+              ease: EASE,
+              stagger,
+              delay,
+            });
+
           if (trigger === "load") {
-            // строки спрятаны под маской; раскрываем после прелоадера
-            gsap.set(self.lines, { yPercent: 110 });
-            introReady(() =>
-              gsap.to(self.lines, {
-                yPercent: 0,
-                duration: DUR.base,
-                ease: EASE,
-                stagger,
-                delay,
-              }),
-            );
-            return;
+            introReady(play);
+          } else {
+            ioStop = onEnter(el, play);
           }
-          return gsap.from(self.lines, {
-            yPercent: 110,
-            duration: DUR.base,
-            ease: EASE,
-            stagger,
-            delay,
-            scrollTrigger: { trigger: el, start: "top 85%" },
-          });
+          return;
         },
       });
 
       return () => {
+        ioStop?.();
         split.revert();
       };
     },

@@ -68,3 +68,33 @@ export function introReady(cb: () => void): void {
   // страховка: не держать контент скрытым, если прелоадер не отработал
   if (!introTimer) introTimer = setTimeout(markIntroDone, 3500);
 }
+
+/**
+ * Триггер «по входу в вьюпорт» на IntersectionObserver — надёжнее
+ * GSAP ScrollTrigger в связке с Lenis (срабатывает и для уже видимых,
+ * и для входящих; не зависит от sync скролла). Возвращает cleanup.
+ */
+export function onEnter(
+  el: Element,
+  cb: () => void,
+  opts: { once?: boolean; rootMargin?: string } = {},
+): () => void {
+  const { once = true, rootMargin = "0px 0px -12% 0px" } = opts;
+  if (typeof IntersectionObserver === "undefined") {
+    cb();
+    return () => {};
+  }
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          cb();
+          if (once) io.disconnect();
+        }
+      }
+    },
+    { rootMargin, threshold: 0 },
+  );
+  io.observe(el);
+  return () => io.disconnect();
+}

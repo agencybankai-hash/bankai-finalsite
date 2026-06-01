@@ -3,13 +3,13 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
-import { registerGsap, prefersReducedMotion, EASE } from "@/lib/motion";
+import { registerGsap, prefersReducedMotion, onEnter, EASE } from "@/lib/motion";
 
 /**
- * Count-up на скролле (донор Osmo «Number Odometer» / «Display Count»).
- * Парсит число из строки («$14.6M», «до 5.2x», «50+», «до -40%»),
- * тикает с 0 до значения при входе в вьюпорт, сохраняя префикс/суффикс
- * и число знаков после запятой. reduced-motion / no-JS → сразу значение.
+ * Count-up по входу в вьюпорт (донор Osmo «Number Odometer»), триггер на
+ * IntersectionObserver. Парсит число из строки («$14.6M», «до 5.2x»,
+ * «50+», «до -40%»), тикает с 0 до значения, сохраняя префикс/суффикс
+ * и знаки после запятой. reduced-motion / no-JS → сразу значение.
  */
 export function CountUp({
   value,
@@ -41,14 +41,16 @@ export function CountUp({
 
       const obj = { v: 0 };
       el.textContent = fmt(0);
-      gsap.to(obj, {
-        v: target,
-        duration: 1.2,
-        ease: EASE,
-        scrollTrigger: { trigger: el, start: "top 90%", once: true },
-        onUpdate: () => {
-          el.textContent = fmt(obj.v);
-        },
+
+      return onEnter(el, () => {
+        gsap.to(obj, {
+          v: target,
+          duration: 1.2,
+          ease: EASE,
+          onUpdate: () => {
+            el.textContent = fmt(obj.v);
+          },
+        });
       });
     },
     { scope: ref },
