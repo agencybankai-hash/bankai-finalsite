@@ -27,8 +27,10 @@ await sql`CREATE TABLE IF NOT EXISTS checklist_approvals (
   artur      boolean NOT NULL DEFAULT false,
   daniyar    boolean NOT NULL DEFAULT false,
   petr       boolean NOT NULL DEFAULT false,
+  note       text,
   updated_at timestamptz NOT NULL DEFAULT now()
 )`;
+await sql`ALTER TABLE checklist_approvals ADD COLUMN IF NOT EXISTS note text`;
 
 const [{ count }] = await sql`SELECT count(*)::int AS count FROM leads`;
 console.log("OK: таблица leads готова, строк:", count);

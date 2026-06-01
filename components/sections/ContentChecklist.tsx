@@ -7,13 +7,19 @@ import {
   macroNote,
   approvers,
   type ApproverKey,
+  type CheckStatus,
 } from "@/content/checklist";
 import { cn } from "@/lib/utils";
 
-type Approval = { artur: boolean; daniyar: boolean; petr: boolean };
+type Approval = {
+  artur: boolean;
+  daniyar: boolean;
+  petr: boolean;
+  note: string;
+};
 type ApprovalMap = Record<string, Approval>;
 
-const EMPTY: Approval = { artur: false, daniyar: false, petr: false };
+const EMPTY: Approval = { artur: false, daniyar: false, petr: false, note: "" };
 const isDone = (a?: Approval) => !!a && a.artur && a.daniyar && a.petr;
 
 const chipTone: Record<string, string> = {
@@ -41,8 +47,38 @@ function Bar({ done, total }: { done: number; total: number }) {
   );
 }
 
+/** Заметка к пункту: синхрон с сервером, пока не редактируешь; сохраняет по blur. */
+function NoteInput({
+  value,
+  onSave,
+}: {
+  value: string;
+  onSave: (v: string) => void;
+}) {
+  const [v, setV] = useState(value);
+  const [focused, setFocused] = useState(false);
+  useEffect(() => {
+    if (!focused) setV(value);
+  }, [value, focused]);
+  return (
+    <input
+      value={v}
+      onChange={(e) => setV(e.target.value)}
+      onFocus={() => setFocused(true)}
+      onBlur={() => {
+        setFocused(false);
+        if (v !== value) onSave(v.trim());
+      }}
+      placeholder="заметка для команды…"
+      className="mt-1.5 w-full max-w-md rounded-md border border-border bg-surface px-2.5 py-1 text-xs text-ink-2 placeholder:text-muted focus:border-ink focus:outline-none"
+    />
+  );
+}
+
 export function ContentChecklist() {
   const [approvals, setApprovals] = useState<ApprovalMap>({});
+  const [statusFilter, setStatusFilter] = useState<CheckStatus | "all">("all");
+  const [onlyOpen, setOnlyOpen] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -58,65 +94,108 @@ export function ContentChecklist() {
     load();
     const onFocus = () => load();
     window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
+    const t = setInterval(load, 30_000); // realtime «на минималках» — поллинг
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      clearInterval(t);
+    };
   }, [load]);
 
-  const toggle = (id: string, key: ApproverKey) => {
-    const current = approvals[id] ?? EMPTY;
-    const value = !current[key];
-    // оптимистично
-    setApprovals((prev) => ({
-      ...prev,
-      [id]: { ...(prev[id] ?? EMPTY), [key]: value },
-    }));
+  const post = (payload: object) =>
     fetch("/api/checklist", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ itemId: id, approver: key, value }),
+      body: JSON.stringify(payload),
     })
       .then((r) => {
         if (!r.ok) load();
       })
       .catch(() => load());
+
+  const toggle = (id: string, key: ApproverKey) => {
+    const value = !(approvals[id] ?? EMPTY)[key];
+    setApprovals((prev) => ({
+      ...prev,
+      [id]: { ...(prev[id] ?? EMPTY), [key]: value },
+    }));
+    post({ itemId: id, approver: key, value });
   };
+
+  const saveNote = (id: string, note: string) => {
+    setApprovals((prev) => ({ ...prev, [id]: { ...(prev[id] ?? EMPTY), note } }));
+    post({ itemId: id, note });
+  };
+
+  const matches = (status: CheckStatus, id: string) =>
+    (statusFilter === "all" || status === statusFilter) &&
+    (!onlyOpen || !isDone(approvals[id]));
 
   const allItems = checklist.flatMap((p) => p.items);
   const doneTotal = allItems.filter((i) => isDone(approvals[i.id])).length;
 
   return (
     <div>
-      {/* Общий прогресс + легенда */}
+      {/* Прогресс + смысл апрува + фильтры */}
       <div className="flex flex-col gap-4 rounded-xl border border-border bg-bg p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-label uppercase text-muted">
-              Общий прогресс · зачёркнуто при 3 апрувах
-            </div>
+            <div className="text-label uppercase text-muted">Общий прогресс</div>
             <div className="mt-2">
               <Bar done={doneTotal} total={allItems.length} />
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            {Object.values(statusMeta).map((s) => (
-              <span
-                key={s.label}
+            <button
+              onClick={() => {
+                setStatusFilter("all");
+                setOnlyOpen(false);
+              }}
+              className={cn(
+                "inline-flex items-center rounded-md px-2 py-0.5 text-xs transition-colors duration-200",
+                statusFilter === "all" && !onlyOpen
+                  ? "bg-ink text-bg"
+                  : "bg-surface-2 text-ink-2",
+              )}
+            >
+              Все
+            </button>
+            <button
+              onClick={() => setOnlyOpen((v) => !v)}
+              className={cn(
+                "inline-flex items-center rounded-md px-2 py-0.5 text-xs transition-colors duration-200",
+                onlyOpen ? "bg-ink text-bg" : "bg-surface-2 text-ink-2",
+              )}
+            >
+              Незакрытые
+            </button>
+            {(Object.keys(statusMeta) as CheckStatus[]).map((k) => (
+              <button
+                key={k}
+                onClick={() =>
+                  setStatusFilter((p) => (p === k ? "all" : k))
+                }
                 className={cn(
-                  "inline-flex items-center rounded-md px-2 py-0.5 text-xs",
-                  chipTone[s.tone],
+                  "inline-flex items-center rounded-md px-2 py-0.5 text-xs transition-colors duration-200",
+                  statusFilter === k
+                    ? "bg-ink text-bg"
+                    : chipTone[statusMeta[k].tone],
                 )}
               >
-                {s.label}
-              </span>
+                {statusMeta[k].label}
+              </button>
             ))}
           </div>
         </div>
         <div className="border-t border-border pt-3 text-xs text-muted">
-          Апрув ставит каждый сам: {approvers.map((a) => a.label).join(" · ")}.
-          Состояние общее — отметки и зачёркивание видят все.
+          Апрув = работа по секции принята и уходит в дизайн. Ставит каждый сам:{" "}
+          {approvers.map((a) => a.label).join(" · ")}. Все 3 → зачёркнуто.
+          Состояние общее (обновляется каждые ~30 сек и при возврате на вкладку).
         </div>
       </div>
 
       {checklist.map((page) => {
+        const visible = page.items.filter((i) => matches(i.status, i.id));
+        if (visible.length === 0) return null;
         const pageDone = page.items.filter((i) => isDone(approvals[i.id])).length;
         return (
           <section key={page.route} className="mt-12">
@@ -131,7 +210,7 @@ export function ContentChecklist() {
             </div>
 
             <ul>
-              {page.items.map((item) => {
+              {visible.map((item) => {
                 const sm = statusMeta[item.status];
                 const a = approvals[item.id] ?? EMPTY;
                 const done = isDone(a);
@@ -159,9 +238,12 @@ export function ContentChecklist() {
                           {item.source}
                         </div>
                       )}
+                      <NoteInput
+                        value={a.note}
+                        onSave={(v) => saveNote(item.id, v)}
+                      />
                     </div>
 
-                    {/* 3 именованных апрува */}
                     <div className="flex shrink-0 items-center gap-2.5">
                       {approvers.map((ap) => (
                         <label
