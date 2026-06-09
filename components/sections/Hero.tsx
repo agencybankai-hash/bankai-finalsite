@@ -1,5 +1,6 @@
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { Pill } from "@/components/ui/Pill";
 import { Reveal } from "@/components/motion/Reveal";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { HeroVisual } from "@/components/sections/HeroVisual";
@@ -36,12 +37,14 @@ export function Hero({
         <div className="grid items-center gap-10 py-14 sm:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:py-24">
           {/* Левая колонка — текст */}
           <Reveal stagger trigger="load" delay={0.3}>
-            <p data-reveal className="mb-5 text-label uppercase text-muted">
-              SEO · Контекст · Сайты
-            </p>
-            {/* H1 — длинная SEO-строка (ключ+гео), не слоган: держим text-h1,
-                не display, иначе строки выталкивают CTA за сгиб */}
-            <SplitReveal as="h1" className="text-h1 text-ink">
+            <div data-reveal className="mb-5">
+              <Pill variant="soft" size="sm" className="uppercase tracking-wide">
+                SEO · Контекст · Сайты
+              </Pill>
+            </div>
+            {/* H1 — длинная SEO-строка (ключ+гео), не слоган: размер text-hero
+                (меньше h1), чтобы строка ложилась в 3 строки и не давила колонку */}
+            <SplitReveal as="h1" className="text-hero text-ink">
               {titleText}
             </SplitReveal>
             {subtitle && (

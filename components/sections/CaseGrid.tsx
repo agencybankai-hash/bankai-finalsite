@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Badge } from "@/components/ui/Badge";
+import { Pill } from "@/components/ui/Pill";
 import { Reveal } from "@/components/motion/Reveal";
 import type { CaseStudy } from "@/content/types";
 
@@ -16,14 +16,23 @@ export function CaseGrid({ items }: { items: CaseStudy[] }) {
           key={c.slug}
           href={`/cases/${c.slug}`}
           data-reveal
-          className="group flex flex-col rounded-xl border border-border bg-bg p-7 transition duration-300 ease-osmo hover:-translate-y-1 hover:border-ink"
+          className="group flex flex-col rounded-xl border border-border bg-bg p-7 shadow-card transition duration-300 ease-osmo hover:-translate-y-1 hover:border-ink hover:shadow-card-hover"
         >
           <div className="flex flex-wrap gap-2">
             {c.template && (
-              <Badge className="border-ink bg-ink text-bg">Образец</Badge>
+              <Pill variant="solid" size="sm">
+                Образец
+              </Pill>
+            )}
+            {c.inProgress && (
+              <Pill size="sm" className="bg-accent text-accent-fg">
+                В работе
+              </Pill>
             )}
             {c.channels.map((ch) => (
-              <Badge key={ch}>{ch}</Badge>
+              <Pill key={ch} variant="outline" size="sm">
+                {ch}
+              </Pill>
             ))}
           </div>
 

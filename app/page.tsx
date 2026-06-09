@@ -1,6 +1,8 @@
-import Link from "next/link";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
+import { IconBadge } from "@/components/ui/IconBadge";
+import { FloatCard } from "@/components/ui/FloatCard";
+import type { IconName } from "@/components/ui/Icon";
 import { Hero } from "@/components/sections/Hero";
 import { TrustBar } from "@/components/sections/TrustBar";
 import { ClientsBar } from "@/components/sections/ClientsBar";
@@ -8,13 +10,14 @@ import { BulletList } from "@/components/sections/BulletList";
 import { SystemSection } from "@/components/sections/SystemSection";
 import { FeatureGrid } from "@/components/sections/FeatureGrid";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
-import { CaseGrid } from "@/components/sections/CaseGrid";
+import { CaseExplorer } from "@/components/sections/CaseExplorer";
 import { ServicesGrid } from "@/components/sections/ServicesGrid";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { Pricing } from "@/components/sections/Pricing";
 import { FAQ } from "@/components/sections/FAQ";
 import { CTASection } from "@/components/sections/CTASection";
 import { LeadMagnet } from "@/components/sections/LeadMagnet";
+import { Reveal } from "@/components/motion/Reveal";
 import {
   hero,
   trustStats,
@@ -32,6 +35,9 @@ import { homeCases } from "@/content/cases";
 import { testimonials } from "@/content/testimonials";
 import { homeFaq } from "@/content/faq";
 
+// Иконки под боли (донор #3 — карточки с icon-бейджами)
+const problemIcons: IconName[] = ["gauge", "target", "chart"];
+
 export default function Home() {
   return (
     <>
@@ -48,16 +54,42 @@ export default function Home() {
 
       <TrustBar items={trustStats} />
 
-      {/* Проблема */}
+      {/* Проблема — донор #3: текст слева, карточки-боли справа */}
       <Section>
-        <SectionHeader title={problem.title} lead={problem.lead} />
-        <div className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-          {problem.groups.map((g) => (
-            <div key={g.label}>
-              <h3 className="text-base font-semibold text-ink">{g.label}</h3>
-              <BulletList items={g.items} columns={1} className="mt-5" />
+        <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+          <div>
+            <SectionHeader title={problem.title} lead={problem.lead} />
+            <div className="mt-8">
+              <Button href="/contacts" size="lg" variant="accent">
+                Получить бесплатный аудит
+              </Button>
             </div>
-          ))}
+          </div>
+          <div className="relative">
+            <Reveal stagger className="space-y-4">
+              {problem.groups.map((g, i) => (
+                <div
+                  key={g.label}
+                  data-reveal
+                  className="rounded-xl border border-border bg-bg p-6 shadow-card"
+                >
+                  <div className="flex items-center gap-3">
+                    <IconBadge icon={problemIcons[i]} />
+                    <h3 className="text-base font-semibold text-ink">{g.label}</h3>
+                  </div>
+                  <BulletList items={g.items} columns={1} className="mt-4" />
+                </div>
+              ))}
+            </Reveal>
+            <div className="pointer-events-none absolute -right-3 -top-6 hidden w-44 lg:block">
+              <FloatCard
+                float
+                label="Заявки утекают"
+                value="−37%"
+                icon="trending"
+              />
+            </div>
+          </div>
         </div>
       </Section>
 
@@ -80,31 +112,24 @@ export default function Home() {
           eyebrow="Услуги"
           title={servicesPreview.title}
           lead={servicesPreview.lead}
+          align="center"
         />
         <div className="mt-12">
           <ServicesGrid cards={servicesPreview.cards} />
         </div>
       </Section>
 
-      {/* Кейсы */}
+      {/* Кейсы — донор #6: pill-фильтры + карточки */}
       <Section>
-        <SectionHeader title="Результаты клиентов" />
+        <SectionHeader eyebrow="Кейсы" title="Результаты клиентов" />
         <div className="mt-10">
-          <CaseGrid items={homeCases} />
-        </div>
-        <div className="mt-10">
-          <Link
-            href="/cases"
-            className="text-sm font-medium text-ink underline underline-offset-4"
-          >
-            Все кейсы →
-          </Link>
+          <CaseExplorer items={homeCases} allHref="/cases" />
         </div>
       </Section>
 
       {/* Отзывы */}
       <Section tone="surface">
-        <SectionHeader title="Что говорят клиенты" />
+        <SectionHeader eyebrow="Отзывы" title="Что говорят клиенты" align="center" />
         <div className="mt-10">
           <Testimonials items={testimonials} />
         </div>
@@ -112,7 +137,7 @@ export default function Home() {
 
       {/* Что вы получаете */}
       <Section>
-        <SectionHeader title={homeIncludes.title} />
+        <SectionHeader eyebrow="Что входит" title={homeIncludes.title} align="center" />
         <div className="mt-10">
           <FeatureGrid items={homeIncludes.items} />
         </div>
@@ -120,7 +145,7 @@ export default function Home() {
 
       {/* Процесс */}
       <Section tone="surface">
-        <SectionHeader title={process.title} />
+        <SectionHeader eyebrow="Процесс" title={process.title} align="center" />
         <div className="mt-10">
           <ProcessSteps steps={process.steps} />
         </div>
@@ -140,9 +165,12 @@ export default function Home() {
               </Button>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-6 lg:pl-8">
+          <div className="grid grid-cols-2 gap-4 lg:pl-8">
             {trustStats.map((s) => (
-              <div key={s.label}>
+              <div
+                key={s.label}
+                className="rounded-xl border border-border bg-bg p-5 shadow-card"
+              >
                 <div className="text-2xl font-semibold text-ink">{s.value}</div>
                 <div className="mt-1 text-sm text-ink-2">{s.label}</div>
               </div>
@@ -154,8 +182,10 @@ export default function Home() {
       {/* Что мы гарантируем */}
       <Section tone="surface">
         <SectionHeader
+          eyebrow="Гарантии"
           title={guarantee.title}
           lead={guarantee.lead}
+          align="center"
         />
         <div className="mt-10">
           <FeatureGrid items={guarantee.items} />
@@ -165,8 +195,10 @@ export default function Home() {
       {/* Тарифы */}
       <Section>
         <SectionHeader
+          eyebrow="Тарифы"
           title="Прозрачные тарифы"
           lead="Платите по тарифу за каждый канал, рекламный бюджет - отдельно и напрямую, без скрытых наценок. Это инвестиция: на старте считаем, за сколько окупится, и не беремся, если в вашей нише не окупается."
+          align="center"
         />
         <div className="mt-10">
           <Pricing />
@@ -177,7 +209,7 @@ export default function Home() {
 
       {/* FAQ */}
       <Section>
-        <SectionHeader title="Частые вопросы" />
+        <SectionHeader eyebrow="FAQ" title="Частые вопросы" align="center" />
         <div className="mt-8">
           <FAQ items={homeFaq} />
         </div>

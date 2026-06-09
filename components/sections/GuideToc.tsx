@@ -82,12 +82,14 @@ export function GuideToc({ sections }: { sections: GuideSection[] }) {
         <nav className="border-t border-border px-3 py-3">{list}</nav>
       </details>
 
-      {/* Десктоп: липкий сайдбар */}
-      <nav className="hidden lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-auto">
-        <div className="mb-3 text-xs font-medium uppercase tracking-wide text-muted">
-          Содержание
+      {/* Десктоп: липкий сайдбар в плашке */}
+      <nav className="hidden lg:sticky lg:top-24 lg:block">
+        <div className="rounded-xl border border-border bg-surface p-4 lg:max-h-[calc(100vh-7rem)] lg:overflow-auto">
+          <div className="mb-3 pl-3 text-xs font-medium uppercase tracking-wide text-muted">
+            Содержание
+          </div>
+          {list}
         </div>
-        {list}
       </nav>
     </>
   );

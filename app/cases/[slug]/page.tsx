@@ -44,7 +44,12 @@ export default async function CaseDetailPage({ params }: Params) {
             </Link>
             <div className="mt-6 flex flex-wrap items-center gap-2">
               {c.template && (
-                <Badge className="border-ink bg-ink text-bg">Образец</Badge>
+                <Badge className="border-ink! bg-ink! text-bg!">Образец</Badge>
+              )}
+              {c.inProgress && (
+                <Badge className="border-accent! bg-accent! text-accent-fg!">
+                  В работе
+                </Badge>
               )}
               {c.channels.map((ch) => (
                 <Badge key={ch}>{ch}</Badge>
@@ -65,6 +70,12 @@ export default async function CaseDetailPage({ params }: Params) {
               <p className="mt-6 max-w-2xl rounded-lg border border-dashed border-border bg-surface px-4 py-3 text-sm leading-relaxed text-ink-2">
                 Демонстрационный шаблон подачи. Цифры иллюстративные - заменяются
                 реальными метриками проекта при упаковке кейса.
+              </p>
+            )}
+            {c.inProgress && (
+              <p className="mt-6 max-w-2xl rounded-lg border border-dashed border-accent bg-surface px-4 py-3 text-sm leading-relaxed text-ink-2">
+                Проект в работе. Здесь - задача и план; результаты в цифрах
+                обновим после завершения и запуска.
               </p>
             )}
             <dl className="mt-8 grid grid-cols-2 gap-6 border-t border-border pt-6 sm:grid-cols-4">
@@ -195,11 +206,13 @@ export default async function CaseDetailPage({ params }: Params) {
       {/* Результаты */}
       <Section tone="surface">
         <SectionHeader
-          title="Цифры проекта"
+          title={c.inProgress ? "Результаты" : "Цифры проекта"}
           lead={
-            c.template
-              ? "Цифры иллюстративные - образец подачи результатов."
-              : "Метрики реальные; часть закрыта по NDA и показывается на встрече."
+            c.inProgress
+              ? "Проект в работе - результаты в цифрах обновим после завершения."
+              : c.template
+                ? "Цифры иллюстративные - образец подачи результатов."
+                : "Метрики реальные; часть закрыта по NDA и показывается на встрече."
           }
         />
         <div className="mt-10 space-y-10">

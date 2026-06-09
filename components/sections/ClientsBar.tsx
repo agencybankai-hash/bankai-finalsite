@@ -29,7 +29,7 @@ export function ClientsBar({
         {items.map((c) => (
           <div
             key={c.name}
-            className="flex h-14 w-44 shrink-0 items-center justify-center px-2"
+            className="mx-2.5 flex h-16 w-44 shrink-0 items-center justify-center rounded-xl border border-border bg-bg px-4 shadow-card"
           >
             {c.logo ? (
               // eslint-disable-next-line @next/next/no-img-element

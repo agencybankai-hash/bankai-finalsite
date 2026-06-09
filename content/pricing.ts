@@ -4,6 +4,7 @@ export type PricingPlan = {
   sub: string;
   unit: string;
   includes: string[];
+  featured?: boolean;
 };
 
 export const pricingPlans: PricingPlan[] = [
@@ -24,6 +25,7 @@ export const pricingPlans: PricingPlan[] = [
     price: "от 350 000 ₸",
     sub: "≈ $750",
     unit: "в месяц за ведение",
+    featured: true,
     includes: [
       "Запуск и структура кампаний",
       "Управление ставками и бюджетом",

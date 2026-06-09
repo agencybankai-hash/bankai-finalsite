@@ -1,5 +1,6 @@
 import { cn, nbsp } from "@/lib/utils";
 import { Container } from "./Container";
+import { Pill } from "./Pill";
 
 type Tone = "default" | "surface" | "ink";
 
@@ -57,7 +58,11 @@ export function SectionHeader({
       )}
     >
       {eyebrow && (
-        <p className="mb-3 text-label uppercase text-muted">{eyebrow}</p>
+        <div className={cn("mb-4", align === "center" && "flex justify-center")}>
+          <Pill variant="soft" size="sm" className="uppercase tracking-wide">
+            {eyebrow}
+          </Pill>
+        </div>
       )}
       <h2 className="text-h2 text-ink">{nbsp(title)}</h2>
       {lead && <p className="mt-4 text-lead text-ink-2">{nbsp(lead)}</p>}

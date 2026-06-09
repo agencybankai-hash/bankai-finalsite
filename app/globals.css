@@ -22,6 +22,10 @@
   /* Брендовый акцент (точечно: CTA, марка, маркер). */
   --color-accent: #f14736; /* коралл */
   --color-accent-fg: #ffffff; /* текст на акценте */
+  /* Мягкий тон акцента (донор metatag): icon-бейджи, eyebrow-pill,
+     заливка активных pill-фильтров. Коралл на тёплом фоне. */
+  --color-accent-soft: #fde6e2; /* ~12% */
+  --color-accent-soft-2: #fbd3cc; /* глубже */
 
   /* ── Типо-шкала (Inter, fluid clamp; иерархия размером+трекингом) ── */
   /* lh 1.05: тугой display, но кириллице чуть больше воздуха, чем латинице
@@ -35,6 +39,13 @@
   --text-h1--line-height: 1.02;
   --text-h1--letter-spacing: -0.025em;
   --text-h1--font-weight: 600;
+
+  /* hero H1 — длинная SEO-строка: меньше h1, чтобы ложилась в 3 строки
+     и не доминировала над колонкой (см. Hero.tsx) */
+  --text-hero: clamp(2rem, 2.2vw + 0.75rem, 2.5rem);
+  --text-hero--line-height: 1.1;
+  --text-hero--letter-spacing: -0.02em;
+  --text-hero--font-weight: 600;
 
   --text-h2: clamp(1.875rem, 2.5vw + 0.75rem, 3rem);
   --text-h2--line-height: 1.05;
@@ -58,11 +69,18 @@
   --text-label--letter-spacing: 0.08em;
   --text-label--font-weight: 500;
 
-  /* ── Радиусы: ужаты к «точному» Osmo (сквозная консолидация) ── */
-  --radius-md: 0.375rem; /* 6px — кнопки */
-  --radius-lg: 0.375rem; /* 6px */
-  --radius-xl: 0.5rem; /* 8px — карточки */
-  --radius-2xl: 0.75rem;
+  /* ── Радиусы: крупнее под донора metatag (мягкие карточки) ── */
+  --radius-md: 0.5rem; /* 8px — кнопки */
+  --radius-lg: 0.5rem; /* 8px */
+  --radius-xl: 1rem; /* 16px — карточки */
+  --radius-2xl: 1.25rem; /* 20px — крупные блоки/full-bleed */
+
+  /* ── Тени: мягкие, тёплый тон (донор metatag) ── */
+  --shadow-card: 0 1px 2px rgba(28, 26, 24, 0.04),
+    0 6px 20px -8px rgba(28, 26, 24, 0.1);
+  --shadow-card-hover: 0 2px 6px rgba(28, 26, 24, 0.06),
+    0 18px 40px -14px rgba(28, 26, 24, 0.16);
+  --shadow-float: 0 10px 34px -8px rgba(28, 26, 24, 0.2);
 
   /* ── Моторика: одна сигнатура (донор Osmo) ── */
   --ease-osmo: cubic-bezier(0.625, 0.05, 0, 1);
@@ -114,6 +132,26 @@ footer a {
 .split-line {
   padding-bottom: 0.18em;
   margin-bottom: -0.18em;
+}
+
+/* Лёгкий float для floating-карточек (донор metatag). Задержку варьируем
+   инлайн (animation-delay). Отключается при prefers-reduced-motion. */
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.float-soft {
+  animation: float-soft 6s var(--ease-osmo) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .float-soft {
+    animation: none;
+  }
 }
 
 /* Скролл отдаём Lenis (native smooth убран, чтобы не дублировать). */

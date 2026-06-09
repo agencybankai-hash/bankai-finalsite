@@ -12,9 +12,15 @@ export function Testimonials({ items }: { items: Testimonial[] }) {
       {items.map((t) => (
         <figure
           key={t.role}
-          className="flex flex-col rounded-xl border border-border bg-bg p-7"
+          className="flex flex-col rounded-xl border border-border bg-bg p-7 shadow-card"
         >
-          <span aria-hidden className="mb-6 block h-0.5 w-8 bg-accent" />
+          <div aria-hidden className="mb-5 flex gap-0.5 text-accent">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <span key={i} className="text-sm">
+                ★
+              </span>
+            ))}
+          </div>
           <blockquote className="flex-1">
             <SplitReveal
               as="p"

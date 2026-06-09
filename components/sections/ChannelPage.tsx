@@ -3,6 +3,8 @@ import { cn } from "@/lib/utils";
 import { Container } from "@/components/ui/Container";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
+import { Pill } from "@/components/ui/Pill";
+import { Icon } from "@/components/ui/Icon";
 import { Hero } from "@/components/sections/Hero";
 import { BulletList } from "@/components/sections/BulletList";
 import { FeatureGrid } from "@/components/sections/FeatureGrid";
@@ -64,7 +66,7 @@ export function ChannelPage({ channel }: { channel: ServiceChannel }) {
       <Section>
         <SectionHeader title="Кому подходит" />
         <div className="mt-8">
-          <BulletList items={channel.audience} />
+          <BulletList items={channel.audience} variant="check" />
         </div>
       </Section>
 
@@ -78,7 +80,7 @@ export function ChannelPage({ channel }: { channel: ServiceChannel }) {
 
       {/* Что входит */}
       <Section>
-        <SectionHeader title="Что мы делаем" />
+        <SectionHeader eyebrow="Что входит" title="Что мы делаем" align="center" />
         <div className="mt-10">
           <FeatureGrid items={channel.includes} />
         </div>
@@ -86,7 +88,7 @@ export function ChannelPage({ channel }: { channel: ServiceChannel }) {
 
       {/* Процесс */}
       <Section tone="surface">
-        <SectionHeader title="Как мы работаем" />
+        <SectionHeader eyebrow="Процесс" title="Как мы работаем" align="center" />
         <div className="mt-10">
           <ProcessSteps steps={channel.process} />
         </div>
@@ -116,7 +118,9 @@ export function ChannelPage({ channel }: { channel: ServiceChannel }) {
       {/* Тарифы */}
       <Section>
         <SectionHeader
+          eyebrow="Тарифы"
           title={channel.plans ? "Прозрачные тарифы" : "Прозрачный тариф"}
+          align="center"
         />
         {channel.plans ? (
           <div className="mt-10 grid gap-5 lg:grid-cols-3">
@@ -124,10 +128,15 @@ export function ChannelPage({ channel }: { channel: ServiceChannel }) {
               <div
                 key={p.name}
                 className={cn(
-                  "flex flex-col rounded-xl border bg-bg p-6",
-                  p.featured ? "border-ink" : "border-border",
+                  "flex flex-col rounded-xl border bg-bg p-6 shadow-card",
+                  p.featured ? "border-accent" : "border-border",
                 )}
               >
+                {p.featured && (
+                  <Pill variant="soft" size="sm" className="mb-3 self-start">
+                    Популярно
+                  </Pill>
+                )}
                 <h3 className="text-base font-semibold text-ink">{p.name}</h3>
                 <div className="mt-4 flex items-baseline gap-2">
                   <span className="text-2xl font-semibold text-ink">{p.price}</span>
@@ -136,9 +145,10 @@ export function ChannelPage({ channel }: { channel: ServiceChannel }) {
                 <ul className="mt-5 space-y-2.5">
                   {p.includes.map((i) => (
                     <li key={i} className="flex gap-2.5 text-sm text-ink-2">
-                      <span aria-hidden className="text-muted">
-                        —
-                      </span>
+                      <Icon
+                        name="check"
+                        className="mt-0.5 h-4 w-4 shrink-0 text-accent"
+                      />
                       <span>{i}</span>
                     </li>
                   ))}
@@ -147,7 +157,7 @@ export function ChannelPage({ channel }: { channel: ServiceChannel }) {
             ))}
           </div>
         ) : (
-          <div className="mt-8 flex flex-col gap-4 rounded-xl border border-border bg-bg p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-8 flex flex-col gap-4 rounded-xl border border-border bg-bg p-6 shadow-card sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-semibold text-ink">
@@ -170,7 +180,7 @@ export function ChannelPage({ channel }: { channel: ServiceChannel }) {
 
       {/* Часть системы */}
       <Section tone="surface">
-        <div className="rounded-xl border border-ink bg-bg p-8">
+        <div className="rounded-2xl border border-ink bg-bg p-8 shadow-card">
           <p className="max-w-3xl text-lg leading-relaxed text-ink">
             {channel.partOfSystem}
           </p>
@@ -186,7 +196,7 @@ export function ChannelPage({ channel }: { channel: ServiceChannel }) {
       {/* Гайд по каналу - «нет секретов» */}
       {guideSlugMap[channel.slug] && (
         <Section>
-          <div className="rounded-xl border border-border bg-surface p-8">
+          <div className="rounded-2xl border border-border bg-surface p-8 shadow-card">
             <div className="text-xs uppercase tracking-wide text-muted">
               Нет секретов
             </div>
@@ -206,7 +216,7 @@ export function ChannelPage({ channel }: { channel: ServiceChannel }) {
 
       {/* FAQ */}
       <Section>
-        <SectionHeader title="Частые вопросы" />
+        <SectionHeader eyebrow="FAQ" title="Частые вопросы" align="center" />
         <div className="mt-8">
           <FAQ items={channel.faq} />
         </div>

@@ -1,4 +1,6 @@
-import { Badge } from "@/components/ui/Badge";
+import { Pill } from "@/components/ui/Pill";
+import { IconBadge } from "@/components/ui/IconBadge";
+import { Blobs } from "@/components/ui/Blobs";
 import { Reveal } from "@/components/motion/Reveal";
 
 type Layer = {
@@ -23,15 +25,15 @@ export function SystemSection({
           <div
             key={l.tag}
             data-reveal
-            className="flex flex-col rounded-xl border border-border bg-bg p-7"
+            className="flex flex-col rounded-xl border border-border bg-bg p-7 shadow-card"
           >
             <div className="flex items-start justify-between">
-              <span className="text-h2 leading-none text-surface-2">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <Badge>{l.tag}</Badge>
+              <IconBadge size="md">{String(i + 1).padStart(2, "0")}</IconBadge>
+              <Pill variant="outline" size="sm">
+                {l.tag}
+              </Pill>
             </div>
-            <div className="mt-8 text-h3 text-ink">{l.role}</div>
+            <div className="mt-6 text-h3 text-ink">{l.role}</div>
             <p className="mt-2 text-sm leading-relaxed text-ink-2">{l.text}</p>
             {l.plain && (
               <details className="group mt-auto rounded-lg border-l-2 border-ink bg-surface-2 pt-4 [&[open]]:pt-0">
@@ -56,11 +58,12 @@ export function SystemSection({
       </Reveal>
 
       {/* Итог — тёмный акцентный вывод (перекличка с hero-панелью) */}
-      <Reveal className="mt-5 flex flex-col gap-3 rounded-xl bg-ink p-7 text-bg sm:flex-row sm:items-center sm:gap-6">
-        <span className="shrink-0 text-label uppercase text-accent">
+      <Reveal className="relative mt-5 flex flex-col gap-3 overflow-hidden rounded-2xl bg-ink p-8 text-bg sm:flex-row sm:items-center sm:gap-6">
+        <Blobs tone="dark" />
+        <span className="relative shrink-0 text-label uppercase text-accent">
           Одна система
         </span>
-        <p className="text-base leading-relaxed text-bg/90">{result}</p>
+        <p className="relative text-base leading-relaxed text-bg/90">{result}</p>
       </Reveal>
     </div>
   );

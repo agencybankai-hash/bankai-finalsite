@@ -7,6 +7,7 @@ import { CTASection } from "@/components/sections/CTASection";
 import {
   kzCases,
   intlCases,
+  inProgressCases,
   templateCases,
   casesIntro,
   casesStats,
@@ -44,8 +45,8 @@ export default function CasesPage() {
       {intlCases.length > 0 && (
         <Section tone="surface">
           <SectionHeader
-            title="Кейсы на рынке США"
-            lead="Проекты на конкурентном рынке США - от B2B SaaS до сервисного бизнеса."
+            title="Кейсы на зарубежных рынках"
+            lead="Проекты на конкурентных рынках США, России и Монголии - от B2B SaaS до сервисного бизнеса и разработки."
           />
           <div className="mt-10">
             <CaseGrid items={intlCases} />
@@ -53,8 +54,20 @@ export default function CasesPage() {
         </Section>
       )}
 
-      {templateCases.length > 0 && (
+      {inProgressCases.length > 0 && (
         <Section>
+          <SectionHeader
+            title="Сейчас в работе"
+            lead="Проекты в активной работе - задача и подход уже здесь, результаты в цифрах обновим по завершении."
+          />
+          <div className="mt-10">
+            <CaseGrid items={inProgressCases} />
+          </div>
+        </Section>
+      )}
+
+      {templateCases.length > 0 && (
+        <Section tone="surface">
           <SectionHeader
             title="Образцы подачи кейсов"
             lead="Демонстрационные шаблоны под рынок Казахстана - SEO, контекст, разработка и комбинированный. Цифры иллюстративные; показывают структуру и подачу сильного кейса."

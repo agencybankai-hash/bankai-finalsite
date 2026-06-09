@@ -7,9 +7,13 @@ export function TrustBar({ items }: { items: StatItem[] }) {
   return (
     <div className="border-b border-border bg-surface">
       <Container>
-        <Reveal stagger className="grid grid-cols-2 gap-6 py-10 sm:grid-cols-4">
+        <Reveal stagger className="grid grid-cols-2 gap-4 py-10 sm:grid-cols-4">
           {items.map((s) => (
-            <div key={s.label} data-reveal>
+            <div
+              key={s.label}
+              data-reveal
+              className="rounded-xl border border-border bg-bg p-6 shadow-card"
+            >
               <Stat value={s.value} label={s.label} animate />
             </div>
           ))}

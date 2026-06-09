@@ -10,7 +10,13 @@ export type ServicePlan = {
   featured?: boolean;
 };
 export type FaqItem = { q: string; a: string };
-export type Feature = { title: string; text: string; details?: string };
+export type Feature = {
+  title: string;
+  text: string;
+  details?: string;
+  /** ключ иконки (см. components/ui/Icon) для icon-бейджа карточки */
+  icon?: string;
+};
 
 /** Клиент для логотипной полосы. logo - путь к файлу (если есть), иначе wordmark-плейсхолдер; nda - показывать обезличенным. */
 export type ClientLogo = { name: string; logo?: string; nda?: boolean };
@@ -101,6 +107,8 @@ export type CaseStudy = {
   /* --- Сильные приёмы подачи (опционально) --- */
   /** Образец-шаблон, а не реальный клиент. */
   template?: boolean;
+  /** Проект в работе: бейдж «В работе», результаты — заглушка до завершения. */
+  inProgress?: boolean;
   /** Квантифицированный заголовок-результат (хук). */
   headline?: string;
   /** Срок проекта. */
