@@ -36,7 +36,7 @@ export function ClientsBar({
               <img
                 src={c.logo}
                 alt={c.name}
-                className="max-h-7 w-auto opacity-60 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0"
+                className="max-h-7 w-auto rounded-md opacity-60 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0"
               />
             ) : (
               <span className="truncate text-sm font-semibold uppercase tracking-wide text-muted transition-colors duration-300 hover:text-ink">

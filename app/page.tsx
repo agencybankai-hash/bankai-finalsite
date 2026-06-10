@@ -24,6 +24,7 @@ import {
   problem,
   system,
   servicesPreview,
+  homeAudience,
   homeIncludes,
   process,
   companyBlock,
@@ -93,7 +94,7 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* Система - яблочная метафора */}
+      {/* Система - молочная метафора */}
       <Section id="services" tone="surface">
         <SectionHeader eyebrow="Как это работает" title={system.title} lead={system.lead} />
         <div className="mt-12">
@@ -103,6 +104,21 @@ export default function Home() {
           <p className="max-w-3xl text-sm leading-relaxed text-ink-2">
             {system.targeted}
           </p>
+        </div>
+      </Section>
+
+      {/* Кому подходим - квалификация аудитории между системой и оффером */}
+      <Section>
+        <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr]">
+          <SectionHeader eyebrow="Кому подходим" title={homeAudience.title} />
+          <Reveal>
+            <BulletList
+              items={homeAudience.items}
+              variant="check"
+              columns={1}
+              className="lg:mt-2"
+            />
+          </Reveal>
         </div>
       </Section>
 
@@ -197,7 +213,7 @@ export default function Home() {
         <SectionHeader
           eyebrow="Тарифы"
           title="Прозрачные тарифы"
-          lead="Платите по тарифу за каждый канал, рекламный бюджет - отдельно и напрямую, без скрытых наценок. Это инвестиция: на старте считаем, за сколько окупится, и не беремся, если в вашей нише не окупается."
+          lead="Платите по тарифу за каждый канал, рекламный бюджет - отдельно и напрямую, без скрытых наценок. Это инвестиция: на старте считаем, за сколько окупится, и не берёмся, если в вашей нише не окупается."
           align="center"
         />
         <div className="mt-10">

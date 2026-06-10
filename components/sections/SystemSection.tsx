@@ -2,12 +2,17 @@ import { Pill } from "@/components/ui/Pill";
 import { IconBadge } from "@/components/ui/IconBadge";
 import { Blobs } from "@/components/ui/Blobs";
 import { Reveal } from "@/components/motion/Reveal";
+import {
+  SystemIllustration,
+  type SystemVisual,
+} from "@/components/sections/SystemIllustration";
 
 type Layer = {
   tag: string;
   role: string;
   text: string;
   plain?: string;
+  visual?: SystemVisual;
   illustration?: string;
 };
 
@@ -33,7 +38,12 @@ export function SystemSection({
                 {l.tag}
               </Pill>
             </div>
-            <div className="mt-6 text-h3 text-ink">{l.role}</div>
+            {l.visual && (
+              <div className="mt-6 border-b border-border pb-5">
+                <SystemIllustration variant={l.visual} label={l.illustration} />
+              </div>
+            )}
+            <div className="mt-5 text-h3 text-ink">{l.role}</div>
             <p className="mt-2 text-sm leading-relaxed text-ink-2">{l.text}</p>
             {l.plain && (
               <details className="group mt-auto rounded-lg border-l-2 border-ink bg-surface-2 pt-4 [&[open]]:pt-0">

@@ -66,7 +66,7 @@ export function HeroVisual() {
       />
 
       {/* Центральная тёмная панель — «снимок результата» */}
-      <div className="rounded-2xl bg-ink p-7 text-bg shadow-float">
+      <div className="rounded-2xl bg-ink p-7 pb-14 text-bg shadow-float">
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-2 text-label uppercase text-bg/55">
             <span className="h-2 w-2 rounded-full bg-accent" aria-hidden />
@@ -103,7 +103,7 @@ export function HeroVisual() {
 
       {/* Floating-карточка-отзыв (донор metatag — стеклянные карточки) */}
       <div
-        className="float-soft absolute -left-7 -top-9 w-48 rounded-xl border border-border bg-bg p-3.5 shadow-float"
+        className="float-soft absolute -left-7 -top-14 w-48 rounded-xl border border-border bg-bg p-3.5 shadow-float"
         style={{ animationDelay: "-1.5s" }}
       >
         <div className="flex gap-0.5 text-accent" aria-hidden>
@@ -119,7 +119,7 @@ export function HeroVisual() {
       </div>
 
       {/* Floating-карточка-метрика */}
-      <div className="absolute -bottom-6 -right-5 w-44">
+      <div className="absolute -bottom-12 -right-7 w-44">
         <FloatCard
           float
           style={{ animationDelay: "-3.5s" }}
