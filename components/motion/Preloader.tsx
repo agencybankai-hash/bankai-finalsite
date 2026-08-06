@@ -5,12 +5,28 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, prefersReducedMotion, EASE, markIntroDone } from "@/lib/motion";
 
+const SEEN_KEY = "bankai:intro";
+
+function introSeen(): boolean {
+  try {
+    return sessionStorage.getItem(SEEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markIntroSeen(): void {
+  try {
+    sessionStorage.setItem(SEEN_KEY, "1");
+  } catch {}
+}
+
 /**
- * Прелоадер-заставка. Играет на каждой полной загрузке (на внутренних
- * SPA-переходах не ремаунтится → не мешает). Гарантированно мягкая,
- * ~2с, по времени (не по реальному прогрессу) — стильный интро-жест.
- * В момент подъёма занавеса вызывает markIntroDone() → первый экран
- * раскрывается синхронно с уходом занавеса. reduced-motion → мгновенно.
+ * Прелоадер-заставка. Полный таймлайн (~2с) играет один раз за сессию —
+ * повторные полные загрузки скипают занавес, чтобы не держать первый
+ * экран скрытым и не тянуть LCP. В момент подъёма занавеса (или сразу
+ * при скипе) вызывает markIntroDone() → первый экран раскрывается
+ * синхронно с уходом занавеса. reduced-motion → мгновенно.
  */
 export function Preloader() {
   const ref = useRef<HTMLDivElement>(null);
@@ -21,11 +37,13 @@ export function Preloader() {
       const el = ref.current;
       if (!el) return;
 
-      if (prefersReducedMotion()) {
+      if (prefersReducedMotion() || introSeen()) {
         gsap.set(el, { display: "none" });
         markIntroDone();
         return;
       }
+
+      markIntroSeen();
 
       const word = el.querySelector("[data-pl-word]");
       const bar = el.querySelector("[data-pl-bar]");

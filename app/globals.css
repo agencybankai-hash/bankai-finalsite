@@ -15,12 +15,15 @@
   --color-surface: #f2f0ec; /* подложка чередующихся секций */
   --color-surface-2: #e9e6e0; /* глубже */
   --color-border: #e2dfd8;
-  --color-muted: #9c968c; /* подписи/плейсхолдеры */
+  --color-muted: #767068; /* подписи/плейсхолдеры — 4.6:1 на bg, 4.3:1 на surface */
   --color-ink-2: #57534d; /* вторичный текст */
   --color-ink: #1c1a18; /* near-black — основной текст */
 
-  /* Брендовый акцент (точечно: CTA, марка, маркер). */
-  --color-accent: #f14736; /* коралл */
+  /* Брендовый акцент (точечно: CTA, марка, маркер).
+     Базовый тон затемнён до AA: белый на нём — 4.8:1. */
+  --color-accent: #d63324; /* коралл */
+  --color-accent-strong: #d63324; /* заливка CTA — алиас базового */
+  --color-accent-bright: #f14736; /* исходный коралл — декор и тёмные секции */
   --color-accent-fg: #ffffff; /* текст на акценте */
   /* Мягкий тон акцента (донор metatag): icon-бейджи, eyebrow-pill,
      заливка активных pill-фильтров. Коралл на тёплом фоне. */
@@ -98,13 +101,15 @@
 
 /* ── Инверсия секций (tone="ink"): локально переопределяем нейтрали,
    и все utility text-ink/bg-surface/border-border внутри
-   инвертируются автоматически. Акцент не трогаем. ── */
+   инвертируются автоматически. Акцент возвращаем к исходному
+   коралу: на тёмном он даёт 4.7:1, затемнённый — нет. ── */
 .tone-ink {
   --color-bg: #1c1a18;
   --color-surface: #232120;
   --color-surface-2: #2c2a28;
   --color-border: #38332f;
   --color-muted: #8a857d;
+  --color-accent: var(--color-accent-bright);
   --color-ink-2: #b8b3aa;
   --color-ink: #f4f2ee;
   background-color: var(--color-bg);
@@ -276,12 +281,15 @@ html.lenis body {
   flex: none;
   accent-color: var(--color-ink);
 }
-/* Формулы и код */
+/* Формулы и код. Блоки в гайдах — текстовые формулы без подсветки,
+   поэтому переносим строки, а не обрезаем по правому краю. */
 .guide-prose pre {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 0.6rem;
   padding: 0.9rem 1.1rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   overflow-x: auto;
   margin: 1.1rem 0;
   font-size: 0.875rem;
@@ -321,6 +329,11 @@ html.lenis body {
   border-top: 1px solid var(--color-border);
   margin: 2.5rem 0;
 }
+/* Линию перед h2 рисует сам заголовок (border-top) — исходный hr прячем,
+   иначе две линии подряд. */
+.guide-prose hr:has(+ h2) {
+  display: none;
+}
 .guide-prose blockquote {
   border-left: 3px solid var(--color-border);
   padding-left: 1rem;
@@ -336,6 +349,10 @@ html.lenis body {
 }
 .guide-prose .gp-callout > :last-child {
   margin-bottom: 0;
+}
+/* Разделитель между разделами затягивает внутрь карточки — гасим. */
+.guide-prose .gp-callout > hr:last-child {
+  display: none;
 }
 /* H3 внутри callout превращается в метку-ярлык (не заголовок) */
 .guide-prose .gp-callout h3 {
@@ -364,10 +381,13 @@ html.lenis body {
 .guide-prose .gp-do {
   margin: 1.6rem 0;
   border: 1px solid var(--color-border);
-  border-left: 3px solid var(--color-ink);
+  border-left: 3px solid var(--color-accent);
   background: var(--color-surface);
   border-radius: 0.7rem;
   padding: 1.15rem 1.3rem;
+}
+.guide-prose .gp-do h3 {
+  color: var(--color-ink);
 }
 
 /* «Где сливают» - заметка-предупреждение */
@@ -392,19 +412,19 @@ html.lenis body {
 .guide-prose .gp-checklist {
   margin: 1.6rem 0;
   border: 1px solid var(--color-border);
-  background: var(--color-surface);
+  border-left: 3px solid var(--color-muted);
+  background: var(--color-bg);
   border-radius: 0.7rem;
   padding: 1.15rem 1.3rem;
 }
 
-/* внутри карточек код/таблицы/инлайн-код выводим на белый фон для контраста */
+/* внутри карточек код/таблицы/инлайн-код выводим на белый фон для контраста
+   (чек-лист сам светлый — там работает базовый surface) */
 .guide-prose .gp-do pre,
-.guide-prose .gp-warn pre,
-.guide-prose .gp-checklist pre {
+.guide-prose .gp-warn pre {
   background: var(--color-bg);
 }
-.guide-prose .gp-do th,
-.guide-prose .gp-checklist th {
+.guide-prose .gp-do th {
   background: var(--color-bg);
 }
 .guide-prose .gp-do :not(pre) > code,

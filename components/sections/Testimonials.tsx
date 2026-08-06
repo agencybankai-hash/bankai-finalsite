@@ -1,10 +1,10 @@
-import { SplitReveal } from "@/components/motion/SplitReveal";
+import { Reveal } from "@/components/motion/Reveal";
 import type { Testimonial } from "@/content/types";
 
 /**
- * Отзывы: цитата — фокус, раскрывается построчно из-под маски на скролле
- * (донор Osmo «Line Reveal Testimonials»). Аватары убраны (отзывы
- * обезличены), акцент-штрих сверху. Атрибуция под разделителем.
+ * Отзывы: цитата — фокус, карточка мягко проявляется на скролле
+ * (построчная маска в DS зарезервирована за крупными заголовками).
+ * Аватары убраны (отзывы обезличены). Атрибуция под разделителем.
  */
 export function Testimonials({ items }: { items: Testimonial[] }) {
   return (
@@ -22,13 +22,9 @@ export function Testimonials({ items }: { items: Testimonial[] }) {
             ))}
           </div>
           <blockquote className="flex-1">
-            <SplitReveal
-              as="p"
-              trigger="scroll"
-              className="text-lg leading-relaxed text-ink"
-            >
+            <Reveal as="p" className="text-lg leading-relaxed text-ink">
               «{t.quote}»
-            </SplitReveal>
+            </Reveal>
           </blockquote>
           <figcaption className="mt-8 border-t border-border pt-5">
             <div className="text-sm font-medium text-ink">{t.author}</div>

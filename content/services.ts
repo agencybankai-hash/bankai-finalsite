@@ -1,5 +1,27 @@
 import type { ServiceChannel } from "./types";
 
+/** Название услуги в падежах - для заголовков H2 на странице канала. */
+export const channelForms: Record<
+  string,
+  { acc: string; gen: string; prep: string }
+> = {
+  seo: {
+    acc: "SEO продвижение",
+    gen: "SEO продвижения",
+    prep: "SEO продвижении",
+  },
+  context: {
+    acc: "контекстную рекламу",
+    gen: "контекстной рекламы",
+    prep: "контекстной рекламе",
+  },
+  web: {
+    acc: "разработку сайта",
+    gen: "разработки сайта",
+    prep: "разработке сайта",
+  },
+};
+
 /* ─────────────────────────  Каналы  ───────────────────────── */
 
 export const channels: ServiceChannel[] = [

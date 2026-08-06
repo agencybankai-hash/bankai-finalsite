@@ -66,7 +66,9 @@ export function HeroVisual() {
       />
 
       {/* Центральная тёмная панель — «снимок результата» */}
-      <div className="rounded-2xl bg-ink p-7 pb-14 text-bg shadow-float">
+      {/* pb с запасом: снизу справа панель перекрывает floating-карточка,
+          которая ещё и качается по вертикали (±8px) */}
+      <div className="rounded-2xl bg-ink p-7 pb-24 text-bg shadow-float">
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-2 text-label uppercase text-bg/55">
             <span className="h-2 w-2 rounded-full bg-accent" aria-hidden />

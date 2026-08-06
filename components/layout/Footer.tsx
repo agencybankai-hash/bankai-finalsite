@@ -86,16 +86,18 @@ export function Footer() {
                   Telegram {contacts.telegram}
                 </a>
               </li>
-              <li>
-                <a
-                  href={contacts.youtubeUrl}
-                  className="hover:text-ink"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  YouTube
-                </a>
-              </li>
+              {contacts.youtubeUrl !== "#" && (
+                <li>
+                  <a
+                    href={contacts.youtubeUrl}
+                    className="hover:text-ink"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    YouTube
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
         </div>

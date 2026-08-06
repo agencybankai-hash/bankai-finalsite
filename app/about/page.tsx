@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Stat } from "@/components/ui/Stat";
-import { MediaPlaceholder } from "@/components/ui/MediaPlaceholder";
 import { Hero } from "@/components/sections/Hero";
 import { FeatureGrid } from "@/components/sections/FeatureGrid";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
 import { CTASection } from "@/components/sections/CTASection";
+import { Reveal } from "@/components/motion/Reveal";
 import { about } from "@/content/about";
 import { process, finalCta } from "@/content/site";
 
 export const metadata: Metadata = {
   title: "О нас",
   description: about.hero.lead,
+  alternates: { canonical: "/about" },
 };
 
 export default function AboutPage() {
@@ -20,20 +21,15 @@ export default function AboutPage() {
       <Hero
         title={about.hero.title}
         subtitle={about.hero.lead}
+        primary={{ label: "Обсудить проект", href: "/contacts" }}
+        badge="О нас"
+        visual={false}
       />
 
       {/* История */}
       <Section>
         <div className="grid gap-10 lg:grid-cols-2">
-          <div>
-            <SectionHeader title={about.story.title} />
-            <div className="mt-8">
-              <MediaPlaceholder label="Видео: о подходе (запись)" ratio="16/9" />
-              <p className="mt-3 text-sm text-muted">
-                Короткий ролик для тех, кому удобнее посмотреть, чем читать.
-              </p>
-            </div>
-          </div>
+          <SectionHeader title={about.story.title} />
           <div className="space-y-8">
             {about.story.blocks.map((b) => (
               <div key={b.heading}>
@@ -57,11 +53,17 @@ export default function AboutPage() {
 
       {/* Цифры */}
       <Section>
-        <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
+        <Reveal stagger className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {about.stats.map((s) => (
-            <Stat key={s.label} value={s.value} label={s.label} />
+            <div
+              key={s.label}
+              data-reveal
+              className="rounded-xl border border-border bg-bg p-6 shadow-card"
+            >
+              <Stat value={s.value} label={s.label} animate />
+            </div>
           ))}
-        </div>
+        </Reveal>
       </Section>
 
       {/* Команда */}
@@ -70,23 +72,24 @@ export default function AboutPage() {
           title={about.team.title}
           lead={about.team.note}
         />
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <Reveal stagger className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {about.team.members.map((m) => (
             <div
               key={m.role}
-              className="rounded-xl border border-border bg-bg p-6"
+              data-reveal
+              className="rounded-xl border border-border bg-bg p-6 shadow-card"
             >
-              <div className="h-14 w-14 rounded-full border border-dashed border-border bg-surface-2" />
+              <div className="h-14 w-14 rounded-full bg-surface-2" />
               <div className="mt-4 text-base font-semibold text-ink">{m.role}</div>
               <div className="mt-1 text-sm text-ink-2">{m.note}</div>
             </div>
           ))}
-        </div>
+        </Reveal>
       </Section>
 
       {/* Дальше - отдел продаж */}
       <Section>
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
           <SectionHeader title={about.beyond.title} />
           <div>
             <p className="text-base leading-relaxed text-ink-2">
@@ -113,13 +116,10 @@ export default function AboutPage() {
       {/* Гео */}
       <Section>
         <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
-          <div>
-            <SectionHeader title={about.geo.title} />
-            <p className="mt-4 text-base leading-relaxed text-ink-2">
-              {about.geo.text}
-            </p>
-          </div>
-          <MediaPlaceholder label="Гео присутствия: KZ + US" ratio="4/3" />
+          <SectionHeader title={about.geo.title} />
+          <p className="text-base leading-relaxed text-ink-2">
+            {about.geo.text}
+          </p>
         </div>
       </Section>
 

@@ -28,8 +28,6 @@ export function MotionProvider({ children }: { children: React.ReactNode }) {
       smoothWheel: true,
     });
     lenisRef.current = lenis;
-    // Доступ для якорных переходов (GuideToc и т.п.).
-    (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
 
     lenis.on("scroll", ScrollTrigger.update);
     const ticker = (time: number) => lenis.raf(time * 1000);
@@ -44,7 +42,6 @@ export function MotionProvider({ children }: { children: React.ReactNode }) {
       gsap.ticker.remove(ticker);
       lenis.destroy();
       lenisRef.current = null;
-      (window as unknown as { __lenis?: Lenis }).__lenis = undefined;
     };
   }, []);
 

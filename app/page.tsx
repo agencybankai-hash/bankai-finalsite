@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { IconBadge } from "@/components/ui/IconBadge";
 import { FloatCard } from "@/components/ui/FloatCard";
 import type { IconName } from "@/components/ui/Icon";
+import type { StatItem } from "@/content/types";
 import { Hero } from "@/components/sections/Hero";
 import { TrustBar } from "@/components/sections/TrustBar";
 import { ClientsBar } from "@/components/sections/ClientsBar";
@@ -38,6 +39,14 @@ import { homeFaq } from "@/content/faq";
 
 // Иконки под боли (донор #3 — карточки с icon-бейджами)
 const problemIcons: IconName[] = ["gauge", "target", "chart"];
+
+// Профиль команды в блоке «О компании» — не повтор результатов из TrustBar
+const companyStats: StatItem[] = [
+  { value: "9+ лет", label: "опыта в Казахстане" },
+  { value: "KZ + US", label: "рынки, где работаем" },
+  { value: "5", label: "специалистов в команде" },
+  { value: "3 канала", label: "в одной системе" },
+];
 
 export default function Home() {
   return (
@@ -95,7 +104,7 @@ export default function Home() {
       </Section>
 
       {/* Система - молочная метафора */}
-      <Section id="services" tone="surface">
+      <Section id="system" tone="surface">
         <SectionHeader eyebrow="Как это работает" title={system.title} lead={system.lead} />
         <div className="mt-12">
           <SystemSection layers={system.layers} result={system.result} />
@@ -123,7 +132,7 @@ export default function Home() {
       </Section>
 
       {/* Услуги - 3 канала (перелинковка на посадочные + выбор канала) */}
-      <Section>
+      <Section id="services">
         <SectionHeader
           eyebrow="Услуги"
           title={servicesPreview.title}
@@ -182,7 +191,7 @@ export default function Home() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4 lg:pl-8">
-            {trustStats.map((s) => (
+            {companyStats.map((s) => (
               <div
                 key={s.label}
                 className="rounded-xl border border-border bg-bg p-5 shadow-card"

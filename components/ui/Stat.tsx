@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, nbspValue } from "@/lib/utils";
 import { CountUp } from "@/components/motion/CountUp";
 
 export function Stat({
@@ -13,10 +13,11 @@ export function Stat({
   className?: string;
   animate?: boolean;
 }) {
+  const v = nbspValue(value);
   return (
     <div className={cn("", className)}>
       <div className="text-h2 text-ink">
-        {animate ? <CountUp value={value} /> : value}
+        {animate ? <CountUp value={v} /> : v}
       </div>
       <div className="mt-1 text-sm text-ink-2">{label}</div>
     </div>

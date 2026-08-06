@@ -46,7 +46,7 @@ export function Header() {
                       ▾
                     </span>
                   </Link>
-                  <div className="invisible absolute left-0 top-full w-64 translate-y-1 pt-2 opacity-0 transition duration-300 ease-osmo group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                  <div className="invisible absolute left-0 top-full w-64 translate-y-1 pt-2 opacity-0 transition duration-300 ease-osmo group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
                     <ul className="rounded-xl border border-border bg-bg p-1">
                       {item.children.map((child) => (
                         <li key={child.href}>
@@ -98,9 +98,12 @@ export function Header() {
         </div>
       </Container>
 
-      {/* Мобильное меню */}
+      {/* Мобильное меню: высота ограничена окном за вычетом шапки (h-16) */}
       {open && (
-        <div className="border-t border-border bg-bg lg:hidden">
+        <div
+          data-lenis-prevent
+          className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-border bg-bg lg:hidden"
+        >
           <Container>
             <nav className="flex flex-col gap-1 py-4">
               {nav.map((item) => (

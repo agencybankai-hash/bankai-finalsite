@@ -11,8 +11,8 @@ const HIDDEN_PREFIXES = ["/contacts", "/privacy", "/terms"];
 export function FloatingCta() {
   const pathname = usePathname();
   const [closed, setClosed] = useState(false);
-  // Десктоп-карточку показываем после ухода hero (~0.8 экрана), чтобы не
-  // дублировать hero-CTA и не конфликтовать с правой колонкой hero.
+  // Показываем после ухода hero (~0.8 экрана), чтобы не дублировать hero-CTA
+  // и не перекрывать первый экран (мобильный бар - тоже).
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () =>
@@ -81,28 +81,32 @@ export function FloatingCta() {
         </div>
       )}
 
-      {/* Мобилка: фиксированный нижний бар */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-bg/95 backdrop-blur lg:hidden">
-        <div
-          className="flex gap-3 px-4 py-3"
-          style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
-        >
-          <Link
-            href={headerCta.href}
-            className="inline-flex h-11 flex-1 items-center justify-center rounded-lg bg-ink px-4 text-sm font-medium text-bg hover:bg-ink-2"
+      {/* Мобилка: фиксированный нижний бар - тоже после hero */}
+      {scrolled && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-bg/95 backdrop-blur lg:hidden">
+          <div
+            className="flex gap-3 px-4 py-3"
+            style={{
+              paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
+            }}
           >
-            {headerCta.label}
-          </Link>
-          <a
-            href={contacts.telegramUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex h-11 flex-1 items-center justify-center rounded-lg border border-border bg-bg px-4 text-sm font-medium text-ink hover:bg-surface"
-          >
-            Telegram
-          </a>
+            <Link
+              href={headerCta.href}
+              className="inline-flex h-11 flex-1 items-center justify-center rounded-lg bg-ink px-4 text-sm font-medium text-bg hover:bg-ink-2"
+            >
+              {headerCta.label}
+            </Link>
+            <a
+              href={contacts.telegramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-11 flex-1 items-center justify-center rounded-lg border border-border bg-bg px-4 text-sm font-medium text-ink hover:bg-surface"
+            >
+              Telegram
+            </a>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

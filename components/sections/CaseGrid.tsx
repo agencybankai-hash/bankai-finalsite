@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { Pill } from "@/components/ui/Pill";
 import { Reveal } from "@/components/motion/Reveal";
 import type { CaseStudy } from "@/content/types";
+import { gridTail } from "./gridTail";
 
 /**
  * Карточки кейсов без превью-картинки (реальных нет): визуальный фокус —
@@ -10,13 +12,16 @@ import type { CaseStudy } from "@/content/types";
  */
 export function CaseGrid({ items }: { items: CaseStudy[] }) {
   return (
-    <Reveal stagger className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map((c) => (
+    <Reveal stagger className="grid gap-6 sm:grid-cols-4 lg:grid-cols-6">
+      {items.map((c, i) => (
         <Link
           key={c.slug}
           href={`/cases/${c.slug}`}
           data-reveal
-          className="group flex flex-col rounded-xl border border-border bg-bg p-7 shadow-card transition duration-300 ease-osmo hover:-translate-y-1 hover:border-ink hover:shadow-card-hover"
+          className={cn(
+            "group flex flex-col rounded-xl border border-border bg-bg p-7 shadow-card transition duration-300 ease-osmo hover:-translate-y-1 hover:border-ink hover:shadow-card-hover sm:col-span-2",
+            gridTail(i, items.length, 3),
+          )}
         >
           <div className="flex flex-wrap gap-2">
             {c.template && (
@@ -46,8 +51,8 @@ export function CaseGrid({ items }: { items: CaseStudy[] }) {
 
           <div className="mt-auto grid grid-cols-2 gap-4 border-t border-border pt-6">
             {c.cardMetrics.map((m) => (
-              <div key={m.label}>
-                <div className="text-2xl font-semibold tracking-tight text-ink">
+              <div key={m.label} className="min-w-0">
+                <div className="break-words text-2xl font-semibold tracking-tight text-ink">
                   {m.value}
                 </div>
                 <div className="mt-1 text-xs leading-snug text-ink-2">

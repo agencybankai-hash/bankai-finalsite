@@ -1,7 +1,13 @@
 import { Section } from "@/components/ui/Section";
-import { nbsp } from "@/lib/utils";
+import { cn, nbsp } from "@/lib/utils";
 import { contacts } from "@/content/site";
 import type { GuideBonus } from "@/content/types";
+
+/* Каналы без реального URL («#») не показываем - вместе с блоком подписки. */
+const socials = [
+  { label: "Telegram", href: contacts.telegramChannelUrl },
+  { label: "YouTube", href: contacts.youtubeUrl },
+].filter((s) => s.href !== "#");
 
 /**
  * Хвост гайда без гейта: бесплатное скачивание чек-листа + мягкий CTA «подпишитесь».
@@ -10,7 +16,7 @@ import type { GuideBonus } from "@/content/types";
 export function GuideOutroCta({ bonus }: { bonus: GuideBonus }) {
   return (
     <Section tone="surface" id="bonus">
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className={cn("grid gap-6", socials.length > 0 && "lg:grid-cols-2")}>
         {/* Бесплатный чек-лист */}
         <div className="rounded-xl border border-border bg-bg p-6 sm:p-8">
           <span className="inline-flex items-center rounded-md border border-ink bg-ink px-2.5 py-0.5 text-xs font-medium text-bg">
@@ -40,33 +46,30 @@ export function GuideOutroCta({ bonus }: { bonus: GuideBonus }) {
         </div>
 
         {/* Поблагодарить - подписаться */}
-        <div className="flex flex-col justify-center rounded-xl border border-border bg-bg p-6 sm:p-8">
-          <h3 className="text-lg font-semibold text-ink">
-            Понравилось? Поблагодарите - подпишитесь
-          </h3>
-          <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-2">
-            Мы отдаём это бесплатно. Если было полезно - подпишитесь на разборы по
-            перформанс-маркетингу в Telegram и на YouTube.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <a
-              href={contacts.telegramChannelUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-11 items-center justify-center rounded-lg border border-border bg-bg px-5 text-sm font-medium text-ink hover:bg-surface"
-            >
-              Telegram
-            </a>
-            <a
-              href={contacts.youtubeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-11 items-center justify-center rounded-lg border border-border bg-bg px-5 text-sm font-medium text-ink hover:bg-surface"
-            >
-              YouTube
-            </a>
+        {socials.length > 0 && (
+          <div className="flex flex-col justify-center rounded-xl border border-border bg-bg p-6 sm:p-8">
+            <h3 className="text-lg font-semibold text-ink">
+              Понравилось? Поблагодарите - подпишитесь
+            </h3>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-2">
+              Мы отдаём это бесплатно. Если было полезно - подпишитесь на разборы
+              по перформанс-маркетингу.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              {socials.map((s) => (
+                <a
+                  key={s.href}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-11 items-center justify-center rounded-lg border border-border bg-bg px-5 text-sm font-medium text-ink hover:bg-surface"
+                >
+                  {s.label}
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </Section>
   );

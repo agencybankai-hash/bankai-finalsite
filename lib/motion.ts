@@ -22,10 +22,9 @@ export function registerGsap(): void {
 
 /** Имя зарегистрированного CustomEase — основной easing проекта. */
 export const EASE = "osmo";
-export const EASE_OUT = "power3.out";
 
 /** Длительности (сек). Зеркало --dur-* в globals.css. */
-export const DUR = { fast: 0.3, base: 0.6, slow: 0.9 } as const;
+export const DUR = { base: 0.6 } as const;
 
 /** Дефолты входной анимации. */
 export const REVEAL = { y: 24, stagger: 0.08 } as const;

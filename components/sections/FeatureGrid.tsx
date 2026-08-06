@@ -4,6 +4,7 @@ import { IconBadge } from "@/components/ui/IconBadge";
 import type { IconName } from "@/components/ui/Icon";
 import { Reveal } from "@/components/motion/Reveal";
 import type { Feature } from "@/content/types";
+import { gridTail } from "./gridTail";
 
 export function FeatureGrid({
   items,
@@ -16,15 +17,18 @@ export function FeatureGrid({
     <Reveal
       stagger
       className={cn(
-        "grid gap-5 sm:grid-cols-2",
-        columns === 3 && "lg:grid-cols-3",
+        "grid gap-5 sm:grid-cols-4",
+        columns === 3 && "lg:grid-cols-6",
       )}
     >
-      {items.map((f) => (
+      {items.map((f, i) => (
         <div
           key={f.title}
           data-reveal
-          className="rounded-xl border border-border bg-bg p-6 shadow-card transition duration-300 ease-osmo hover:-translate-y-1 hover:border-ink hover:shadow-card-hover"
+          className={cn(
+            "rounded-xl border border-border bg-bg p-6 shadow-card transition duration-300 ease-osmo hover:-translate-y-1 hover:border-ink hover:shadow-card-hover sm:col-span-2",
+            gridTail(i, items.length, columns),
+          )}
         >
           <div className="flex items-start justify-between gap-2">
             <IconBadge icon={(f.icon as IconName) ?? "check"} className="mb-4" />

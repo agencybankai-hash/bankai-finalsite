@@ -7,7 +7,8 @@ import type { ClientLogo } from "@/content/types";
  * Wireframe-этап: wordmark-плейсхолдеры (сильные - первыми, см.
  * content/site.ts); реальный логотип подставляется полем `logo` -
  * тогда слот рендерит <img>. `nda: true` - показывать обезличенно.
- * Лента full-bleed; подпись - в контейнере.
+ * Лента full-bleed; подпись - в контейнере. Лента однородна: всё в ч/б
+ * (лого - grayscale, текст - ink), цвет проявляется по ховеру.
  */
 export function ClientsBar({
   items,
@@ -36,10 +37,10 @@ export function ClientsBar({
               <img
                 src={c.logo}
                 alt={c.name}
-                className="max-h-7 w-auto rounded-md opacity-60 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0"
+                className="max-h-7 w-auto max-w-full rounded-md object-contain grayscale transition duration-300 hover:grayscale-0"
               />
             ) : (
-              <span className="truncate text-sm font-semibold uppercase tracking-wide text-muted transition-colors duration-300 hover:text-ink">
+              <span className="truncate text-sm font-semibold uppercase tracking-wide text-ink">
                 {c.nda ? "Под NDA" : c.name}
               </span>
             )}

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 const services = [
@@ -11,8 +12,9 @@ const services = [
 ];
 
 const fieldBase =
-  "w-full rounded-lg border border-border bg-bg px-3.5 py-2.5 text-sm text-ink placeholder:text-muted focus:border-ink focus:outline-none";
+  "w-full rounded-lg border border-border bg-bg px-3.5 py-2.5 text-sm text-ink placeholder:text-muted aria-invalid:border-accent focus-visible:border-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
 const labelBase = "mb-1.5 block text-sm font-medium text-ink";
+const errorBase = "mt-1.5 text-xs font-medium text-accent";
 
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "error" | "success">("idle");
@@ -103,7 +105,9 @@ export function ContactForm() {
             aria-invalid={errors.name || undefined}
           />
           {errors.name && (
-            <p className="mt-1.5 text-xs text-ink">Укажите имя</p>
+            <p role="alert" className={errorBase}>
+              Укажите имя
+            </p>
           )}
         </div>
         <div>
@@ -118,7 +122,9 @@ export function ContactForm() {
             aria-invalid={errors.contact || undefined}
           />
           {errors.contact && (
-            <p className="mt-1.5 text-xs text-ink">Укажите способ связи</p>
+            <p role="alert" className={errorBase}>
+              Укажите способ связи
+            </p>
           )}
         </div>
       </div>
@@ -162,10 +168,12 @@ export function ContactForm() {
       </div>
 
       {status === "error" && (
-        <p className="text-sm text-ink">Заполните обязательные поля выше.</p>
+        <p role="alert" className="text-sm font-medium text-accent">
+          Заполните обязательные поля выше.
+        </p>
       )}
       {sendErr && (
-        <p className="text-sm text-ink">
+        <p role="alert" className="text-sm font-medium text-accent">
           Не удалось отправить. Попробуйте ещё раз или напишите в Telegram.
         </p>
       )}
@@ -179,7 +187,14 @@ export function ContactForm() {
           {pending ? "Отправляем…" : "Отправить заявку"}
         </button>
         <p className="text-xs text-muted">
-          Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности.
+          Нажимая кнопку, вы соглашаетесь с{" "}
+          <Link
+            href="/privacy"
+            className="underline underline-offset-2 hover:text-ink-2"
+          >
+            политикой конфиденциальности
+          </Link>
+          .
         </p>
       </div>
     </form>

@@ -4,7 +4,7 @@ import { Pill } from "@/components/ui/Pill";
 import { Icon } from "@/components/ui/Icon";
 import { Blobs } from "@/components/ui/Blobs";
 import { Reveal } from "@/components/motion/Reveal";
-import { cn } from "@/lib/utils";
+import { cn, nbspValue } from "@/lib/utils";
 
 export function Pricing() {
   return (
@@ -29,9 +29,9 @@ export function Pricing() {
             </h3>
             <div className="mt-4 flex items-baseline gap-2">
               <span className="text-3xl font-semibold tracking-tight text-ink">
-                {p.price}
+                {nbspValue(p.price)}
               </span>
-              <span className="text-sm text-muted">{p.sub}</span>
+              <span className="text-sm text-muted">{nbspValue(p.sub)}</span>
             </div>
             <div className="text-sm text-ink-2">{p.unit}</div>
             <ul className="mt-6 space-y-2.5">

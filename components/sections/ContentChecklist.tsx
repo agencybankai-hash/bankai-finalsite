@@ -55,19 +55,14 @@ function NoteInput({
   value: string;
   onSave: (v: string) => void;
 }) {
-  const [v, setV] = useState(value);
-  const [focused, setFocused] = useState(false);
-  useEffect(() => {
-    if (!focused) setV(value);
-  }, [value, focused]);
+  const [draft, setDraft] = useState<string | null>(null);
   return (
     <input
-      value={v}
-      onChange={(e) => setV(e.target.value)}
-      onFocus={() => setFocused(true)}
+      value={draft ?? value}
+      onChange={(e) => setDraft(e.target.value)}
       onBlur={() => {
-        setFocused(false);
-        if (v !== value) onSave(v.trim());
+        setDraft(null);
+        if (draft !== null && draft !== value) onSave(draft.trim());
       }}
       placeholder="заметка для команды…"
       className="mt-1.5 w-full max-w-md rounded-md border border-border bg-surface px-2.5 py-1 text-xs text-ink-2 placeholder:text-muted focus:border-ink focus:outline-none"
@@ -91,7 +86,7 @@ export function ContentChecklist() {
   }, []);
 
   useEffect(() => {
-    load();
+    queueMicrotask(load);
     const onFocus = () => load();
     window.addEventListener("focus", onFocus);
     const t = setInterval(load, 30_000); // realtime «на минималках» — поллинг

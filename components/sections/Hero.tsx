@@ -4,7 +4,7 @@ import { Pill } from "@/components/ui/Pill";
 import { Reveal } from "@/components/motion/Reveal";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { HeroVisual } from "@/components/sections/HeroVisual";
-import { nbsp } from "@/lib/utils";
+import { cn, nbsp } from "@/lib/utils";
 import type { Cta } from "@/content/types";
 
 const NB = String.fromCharCode(160); // неразрывный пробел
@@ -17,6 +17,8 @@ export function Hero({
   secondary,
   note,
   badges,
+  badge = "SEO · Контекст · Сайты",
+  visual = true,
 }: {
   title: string;
   subtitle?: string;
@@ -24,6 +26,10 @@ export function Hero({
   secondary?: Cta;
   note?: string;
   badges?: string[];
+  /** Пилюля над заголовком; null — без пилюли. */
+  badge?: string | null;
+  /** Правая колонка с продающим визуалом (только десктоп). */
+  visual?: boolean;
 }) {
   // Дефис-разделитель → em-dash, приклеенный к следующему слову (nbsp после
   // тире). Так тире не висит в конце строки, а ведёт value-prop на новой строке.
@@ -34,14 +40,21 @@ export function Hero({
   return (
     <section className="overflow-hidden border-b border-border">
       <Container>
-        <div className="grid items-center gap-10 py-14 sm:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:py-24">
+        <div
+          className={cn(
+            "grid items-center gap-10 py-14 sm:py-16 lg:gap-14 lg:py-24",
+            visual && "lg:grid-cols-[1.05fr_0.95fr]",
+          )}
+        >
           {/* Левая колонка — текст */}
           <Reveal stagger trigger="load" delay={0.3}>
-            <div data-reveal className="mb-5">
-              <Pill variant="soft" size="sm" className="uppercase tracking-wide">
-                SEO · Контекст · Сайты
-              </Pill>
-            </div>
+            {badge && (
+              <div data-reveal className="mb-5">
+                <Pill variant="soft" size="sm" className="uppercase tracking-wide">
+                  {badge}
+                </Pill>
+              </div>
+            )}
             {/* H1 — длинная SEO-строка (ключ+гео), не слоган: размер text-hero
                 (меньше h1), чтобы строка ложилась в 3 строки и не давила колонку */}
             <SplitReveal as="h1" className="text-hero text-ink">
@@ -50,7 +63,10 @@ export function Hero({
             {subtitle && (
               <p
                 data-reveal
-                className="mt-6 max-w-md text-base leading-relaxed text-ink-2"
+                className={cn(
+                  "mt-6 text-base leading-relaxed text-ink-2",
+                  visual ? "max-w-md" : "max-w-2xl",
+                )}
               >
                 {nbsp(subtitle)}
               </p>
@@ -92,9 +108,11 @@ export function Hero({
           </Reveal>
 
           {/* Правая колонка — визуал (на мобилке скрыт, текст важнее) */}
-          <div className="hidden lg:block">
-            <HeroVisual />
-          </div>
+          {visual && (
+            <div className="hidden lg:block">
+              <HeroVisual />
+            </div>
+          )}
         </div>
       </Container>
     </section>
