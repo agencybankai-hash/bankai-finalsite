@@ -10,6 +10,7 @@ import { GuideArticle } from "@/components/sections/GuideArticle";
 import { GuideToc } from "@/components/sections/GuideToc";
 import { GuideOutroCta } from "@/components/sections/GuideOutroCta";
 import { extractSections } from "@/lib/guide-toc";
+import { articleLd, breadcrumbLd, ldJson } from "@/lib/jsonld";
 import { guides, getGuide } from "@/content/guides";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -22,7 +23,11 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const g = getGuide(slug);
   if (!g) return {};
-  return { title: g.title, description: g.description };
+  return {
+    title: g.title,
+    description: g.description,
+    alternates: { canonical: `/guides/${g.slug}` },
+  };
 }
 
 export default async function GuidePage({ params }: Params) {
@@ -44,13 +49,31 @@ export default async function GuidePage({ params }: Params) {
   const outro = i >= 0 ? raw.slice(i).trim() : "";
 
   const sections = extractSections(body);
+  const href = `/guides/${guide.slug}`;
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={ldJson(
+          articleLd(guide.title, guide.description, href),
+        )}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={ldJson(
+          breadcrumbLd([
+            { name: "Главная", path: "/" },
+            { name: "Гайды", path: "/guides" },
+            { name: guide.title, path: href },
+          ]),
+        )}
+      />
+
       <Section>
         <div className="mx-auto max-w-3xl lg:max-w-5xl">
-          <Link href="/" className="text-sm text-ink-2 hover:text-ink">
-            ← На главную
+          <Link href="/guides" className="text-sm text-ink-2 hover:text-ink">
+            ← Все гайды
           </Link>
           {guide.badge && (
             <div className="mt-6">

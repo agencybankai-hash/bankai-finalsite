@@ -5,6 +5,7 @@ import { contacts, siteMeta } from "@/content/site";
 export const metadata: Metadata = {
   title: "Условия использования",
   description: "Условия использования сайта и обращения за услугами.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {

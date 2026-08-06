@@ -13,19 +13,31 @@ import {
   casesStats,
 } from "@/content/cases";
 import { finalCta } from "@/content/site";
+import { breadcrumbLd, ldJson } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
-  title: "Кейсы",
+  title: "Кейсы по SEO, рекламе и сайтам в Казахстане и США",
   description:
     "Результаты проектов на рынках Казахстана и США: заявки, рост трафика и выручки.",
+  alternates: { canonical: "/cases" },
 };
+
+const breadcrumb = breadcrumbLd([
+  { name: "Главная", path: "/" },
+  { name: "Кейсы", path: "/cases" },
+]);
 
 export default function CasesPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={ldJson(breadcrumb)}
+      />
+
       <Hero
-        title={casesIntro.title}
-        subtitle={casesIntro.lead}
+        title="Кейсы по SEO, рекламе и сайтам в Казахстане и США"
+        subtitle={`${casesIntro.title}. ${casesIntro.lead}`}
       />
 
       <TrustBar items={casesStats} />

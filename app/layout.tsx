@@ -8,6 +8,7 @@ import { MotionProvider } from "@/components/motion/MotionProvider";
 import { Preloader } from "@/components/motion/Preloader";
 import { Cursor } from "@/components/motion/Cursor";
 import { siteMeta } from "@/content/site";
+import { ldJson, organizationLd } from "@/lib/jsonld";
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
@@ -15,13 +16,29 @@ const inter = Inter({
   display: "swap",
 });
 
+const homeTitle = "Маркетинговое агентство в Алматы - лидогенерация | Bankai";
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteMeta.url),
   title: {
-    default: "Маркетинговое агентство в Алматы - лидогенерация под ключ | Bankai",
+    default: homeTitle,
     template: "%s · Bankai",
   },
   description: siteMeta.description,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "ru_RU",
+    siteName: siteMeta.name,
+    url: "/",
+    title: homeTitle,
+    description: siteMeta.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: homeTitle,
+    description: siteMeta.description,
+  },
 };
 
 export default function RootLayout({
@@ -32,6 +49,10 @@ export default function RootLayout({
   return (
     <html lang="ru" className={`${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={ldJson(organizationLd)}
+        />
         <MotionProvider>
           <Header />
           <main className="flex-1">{children}</main>

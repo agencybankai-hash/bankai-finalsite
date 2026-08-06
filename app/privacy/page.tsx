@@ -5,6 +5,7 @@ import { contacts, siteMeta } from "@/content/site";
 export const metadata: Metadata = {
   title: "Политика конфиденциальности",
   description: "Как мы обрабатываем и защищаем персональные данные.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {

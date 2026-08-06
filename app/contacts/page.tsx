@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Контакты",
   description:
     "Расскажите о бизнесе и задаче - проведём бесплатный аудит и предложим план.",
+  alternates: { canonical: "/contacts" },
 };
 
 export default function ContactsPage() {
