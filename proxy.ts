@@ -1,9 +1,17 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Basic-Auth на админку. Логин/пароль - из env (ADMIN_USER / ADMIN_PASSWORD).
+// Basic-Auth на внутренние разделы: админка и контент-чеклист.
+// Логин/пароль - из env (ADMIN_USER / ADMIN_PASSWORD).
 // Next 16: конвенция proxy.ts (бывш. middleware.ts).
-export const config = { matcher: ["/admin/:path*", "/api/admin/:path*"] };
+export const config = {
+  matcher: [
+    "/admin/:path*",
+    "/api/admin/:path*",
+    "/checklist/:path*",
+    "/api/checklist/:path*",
+  ],
+};
 
 export function proxy(req: NextRequest) {
   const user = process.env.ADMIN_USER;

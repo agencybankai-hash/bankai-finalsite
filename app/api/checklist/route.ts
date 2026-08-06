@@ -14,22 +14,6 @@ const VALID_IDS = Array.from(
 const VALID_ID_SET = new Set(VALID_IDS);
 const VALID_APPROVERS = new Set<string>(approvers.map((a) => a.key));
 
-type Sql = ReturnType<typeof getSql>;
-
-async function ensureTable(sql: Sql) {
-  await sql`
-    CREATE TABLE IF NOT EXISTS checklist_approvals (
-      item_id    text PRIMARY KEY,
-      artur      boolean NOT NULL DEFAULT false,
-      daniyar    boolean NOT NULL DEFAULT false,
-      petr       boolean NOT NULL DEFAULT false,
-      note       text,
-      updated_at timestamptz NOT NULL DEFAULT now()
-    )
-  `;
-  await sql`ALTER TABLE checklist_approvals ADD COLUMN IF NOT EXISTS note text`;
-}
-
 /* Лёгкий best-effort рейт-лимит в памяти инстанса (на serverless не строгий). */
 const hits = new Map<string, number[]>();
 function rateLimited(ip: string, max = 40, windowMs = 10_000) {
@@ -43,9 +27,6 @@ function rateLimited(ip: string, max = 40, windowMs = 10_000) {
 export async function GET() {
   try {
     const sql = getSql();
-    await ensureTable(sql);
-    // Чистим осиротевшие строки (id, которых больше нет в чеклисте).
-    await sql`DELETE FROM checklist_approvals WHERE NOT (item_id = ANY(${VALID_IDS}::text[]))`;
     const rows = (await sql`
       SELECT item_id, artur, daniyar, petr, note FROM checklist_approvals
     `) as Array<{
@@ -92,7 +73,8 @@ export async function POST(req: Request) {
 
   try {
     const sql = getSql();
-    await ensureTable(sql);
+    // Чистим осиротевшие строки (id, которых больше нет в чеклисте).
+    await sql`DELETE FROM checklist_approvals WHERE NOT (item_id = ANY(${VALID_IDS}::text[]))`;
 
     // Заметка (комментарий к пункту)
     if (typeof b.note === "string") {

@@ -10,7 +10,14 @@ type Lead = {
   email: string | null;
   name: string | null;
   source: string;
-  payload: { guide?: string } | null;
+  payload: {
+    guide?: string;
+    contact?: string;
+    service?: string;
+    niche?: string;
+    revenue?: string;
+    comment?: string;
+  } | null;
   user_agent: string | null;
   created_at: string;
 };
@@ -27,6 +34,11 @@ const dtf = new Intl.DateTimeFormat("ru-RU", {
 function fmtDate(v: string) {
   const d = new Date(v);
   return isNaN(d.getTime()) ? v : dtf.format(d);
+}
+
+function details(r: Lead) {
+  const p = r.payload;
+  return [p?.service, p?.niche, p?.guide, p?.comment].filter(Boolean).join(" · ");
 }
 
 export default async function LeadsPage() {
@@ -82,8 +94,9 @@ export default async function LeadsPage() {
               <thead>
                 <tr className="border-b border-border bg-surface text-left">
                   <th className="px-4 py-3 font-medium text-ink">Дата</th>
-                  <th className="px-4 py-3 font-medium text-ink">Email</th>
+                  <th className="px-4 py-3 font-medium text-ink">Контакт</th>
                   <th className="px-4 py-3 font-medium text-ink">Источник</th>
+                  <th className="px-4 py-3 font-medium text-ink">Детали</th>
                   <th className="px-4 py-3 font-medium text-ink">Устройство</th>
                 </tr>
               </thead>
@@ -93,8 +106,16 @@ export default async function LeadsPage() {
                     <td className="whitespace-nowrap px-4 py-3 text-ink-2 tabular-nums">
                       {fmtDate(r.created_at)}
                     </td>
-                    <td className="px-4 py-3 text-ink">{r.email ?? "—"}</td>
+                    <td className="px-4 py-3 text-ink">
+                      {r.payload?.contact || r.email || "—"}
+                    </td>
                     <td className="px-4 py-3 text-ink-2">{r.source}</td>
+                    <td
+                      className="max-w-[40ch] truncate px-4 py-3 text-ink-2"
+                      title={details(r)}
+                    >
+                      {details(r) || "—"}
+                    </td>
                     <td
                       className="max-w-[28ch] truncate px-4 py-3 text-muted"
                       title={r.user_agent ?? ""}

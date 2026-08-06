@@ -4,8 +4,23 @@ import { getSql } from "@/lib/db";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const clip = (v: unknown, n: number) => String(v ?? "").trim().slice(0, n);
 
+/* Лёгкий best-effort рейт-лимит в памяти инстанса (на serverless не строгий). */
+const hits = new Map<string, number[]>();
+function rateLimited(ip: string, max = 5, windowMs = 600_000) {
+  const now = Date.now();
+  const arr = (hits.get(ip) ?? []).filter((t) => now - t < windowMs);
+  arr.push(now);
+  hits.set(ip, arr);
+  return arr.length > max;
+}
+
 /** Приём заявки из основной контакт-формы. Пишет в Neon (таблица leads). */
 export async function POST(req: Request) {
+  const ip = (req.headers.get("x-forwarded-for") ?? "local").split(",")[0].trim();
+  if (rateLimited(ip)) {
+    return NextResponse.json({ ok: false, error: "rate" }, { status: 429 });
+  }
+
   let body: unknown;
   try {
     body = await req.json();
