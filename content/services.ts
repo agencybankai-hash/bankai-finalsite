@@ -6,9 +6,9 @@ export const channelForms: Record<
   { acc: string; gen: string; prep: string }
 > = {
   seo: {
-    acc: "SEO продвижение",
-    gen: "SEO продвижения",
-    prep: "SEO продвижении",
+    acc: "SEO-продвижение",
+    gen: "SEO-продвижения",
+    prep: "SEO-продвижении",
   },
   context: {
     acc: "контекстную рекламу",
@@ -27,12 +27,12 @@ export const channelForms: Record<
 export const channels: ServiceChannel[] = [
   {
     slug: "seo",
-    navLabel: "SEO продвижение",
-    title: "SEO продвижение в Алматы",
+    navLabel: "SEO-продвижение",
+    title: "SEO-продвижение в Алматы",
     hero: {
-      title: "SEO продвижение в Алматы",
+      title: "SEO-продвижение в Алматы",
       subtitle:
-        "Выводим сайты в ТОП-10 Google за 4-6 месяцев. SEO под ключ: семантика, технический аудит, контент, ссылки. Отвечаем за заявки, а не за отчёты ради галочки.",
+        "Работаем на ТОП-10 Google - позиций не обещаем, отвечаем за заявки. Заметный рост органики обычно с 3-4 месяца. SEO под ключ: семантика, технический аудит, контент, ссылки.",
     },
     badges: [
       "Бесплатный аудит за 1-3 дня",
@@ -130,7 +130,7 @@ export const channels: ServiceChannel[] = [
       {
         n: "07",
         title: "Закрепление в ТОПе",
-        duration: "4-6 месяц",
+        duration: "месяцы 4-6",
         text: "Стабилизируем позиции и расширяем семантику на новые запросы и разделы.",
       },
     ],

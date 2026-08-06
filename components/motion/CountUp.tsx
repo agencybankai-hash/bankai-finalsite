@@ -37,7 +37,9 @@ export function CountUp({
       const decimals = (numStr.split(/[.,]/)[1] || "").length;
       const prefix = value.slice(0, match.index);
       const suffix = value.slice((match.index ?? 0) + numStr.length);
-      const fmt = (v: number) => prefix + v.toFixed(decimals) + suffix;
+      const sep = numStr.includes(",") ? "," : ".";
+      const fmt = (v: number) =>
+        prefix + v.toFixed(decimals).replace(".", sep) + suffix;
 
       const obj = { v: 0 };
       el.textContent = fmt(0);

@@ -97,7 +97,7 @@ export function HeroVisual() {
             <div className="mt-0.5 text-sm text-bg/55">стоимость заявки</div>
           </div>
           <div>
-            <div className="text-2xl font-semibold tracking-tight">5.2x</div>
+            <div className="text-2xl font-semibold tracking-tight">5,2x</div>
             <div className="mt-0.5 text-sm text-bg/55">ROAS в проектах</div>
           </div>
         </div>

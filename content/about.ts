@@ -52,7 +52,7 @@ export const about = {
   stats: [
     { value: "9+ лет", label: "опыта в Казахстане" },
     { value: "50+", label: "проектов запущено" },
-    { value: "$14.6M", label: "в продажах у клиента" },
+    { value: "$14,6M", label: "в продажах у клиента" },
     { value: "KZ + US", label: "рынки, где работаем" },
   ] as StatItem[],
   team: {

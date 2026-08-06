@@ -9,7 +9,7 @@ export type PricingPlan = {
 
 export const pricingPlans: PricingPlan[] = [
   {
-    name: "SEO продвижение",
+    name: "SEO-продвижение",
     price: "от 250 000 ₸",
     sub: "Старт / Бизнес",
     unit: "в месяц",

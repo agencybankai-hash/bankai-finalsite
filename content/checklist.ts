@@ -94,8 +94,8 @@ export const checklist: CheckPage[] = [
     title: "Главная",
     items: [
       { id: "home-hero", label: "Hero — H1 (ключ+гео), подзаголовок, 2 CTA, бейджи", source: "site.ts:hero", status: "done" },
-      { id: "home-clients", label: "Логотипы клиентов", source: "site.ts:clients", status: "data", todo: "6 SVG-лого или решение «под NDA»" },
-      { id: "home-trust", label: "Статистика (50+/$14.6M/5.2x/−40%)", source: "site.ts:trustStats", status: "done" },
+      { id: "home-clients", label: "Логотипы клиентов", source: "site.ts:clients", status: "data", todo: "лого для AK Cabinet Craft и AI Moving или решение «под NDA»" },
+      { id: "home-trust", label: "Статистика (50+/$14,6M/5,2x/−40%)", source: "site.ts:trustStats", status: "done" },
       { id: "home-problem", label: "Проблема — 3 группы болей", source: "site.ts:problem", status: "done" },
       { id: "home-system", label: "Система — лид + 3 слоя + итог", source: "site.ts:system", status: "done" },
       { id: "home-services", label: "Услуги — 3 карточки-канала", source: "site.ts:servicesPreview", status: "done" },
@@ -114,7 +114,7 @@ export const checklist: CheckPage[] = [
   },
   {
     route: "/services/seo",
-    title: "Услуги · SEO продвижение",
+    title: "Услуги · SEO-продвижение",
     items: channelItems("svc-seo"),
   },
   {
