@@ -696,7 +696,7 @@ export const cases: CaseStudy[] = [
      Контекст уже даёт продажи (оффер «детский лагерь»), SEO в работе.
      Данные: Google Ads + CRM за 1-7 июня 2026. */
   {
-    slug: "oi-qaragai",
+    slug: "ski-resort-kz",
     client: "Горнолыжный курорт",
     industry: "Туризм · горный курорт",
     geo: "Алматы, Казахстан",
@@ -749,7 +749,7 @@ export const cases: CaseStudy[] = [
       {
         group: "Продажи с формы (CRM · по UTM)",
         items: [
-          { before: "18", after: "16", label: "заявок с формы → продаж за неделю" },
+          { value: "16 из 18", label: "заявок с формы стали продажами за неделю" },
           { value: "только форма", label: "точно атрибутированный канал" },
         ],
       },

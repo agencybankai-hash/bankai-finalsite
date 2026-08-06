@@ -5,14 +5,46 @@ import { Container } from "@/components/ui/Container";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Badge } from "@/components/ui/Badge";
 import { Stat } from "@/components/ui/Stat";
-import { MediaPlaceholder } from "@/components/ui/MediaPlaceholder";
 import { CaseVisual } from "@/components/sections/CaseVisual";
 import { CaseGrid } from "@/components/sections/CaseGrid";
 import { CTASection } from "@/components/sections/CTASection";
 import { cases, getCase } from "@/content/cases";
 import { finalCta } from "@/content/site";
+import type { CaseChannel, CaseStudy } from "@/content/types";
 
 type Params = { params: Promise<{ slug: string }> };
+
+const channelWord: Record<CaseChannel, string> = {
+  SEO: "SEO",
+  Контекст: "контекстная реклама",
+  Сайт: "разработка сайта",
+};
+
+/* Гео для title: город, если он короткий, иначе страна. */
+function shortGeo(geo: string) {
+  const parts = geo
+    .replace(/\s*\([^)]*\)/g, "")
+    .split("·")
+    .map((p) => p.trim());
+  const last = parts[parts.length - 1];
+  return last.length <= 24 ? last : parts[0];
+}
+
+/* Краткий результат из заголовка кейса; если его нет - каналы и гео. */
+function caseSummary(c: CaseStudy) {
+  const lead = c.headline
+    ? c.headline.split(/:| - /)[0].replace(/\s*\([^)]*\)/g, "").trim()
+    : "";
+  if (lead.length > 16) return lead;
+  const channels = c.channels.map((ch) => channelWord[ch]).join(" + ");
+  return `${channels}, ${shortGeo(c.geo)}`;
+}
+
+function metaDescription(text: string) {
+  if (text.length <= 160) return text;
+  const cut = text.slice(0, 160);
+  return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[,.;:-]$/, "")}...`;
+}
 
 export function generateStaticParams() {
   return cases.map((c) => ({ slug: c.slug }));
@@ -22,7 +54,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const c = getCase(slug);
   if (!c) return {};
-  return { title: `${c.client} — кейс`, description: c.teaser };
+  return {
+    title: `${c.client}: ${caseSummary(c)} - кейс`,
+    description: metaDescription(c.teaser),
+    alternates: { canonical: `/cases/${c.slug}` },
+    ...(c.template && { robots: { index: false, follow: false } }),
+  };
 }
 
 export default async function CaseDetailPage({ params }: Params) {
@@ -32,6 +69,12 @@ export default async function CaseDetailPage({ params }: Params) {
 
   const pool = cases.filter((x) => Boolean(x.template) === Boolean(c.template));
   const related = pool.filter((x) => x.slug !== c.slug).slice(0, 3);
+  const testimonial =
+    c.testimonial &&
+    !c.testimonial.quote.startsWith("[") &&
+    !c.testimonial.author.startsWith("[")
+      ? c.testimonial
+      : null;
 
   return (
     <>
@@ -109,16 +152,11 @@ export default async function CaseDetailPage({ params }: Params) {
       </section>
 
       {/* Превью проекта */}
-      <Section>
-        {c.visual ? (
+      {c.visual && (
+        <Section>
           <CaseVisual kind={c.visual} />
-        ) : (
-          <MediaPlaceholder
-            label={`Скриншоты проекта — ${c.client}`}
-            ratio="16/9"
-          />
-        )}
-      </Section>
+        </Section>
+      )}
 
       {/* Задача и стратегия */}
       <Section tone="surface">
@@ -283,14 +321,14 @@ export default async function CaseDetailPage({ params }: Params) {
       )}
 
       {/* Отзыв */}
-      {c.testimonial && (
+      {testimonial && (
         <Section>
           <figure className="mx-auto max-w-3xl text-center">
             <blockquote className="text-xl leading-relaxed text-ink sm:text-2xl">
-              «{c.testimonial.quote}»
+              «{testimonial.quote}»
             </blockquote>
             <figcaption className="mt-6 text-sm text-ink-2">
-              {c.testimonial.author} · {c.testimonial.role}
+              {testimonial.author} · {testimonial.role}
             </figcaption>
           </figure>
         </Section>
