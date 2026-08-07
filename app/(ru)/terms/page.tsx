@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { contacts, siteMeta } from "@/content/site";
+import { pairAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Условия использования",
   description: "Условия использования сайта и обращения за услугами.",
-  alternates: { canonical: "/terms" },
+  alternates: pairAlternates("/terms", "/en/terms"),
 };
 
 export default function TermsPage() {

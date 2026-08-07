@@ -14,12 +14,13 @@ import {
 } from "@/content/cases";
 import { finalCta } from "@/content/site";
 import { breadcrumbLd, ldJson } from "@/lib/jsonld";
+import { pairAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Кейсы по SEO, рекламе и сайтам в Казахстане и США",
   description:
     "Результаты проектов на рынках Казахстана и США: заявки, рост трафика и выручки.",
-  alternates: { canonical: "/cases" },
+  alternates: pairAlternates("/cases", "/en/cases"),
 };
 
 const breadcrumb = breadcrumbLd([

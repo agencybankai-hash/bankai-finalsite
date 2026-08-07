@@ -2,7 +2,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Pill } from "@/components/ui/Pill";
 import { Reveal } from "@/components/motion/Reveal";
-import type { CaseStudy } from "@/content/types";
+import { ui } from "@/content/ui";
+import type { CaseStudy, Locale } from "@/content/types";
 import { gridTail } from "./gridTail";
 
 /**
@@ -10,13 +11,21 @@ import { gridTail } from "./gridTail";
  * на результате (метрики крупно), это и есть «картинка» для секции
  * «Результаты». Hover-lift + стрелка, reveal-каскад.
  */
-export function CaseGrid({ items }: { items: CaseStudy[] }) {
+export function CaseGrid({
+  items,
+  locale = "ru",
+}: {
+  items: CaseStudy[];
+  locale?: Locale;
+}) {
+  const t = ui(locale).cases;
+
   return (
     <Reveal stagger className="grid gap-6 sm:grid-cols-4 lg:grid-cols-6">
       {items.map((c, i) => (
         <Link
           key={c.slug}
-          href={`/cases/${c.slug}`}
+          href={`${t.href}/${c.slug}`}
           data-reveal
           className={cn(
             "group flex flex-col rounded-xl border border-border bg-bg p-7 shadow-card transition duration-300 ease-osmo hover:-translate-y-1 hover:border-ink hover:shadow-card-hover sm:col-span-2",
@@ -26,17 +35,17 @@ export function CaseGrid({ items }: { items: CaseStudy[] }) {
           <div className="flex flex-wrap gap-2">
             {c.template && (
               <Pill variant="solid" size="sm">
-                Образец
+                {t.template}
               </Pill>
             )}
             {c.inProgress && (
               <Pill size="sm" className="bg-accent text-accent-fg">
-                В работе
+                {t.inProgress}
               </Pill>
             )}
             {c.channels.map((ch) => (
               <Pill key={ch} variant="outline" size="sm">
-                {ch}
+                {t.channels[ch]}
               </Pill>
             ))}
           </div>
@@ -63,7 +72,7 @@ export function CaseGrid({ items }: { items: CaseStudy[] }) {
           </div>
 
           <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-ink">
-            Смотреть кейс
+            {t.viewCase}
             <span
               aria-hidden
               className="transition-transform duration-300 ease-osmo group-hover:translate-x-1"

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
 import { IconBadge } from "@/components/ui/IconBadge";
@@ -36,6 +37,12 @@ import {
 import { homeCases } from "@/content/cases";
 import { testimonials } from "@/content/testimonials";
 import { homeFaq } from "@/content/faq";
+import { pairAlternates } from "@/lib/i18n";
+
+/* title/description/OG - из layout'а группы; здесь только hreflang-пара с /en. */
+export const metadata: Metadata = {
+  alternates: pairAlternates("/", "/en"),
+};
 
 // Иконки под боли (донор #3 — карточки с icon-бейджами)
 const problemIcons: IconName[] = ["gauge", "target", "chart"];

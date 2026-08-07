@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { contacts, headerCta, floatingCta } from "@/content/site";
+import { contacts } from "@/content/site";
+import { ui } from "@/content/ui";
+import type { Locale } from "@/content/types";
 
-/* Скрываем там, где CTA избыточен: страница контактов (форма) и легал. */
-const HIDDEN_PREFIXES = ["/contacts", "/privacy", "/terms"];
-
-export function FloatingCta() {
+/* Скрываем там, где CTA избыточен: страница контактов (форма) и легал - см. floatingCta.hiddenOn. */
+export function FloatingCta({ locale = "ru" }: { locale?: Locale }) {
+  const { headerCta, floatingCta } = ui(locale);
   const pathname = usePathname();
   const [closed, setClosed] = useState(false);
   // Показываем после ухода hero (~0.8 экрана), чтобы не дублировать hero-CTA
@@ -21,7 +22,7 @@ export function FloatingCta() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-  if (HIDDEN_PREFIXES.some((p) => pathname.startsWith(p))) return null;
+  if (floatingCta.hiddenOn.some((p) => pathname.startsWith(p))) return null;
 
   return (
     <>
@@ -37,7 +38,7 @@ export function FloatingCta() {
             </span>
             <button
               type="button"
-              aria-label="Закрыть"
+              aria-label={floatingCta.closeLabel}
               onClick={() => setClosed(true)}
               className="-mr-1 -mt-1 inline-flex h-7 w-7 items-center justify-center rounded-md text-bg/50 hover:bg-bg/10 hover:text-bg"
             >

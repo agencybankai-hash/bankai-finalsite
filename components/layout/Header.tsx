@@ -5,27 +5,67 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { nav, headerCta, siteMeta } from "@/content/site";
+import { siteMeta } from "@/content/site";
+import { ui } from "@/content/ui";
+import type { Locale } from "@/content/types";
+import { switchHref } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-export function Header() {
+/* Подпись языка - на нём самом, чтобы читалась в любой локали. */
+const localeName: Record<Locale, string> = { ru: "Русский", en: "English" };
+
+/** Переключатель локали: текущая - статикой, вторая - ссылкой на парную страницу. */
+function LocaleSwitch({
+  locale,
+  href,
+  className,
+  onNavigate,
+}: {
+  locale: Locale;
+  href: string;
+  className?: string;
+  onNavigate?: () => void;
+}) {
+  const other: Locale = locale === "en" ? "ru" : "en";
+  return (
+    <div className={cn("flex items-center gap-1.5 text-xs font-medium", className)}>
+      <span className="text-ink">{locale.toUpperCase()}</span>
+      <span aria-hidden className="text-border">
+        /
+      </span>
+      <Link
+        href={href}
+        hrefLang={other}
+        aria-label={localeName[other]}
+        onClick={onNavigate}
+        className="text-muted hover:text-ink"
+      >
+        {other.toUpperCase()}
+      </Link>
+    </div>
+  );
+}
+
+export function Header({ locale = "ru" }: { locale?: Locale }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { nav, headerCta, home, tagline, menuLabel } = ui(locale);
+  const otherLocaleHref = switchHref(pathname, locale);
 
   const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
+    href === home ? pathname === home : pathname.startsWith(href);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-bg/90 backdrop-blur">
       <Container>
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Логотип */}
-          <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
+          <Link href={home} className="flex items-center gap-2" onClick={() => setOpen(false)}>
             <span className="text-lg font-semibold tracking-tight text-ink">
               {siteMeta.name}
             </span>
             <span className="hidden text-xs text-muted sm:inline">
-              {siteMeta.tagline}
+              {tagline}
             </span>
           </Link>
 
@@ -79,7 +119,8 @@ export function Header() {
             )}
           </nav>
 
-          <div className="hidden lg:block">
+          <div className="hidden items-center gap-4 lg:flex">
+            <LocaleSwitch locale={locale} href={otherLocaleHref} />
             <Button href={headerCta.href} variant="accent">
               {headerCta.label}
             </Button>
@@ -88,7 +129,7 @@ export function Header() {
           {/* Бургер */}
           <button
             type="button"
-            aria-label="Меню"
+            aria-label={menuLabel}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
             className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border text-ink lg:hidden"
@@ -139,6 +180,12 @@ export function Header() {
                   {headerCta.label}
                 </Button>
               </div>
+              <LocaleSwitch
+                locale={locale}
+                href={otherLocaleHref}
+                className="justify-center px-3 pt-4 text-sm"
+                onNavigate={() => setOpen(false)}
+              />
             </nav>
           </Container>
         </div>

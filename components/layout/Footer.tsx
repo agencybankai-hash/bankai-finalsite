@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
-import { nav, legalLinks, contacts, siteMeta, slogan } from "@/content/site";
+import { contacts, siteMeta } from "@/content/site";
+import { ui } from "@/content/ui";
+import type { Locale } from "@/content/types";
 
-const servicesNav = nav.find((n) => n.label === "Услуги")?.children ?? [];
+export function Footer({ locale = "ru" }: { locale?: Locale }) {
+  const { footer } = ui(locale);
 
-export function Footer() {
   return (
     <footer className="border-t border-border bg-surface">
       <Container>
@@ -14,63 +16,37 @@ export function Footer() {
             <div className="text-2xl font-semibold tracking-tight text-ink">
               {siteMeta.name}
             </div>
-            <p className="mt-2 max-w-xs text-sm font-medium text-ink">{slogan}</p>
+            <p className="mt-2 max-w-xs text-sm font-medium text-ink">
+              {footer.slogan}
+            </p>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-ink-2">
-              {siteMeta.description}
+              {footer.description}
             </p>
           </div>
 
-          {/* Услуги */}
-          <div>
-            <div className="text-sm font-medium text-ink">Услуги</div>
-            <ul className="mt-4 space-y-2">
-              <li>
-                <Link href="/" className="text-sm text-ink-2 hover:text-ink">
-                  Лидогенерация под ключ
-                </Link>
-              </li>
-              {servicesNav.map((item) => (
-                <li key={item.href}>
-                  <Link href={item.href} className="text-sm text-ink-2 hover:text-ink">
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Навигация */}
-          <div>
-            <div className="text-sm font-medium text-ink">Компания</div>
-            <ul className="mt-4 space-y-2">
-              <li>
-                <Link href="/cases" className="text-sm text-ink-2 hover:text-ink">
-                  Кейсы
-                </Link>
-              </li>
-              <li>
-                <Link href="/guides" className="text-sm text-ink-2 hover:text-ink">
-                  Гайды
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-sm text-ink-2 hover:text-ink">
-                  О нас
-                </Link>
-              </li>
-              <li>
-                <Link href="/contacts" className="text-sm text-ink-2 hover:text-ink">
-                  Контакты
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {/* Разделы (услуги, компания) */}
+          {footer.columns.map((col) => (
+            <div key={col.title}>
+              <div className="text-sm font-medium text-ink">{col.title}</div>
+              <ul className="mt-4 space-y-2">
+                {col.links.map((item) => (
+                  <li key={item.href}>
+                    <Link href={item.href} className="text-sm text-ink-2 hover:text-ink">
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
 
           {/* Контакты */}
           <div>
-            <div className="text-sm font-medium text-ink">Контакты</div>
+            <div className="text-sm font-medium text-ink">
+              {footer.contactsTitle}
+            </div>
             <ul className="mt-4 space-y-2 text-sm text-ink-2">
-              <li>{contacts.city}</li>
+              <li>{footer.city}</li>
               <li>
                 <a href={`mailto:${contacts.email}`} className="hover:text-ink">
                   {contacts.email}
@@ -105,7 +81,7 @@ export function Footer() {
         <div className="flex flex-col gap-4 border-t border-border py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
           <div>© 2026 {siteMeta.fullName}</div>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
-            {legalLinks.map((l) => (
+            {footer.legal.map((l) => (
               <Link key={l.href} href={l.href} className="hover:text-ink-2">
                 {l.label}
               </Link>

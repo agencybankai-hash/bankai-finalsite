@@ -1,4 +1,5 @@
 import { contacts, siteMeta } from "@/content/site";
+import { siteMetaEn } from "@/content/en/ui";
 
 const base = siteMeta.url.replace(/\/$/, "");
 
@@ -33,6 +34,21 @@ export const organizationLd = {
     { "@type": "Country", name: "США" },
   ],
   ...(sameAs.length > 0 && { sameAs }),
+};
+
+/** Организация для EN-версии: те же данные, подписи латиницей. */
+export const organizationLdEn = {
+  ...organizationLd,
+  description: siteMetaEn.description,
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Almaty",
+    addressCountry: "KZ",
+  },
+  areaServed: [
+    { "@type": "Country", name: "United States" },
+    { "@type": "Country", name: "Kazakhstan" },
+  ],
 };
 
 export function serviceLd(name: string, description: string, path: string) {

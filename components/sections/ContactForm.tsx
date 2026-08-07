@@ -2,21 +2,16 @@
 
 import Link from "next/link";
 import { useState } from "react";
-
-const services = [
-  "Лидогенерация под ключ",
-  "SEO-продвижение",
-  "Контекстная реклама",
-  "Разработка сайта",
-  "Пока не определился",
-];
+import { ui } from "@/content/ui";
+import type { Locale } from "@/content/types";
 
 const fieldBase =
   "w-full rounded-lg border border-border bg-bg px-3.5 py-2.5 text-sm text-ink placeholder:text-muted aria-invalid:border-accent focus-visible:border-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
 const labelBase = "mb-1.5 block text-sm font-medium text-ink";
 const errorBase = "mt-1.5 text-xs font-medium text-accent";
 
-export function ContactForm() {
+export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
+  const t = ui(locale).form;
   const [status, setStatus] = useState<"idle" | "error" | "success">("idle");
   const [errors, setErrors] = useState<{ name?: boolean; contact?: boolean }>({});
   const [pending, setPending] = useState(false);
@@ -61,10 +56,9 @@ export function ContactForm() {
   if (status === "success") {
     return (
       <div className="rounded-xl border border-ink bg-surface p-8 text-center">
-        <h3 className="text-lg font-semibold text-ink">Заявка отправлена</h3>
+        <h3 className="text-lg font-semibold text-ink">{t.successTitle}</h3>
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-ink-2">
-          Спасибо. Свяжемся в течение рабочего дня - обычно быстрее. Если срочно,
-          напишите в Telegram.
+          {t.successText}
         </p>
       </div>
     );
@@ -83,10 +77,15 @@ export function ContactForm() {
       />
       <div>
         <label htmlFor="service" className={labelBase}>
-          Что интересует
+          {t.serviceLabel}
         </label>
-        <select id="service" name="service" className={fieldBase} defaultValue={services[0]}>
-          {services.map((s) => (
+        <select
+          id="service"
+          name="service"
+          className={fieldBase}
+          defaultValue={t.services[0]}
+        >
+          {t.services.map((s) => (
             <option key={s}>{s}</option>
           ))}
         </select>
@@ -95,35 +94,35 @@ export function ContactForm() {
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="name" className={labelBase}>
-            Имя <span className="text-muted">*</span>
+            {t.nameLabel} <span className="text-muted">*</span>
           </label>
           <input
             id="name"
             name="name"
             className={fieldBase}
-            placeholder="Как к вам обращаться"
+            placeholder={t.namePlaceholder}
             aria-invalid={errors.name || undefined}
           />
           {errors.name && (
             <p role="alert" className={errorBase}>
-              Укажите имя
+              {t.nameError}
             </p>
           )}
         </div>
         <div>
           <label htmlFor="contact" className={labelBase}>
-            Контакт <span className="text-muted">*</span>
+            {t.contactLabel} <span className="text-muted">*</span>
           </label>
           <input
             id="contact"
             name="contact"
             className={fieldBase}
-            placeholder="Telegram, email или телефон"
+            placeholder={t.contactPlaceholder}
             aria-invalid={errors.contact || undefined}
           />
           {errors.contact && (
             <p role="alert" className={errorBase}>
-              Укажите способ связи
+              {t.contactError}
             </p>
           )}
         </div>
@@ -132,49 +131,49 @@ export function ContactForm() {
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="niche" className={labelBase}>
-            Ниша <span className="text-muted">— необязательно</span>
+            {t.nicheLabel} <span className="text-muted">{t.optional}</span>
           </label>
           <input
             id="niche"
             name="niche"
             className={fieldBase}
-            placeholder="Чем занимается бизнес"
+            placeholder={t.nichePlaceholder}
           />
         </div>
         <div>
           <label htmlFor="revenue" className={labelBase}>
-            Оборот в месяц <span className="text-muted">— необязательно</span>
+            {t.revenueLabel} <span className="text-muted">{t.optional}</span>
           </label>
           <input
             id="revenue"
             name="revenue"
             className={fieldBase}
-            placeholder="Ориентировочно"
+            placeholder={t.revenuePlaceholder}
           />
         </div>
       </div>
 
       <div>
         <label htmlFor="comment" className={labelBase}>
-          Комментарий <span className="text-muted">— необязательно</span>
+          {t.commentLabel} <span className="text-muted">{t.optional}</span>
         </label>
         <textarea
           id="comment"
           name="comment"
           rows={4}
           className={fieldBase}
-          placeholder="Задача, ссылка на сайт, что уже пробовали"
+          placeholder={t.commentPlaceholder}
         />
       </div>
 
       {status === "error" && (
         <p role="alert" className="text-sm font-medium text-accent">
-          Заполните обязательные поля выше.
+          {t.formError}
         </p>
       )}
       {sendErr && (
         <p role="alert" className="text-sm font-medium text-accent">
-          Не удалось отправить. Попробуйте ещё раз или напишите в Telegram.
+          {t.sendError}
         </p>
       )}
 
@@ -184,17 +183,17 @@ export function ContactForm() {
           disabled={pending}
           className="inline-flex h-12 items-center justify-center rounded-lg bg-ink px-6 text-base font-medium text-bg hover:bg-ink-2 disabled:opacity-60"
         >
-          {pending ? "Отправляем…" : "Отправить заявку"}
+          {pending ? t.submitting : t.submit}
         </button>
         <p className="text-xs text-muted">
-          Нажимая кнопку, вы соглашаетесь с{" "}
+          {t.consent}{" "}
           <Link
-            href="/privacy"
+            href={t.privacyHref}
             className="underline underline-offset-2 hover:text-ink-2"
           >
-            политикой конфиденциальности
+            {t.consentLink}
           </Link>
-          .
+          {t.consentAfter}
         </p>
       </div>
     </form>

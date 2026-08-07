@@ -10,9 +10,14 @@ import { CaseGrid } from "@/components/sections/CaseGrid";
 import { CTASection } from "@/components/sections/CTASection";
 import { cases, getCase } from "@/content/cases";
 import { finalCta } from "@/content/site";
+import { ui } from "@/content/ui";
+import { enPairOf, pairAlternates } from "@/lib/i18n";
 import type { CaseChannel, CaseStudy } from "@/content/types";
 
 type Params = { params: Promise<{ slug: string }> };
+
+/* Лейблы каналов - из словаря локали (EN-копия страницы берёт ui("en")). */
+const t = ui("ru").cases;
 
 const channelWord: Record<CaseChannel, string> = {
   SEO: "SEO",
@@ -54,10 +59,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const c = getCase(slug);
   if (!c) return {};
+  /* hreflang - только у кейсов с EN-версией; у остальных остаётся один canonical. */
+  const path = `/cases/${c.slug}`;
+  const en = enPairOf(path);
   return {
     title: `${c.client}: ${caseSummary(c)} - кейс`,
     description: metaDescription(c.teaser),
-    alternates: { canonical: `/cases/${c.slug}` },
+    alternates: en ? pairAlternates(path, en) : { canonical: path },
     ...(c.template && { robots: { index: false, follow: false } }),
   };
 }
@@ -95,7 +103,7 @@ export default async function CaseDetailPage({ params }: Params) {
                 </Badge>
               )}
               {c.channels.map((ch) => (
-                <Badge key={ch}>{ch}</Badge>
+                <Badge key={ch}>{t.channels[ch]}</Badge>
               ))}
             </div>
             <h1 className="mt-4 text-2xl font-semibold leading-tight tracking-tight text-ink sm:text-3xl">

@@ -3,12 +3,13 @@ import { Section } from "@/components/ui/Section";
 import { Hero } from "@/components/sections/Hero";
 import { ContactForm } from "@/components/sections/ContactForm";
 import { contacts } from "@/content/site";
+import { pairAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Контакты",
   description:
     "Расскажите о бизнесе и задаче - проведём бесплатный аудит и предложим план.",
-  alternates: { canonical: "/contacts" },
+  alternates: pairAlternates("/contacts", "/en/contacts"),
 };
 
 export default function ContactsPage() {

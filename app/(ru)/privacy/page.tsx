@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { contacts, siteMeta } from "@/content/site";
+import { pairAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Политика конфиденциальности",
   description: "Как мы обрабатываем и защищаем персональные данные.",
-  alternates: { canonical: "/privacy" },
+  alternates: pairAlternates("/privacy", "/en/privacy"),
 };
 
 export default function PrivacyPage() {
