@@ -75,8 +75,10 @@ export default async function CaseDetailPage({ params }: Params) {
   const c = getCase(slug);
   if (!c) notFound();
 
-  const pool = cases.filter((x) => Boolean(x.template) === Boolean(c.template));
-  const related = pool.filter((x) => x.slug !== c.slug).slice(0, 3);
+  const related = cases
+    .filter((x) => x.slug !== c.slug && !x.inProgress)
+    .sort((a, b) => Number(Boolean(a.template)) - Number(Boolean(b.template)))
+    .slice(0, 3);
   const testimonial =
     c.testimonial &&
     !c.testimonial.quote.startsWith("[") &&
@@ -94,9 +96,6 @@ export default async function CaseDetailPage({ params }: Params) {
               ← Все кейсы
             </Link>
             <div className="mt-6 flex flex-wrap items-center gap-2">
-              {c.template && (
-                <Badge className="border-ink! bg-ink! text-bg!">Образец</Badge>
-              )}
               {c.inProgress && (
                 <Badge className="border-accent! bg-accent! text-accent-fg!">
                   В работе
@@ -117,12 +116,6 @@ export default async function CaseDetailPage({ params }: Params) {
             <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-2">
               {c.teaser}
             </p>
-            {c.template && (
-              <p className="mt-6 max-w-2xl rounded-lg border border-dashed border-border bg-surface px-4 py-3 text-sm leading-relaxed text-ink-2">
-                Демонстрационный шаблон подачи. Цифры иллюстративные - заменяются
-                реальными метриками проекта при упаковке кейса.
-              </p>
-            )}
             {c.inProgress && (
               <p className="mt-6 max-w-2xl rounded-lg border border-dashed border-accent bg-surface px-4 py-3 text-sm leading-relaxed text-ink-2">
                 Проект в работе. Здесь - задача и план; результаты в цифрах
@@ -256,9 +249,7 @@ export default async function CaseDetailPage({ params }: Params) {
           lead={
             c.inProgress
               ? "Проект в работе - результаты в цифрах обновим после завершения."
-              : c.template
-                ? "Цифры иллюстративные - образец подачи результатов."
-                : "Метрики реальные; часть закрыта по NDA и показывается на встрече."
+              : "Метрики реальные; часть закрыта по NDA и показывается на встрече."
           }
         />
         <div className="mt-10 space-y-10">

@@ -33,11 +33,6 @@ export function CaseGrid({
           )}
         >
           <div className="flex flex-wrap gap-2">
-            {c.template && (
-              <Pill variant="solid" size="sm">
-                {t.template}
-              </Pill>
-            )}
             {c.inProgress && (
               <Pill size="sm" className="bg-accent text-accent-fg">
                 {t.inProgress}

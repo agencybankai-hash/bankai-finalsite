@@ -50,7 +50,7 @@ export default function CasesPage() {
             lead="Проекты на домашнем рынке - Алматы и регионы Казахстана."
           />
           <div className="mt-10">
-            <CaseGrid items={kzCases} />
+            <CaseGrid items={[...kzCases, ...templateCases]} />
           </div>
         </Section>
       )}
@@ -75,18 +75,6 @@ export default function CasesPage() {
           />
           <div className="mt-10">
             <CaseGrid items={inProgressCases} />
-          </div>
-        </Section>
-      )}
-
-      {templateCases.length > 0 && (
-        <Section tone="surface">
-          <SectionHeader
-            title="Образцы подачи кейсов"
-            lead="Демонстрационные шаблоны под рынок Казахстана - SEO, контекст, разработка и комбинированный. Цифры иллюстративные; показывают структуру и подачу сильного кейса."
-          />
-          <div className="mt-10">
-            <CaseGrid items={templateCases} />
           </div>
         </Section>
       )}
