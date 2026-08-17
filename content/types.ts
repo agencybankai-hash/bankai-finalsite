@@ -54,6 +54,55 @@ export type ServiceChannel = {
   partOfSystem: string;
 };
 
+/**
+ * «Спутниковая» посадочная под НЧ-запрос внутри канала
+ * (`/services/{channel}/{slug}`). Всё, чего в лендинге нет, наследуется от
+ * родительского канала: состав работ, процесс, воронка, тарифы, кейсы.
+ */
+export type ServiceLanding = {
+  slug: string;
+  channel: "seo" | "context" | "web";
+  /** Полный путь страницы, напр. "/services/seo/prodvizhenie-saitov-almaty". */
+  path: string;
+  /** meta title: ключ + гео, не слоган. */
+  title: string;
+  /** meta description. */
+  description: string;
+  hero: { title: string; subtitle: string };
+  /**
+   * Ключевая фраза лендинга в падежах - вместо channelForms в H2:
+   * «Что входит в {acc}», «Стоимость {gen}», «Частые вопросы о {prep}».
+   * Гео входит в фразу: acc «продвижение сайтов в Алматы».
+   */
+  keyPhrase: {
+    acc: string;
+    gen: string;
+    prep: string;
+    /** Готовая фраза для H2 процесса «Как мы {process}»; по умолчанию «ведём {acc}». */
+    process?: string;
+  };
+  /** Абзац под hero - прямой ответ на запрос. */
+  intro?: string;
+  /** Ответный блок: структурированный ответ (этапы + сроки + цена) под AI Overview. */
+  answer: {
+    title: string;
+    lead?: string;
+    steps: { title: string; text: string }[];
+    timeline?: string;
+    /** Значение без «от»: «250 000 ₸/мес». */
+    priceFrom?: string;
+  };
+  /** Своё «кому подходит»; не задано - берётся от канала. */
+  audience?: string[];
+  /** Своё «кому не подойдёт»; не задано - блок канала. */
+  problem?: { title: string; items: string[] };
+  faq: FaqItem[];
+  /** Приписка к блоку тарифов канала. */
+  pricingNote?: string;
+  /** Слаги смежных лендингов для перелинковки. */
+  related?: string[];
+};
+
 /** Бесплатный бонус внутри гайда (скачиваемый чек-лист). */
 export type GuideBonus = {
   title: string;

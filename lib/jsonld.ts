@@ -1,5 +1,6 @@
 import { contacts, siteMeta } from "@/content/site";
 import { siteMetaEn } from "@/content/en/ui";
+import type { FaqItem } from "@/content/types";
 
 const base = siteMeta.url.replace(/\/$/, "");
 
@@ -78,6 +79,19 @@ export function articleLd(headline: string, description: string, path: string) {
     mainEntityOfPage: `${base}${path}`,
     author: publisher,
     publisher,
+  };
+}
+
+/** Блок вопрос-ответ страницы: заявка на быстрый ответ в выдаче. */
+export function faqLd(items: FaqItem[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((it) => ({
+      "@type": "Question",
+      name: it.q,
+      acceptedAnswer: { "@type": "Answer", text: it.a },
+    })),
   };
 }
 

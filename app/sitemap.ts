@@ -3,6 +3,7 @@ import { siteMeta } from "@/content/site";
 import { cases } from "@/content/cases";
 import { casesEn } from "@/content/en/cases";
 import { guides } from "@/content/guides";
+import { landings } from "@/content/landings";
 import { enPairOf, ruPairOf } from "@/lib/i18n";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -26,6 +27,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     .filter((c) => !c.template)
     .map((c) => `/cases/${c.slug}`);
   const guidePaths = guides.map((g) => `/guides/${g.slug}`);
+  // Спутниковые посадочные под НЧ-запросы: ниже родительских услуг, выше кейсов.
+  const landingPaths = landings.map((l) => l.path);
 
   const enStaticPaths = [
     "/en",
@@ -50,11 +53,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
         }
       : {};
 
-  const ruEntries = [...staticPaths, ...casePaths, ...guidePaths].map((p) => ({
+  const priorityOf = (p: string) => {
+    if (p === "") return 1;
+    if (landingPaths.includes(p)) return 0.7;
+    return p.startsWith("/guides") || p.startsWith("/services") ? 0.8 : 0.6;
+  };
+
+  const ruEntries = [
+    ...staticPaths,
+    ...landingPaths,
+    ...casePaths,
+    ...guidePaths,
+  ].map((p) => ({
     url: url(p),
     lastModified,
     changeFrequency: "monthly" as const,
-    priority: p === "" ? 1 : p.startsWith("/guides") || p.startsWith("/services") ? 0.8 : 0.6,
+    priority: priorityOf(p),
     ...alternates(p, enPairOf(p)),
   }));
 

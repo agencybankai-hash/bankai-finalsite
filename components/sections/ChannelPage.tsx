@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Pill } from "@/components/ui/Pill";
 import { Icon } from "@/components/ui/Icon";
 import { Hero } from "@/components/sections/Hero";
+import { AnswerBlock } from "@/components/sections/AnswerBlock";
 import { BulletList } from "@/components/sections/BulletList";
 import { FeatureGrid } from "@/components/sections/FeatureGrid";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
@@ -16,8 +17,14 @@ import { CTASection } from "@/components/sections/CTASection";
 import { Reveal } from "@/components/motion/Reveal";
 import { cases } from "@/content/cases";
 import { channelForms } from "@/content/services";
+import { landings, landingsByChannel } from "@/content/landings";
 import { finalCta } from "@/content/site";
-import type { CaseChannel, ServiceChannel } from "@/content/types";
+import type {
+  CaseChannel,
+  Cta,
+  ServiceChannel,
+  ServiceLanding,
+} from "@/content/types";
 
 const channelMap: Record<string, CaseChannel> = {
   seo: "SEO",
@@ -32,25 +39,78 @@ const guideSlugMap: Record<string, string> = {
   web: "landing",
 };
 
-export function ChannelPage({ channel }: { channel: ServiceChannel }) {
+/**
+ * Страница услуги. С `landing` та же страница работает спутниковой посадочной
+ * под НЧ-запрос: hero, ключевая фраза в H2, ответный блок, FAQ и «кому
+ * подходит» берутся из лендинга, остальное наследуется от канала.
+ */
+export function ChannelPage({
+  channel,
+  landing,
+}: {
+  channel: ServiceChannel;
+  landing?: ServiceLanding;
+}) {
   const tag = channelMap[channel.slug];
   const relatedCases = cases.filter((c) => c.channels.includes(tag)).slice(0, 3);
   const guideSlug = guideSlugMap[channel.slug];
-  const forms = channelForms[channel.slug] ?? {
-    acc: channel.navLabel,
-    gen: channel.navLabel,
-    prep: channel.navLabel,
-  };
+  const forms =
+    landing?.keyPhrase ??
+    channelForms[channel.slug] ?? {
+      acc: channel.navLabel,
+      gen: channel.navLabel,
+      prep: channel.navLabel,
+    };
+  const problem = landing?.problem ?? channel.problem;
+  // «вести» сочетается с продвижением и рекламой, но не с созданием сайта
+  const processPhrase =
+    landing?.keyPhrase.process ??
+    (channel.slug === "web" ? "делаем сайты" : `ведём ${forms.acc}`);
+  const hero = landing?.hero ?? channel.hero;
+  const audience = landing?.audience ?? channel.audience;
+  const faq = landing?.faq ?? channel.faq;
+  // У лендинга гео уже внутри ключевой фразы - город второй раз не добавляем.
+  const pricingTitle = landing
+    ? `Стоимость ${forms.gen}`
+    : `Стоимость ${forms.gen} в Алматы`;
+
+  /* Перелинковка: у лендинга - смежные лендинги плюс родительская услуга,
+     у канала - его спутники. Спутников нет - секции нет. */
+  const relatedLinks: Cta[] = landing
+    ? [
+        ...(landing.related ?? [])
+          .map((s) => landings.find((l) => l.slug === s))
+          .filter((l): l is ServiceLanding => Boolean(l))
+          .map((l) => ({ label: l.hero.title, href: l.path })),
+        { label: channel.title, href: `/services/${channel.slug}` },
+      ]
+    : landingsByChannel(channel.slug).map((l) => ({
+        label: l.hero.title,
+        href: l.path,
+      }));
 
   return (
     <>
       <Hero
-        title={channel.hero.title}
-        subtitle={channel.hero.subtitle}
+        title={hero.title}
+        subtitle={hero.subtitle}
         primary={{ label: "Получить бесплатный аудит", href: "/contacts" }}
         secondary={{ label: "Смотреть кейсы", href: "/cases" }}
         badges={channel.badges}
       />
+
+      {/* Прямой ответ на запрос лендинга */}
+      {landing?.intro && (
+        <div className="border-b border-border bg-surface">
+          <Container>
+            <p className="max-w-3xl py-8 text-lead text-ink-2">
+              {landing.intro}
+            </p>
+          </Container>
+        </div>
+      )}
+
+      {landing && <AnswerBlock answer={landing.answer} />}
 
       {/* Яблочная аналогия */}
       {channel.metaphor && (
@@ -74,15 +134,15 @@ export function ChannelPage({ channel }: { channel: ServiceChannel }) {
       <Section>
         <SectionHeader title="Кому подходит" />
         <div className="mt-8">
-          <BulletList items={channel.audience} variant="check" />
+          <BulletList items={audience} variant="check" />
         </div>
       </Section>
 
       {/* Проблема */}
       <Section tone="surface">
-        <SectionHeader title={channel.problem.title} />
+        <SectionHeader title={problem.title} />
         <div className="mt-8">
-          <BulletList items={channel.problem.items} />
+          <BulletList items={problem.items} />
         </div>
       </Section>
 
@@ -102,7 +162,7 @@ export function ChannelPage({ channel }: { channel: ServiceChannel }) {
       <Section tone="surface">
         <SectionHeader
           eyebrow="Процесс"
-          title={`Как мы ведём ${forms.acc}`}
+          title={`Как мы ${processPhrase}`}
           align="center"
         />
         <div className="mt-10">
@@ -135,7 +195,7 @@ export function ChannelPage({ channel }: { channel: ServiceChannel }) {
       <Section>
         <SectionHeader
           eyebrow="Тарифы"
-          title={`Стоимость ${forms.gen} в Алматы`}
+          title={pricingTitle}
           align="center"
         />
         {channel.plans ? (
@@ -197,6 +257,13 @@ export function ChannelPage({ channel }: { channel: ServiceChannel }) {
             </Button>
           </Reveal>
         )}
+        {landing?.pricingNote && (
+          <Reveal className="mt-8">
+            <p className="mx-auto max-w-2xl text-center text-sm leading-relaxed text-ink-2">
+              {landing.pricingNote}
+            </p>
+          </Reveal>
+        )}
       </Section>
 
       {/* Место канала в системе + открытый гайд */}
@@ -256,9 +323,31 @@ export function ChannelPage({ channel }: { channel: ServiceChannel }) {
           align="center"
         />
         <div className="mt-8">
-          <FAQ items={channel.faq} />
+          <FAQ items={faq} />
         </div>
       </Section>
+
+      {/* Смежные страницы */}
+      {relatedLinks.length > 0 && (
+        <Section tone="surface">
+          <SectionHeader title="Смежные страницы" />
+          <Reveal stagger className="mt-8 grid gap-3 sm:grid-cols-2">
+            {relatedLinks.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                data-reveal
+                className="flex items-center justify-between gap-4 rounded-xl border border-border bg-bg px-5 py-4 text-base text-ink shadow-card transition duration-300 ease-osmo hover:border-ink hover:shadow-card-hover"
+              >
+                <span>{l.label}</span>
+                <span aria-hidden className="text-muted">
+                  →
+                </span>
+              </Link>
+            ))}
+          </Reveal>
+        </Section>
+      )}
 
       <CTASection title={finalCta.title} lead={finalCta.lead} cta={finalCta.cta} />
     </>
