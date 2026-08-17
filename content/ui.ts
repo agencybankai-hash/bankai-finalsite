@@ -84,7 +84,6 @@ export const uiRu: UiDict = {
     allCases: "Все кейсы",
     moreCases: "Больше кейсов →",
     empty: "По этому каналу кейсов пока нет.",
-    template: "Образец",
     inProgress: "В работе",
     viewCase: "Смотреть кейс",
   },

@@ -199,7 +199,6 @@ export type UiDict = {
     allCases: string;
     moreCases: string;
     empty: string;
-    template: string;
     inProgress: string;
     viewCase: string;
   };

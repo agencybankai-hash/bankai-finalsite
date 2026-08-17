@@ -94,7 +94,6 @@ export const uiEn: UiDict = {
     allCases: "All cases",
     moreCases: "More cases →",
     empty: "No cases in this channel yet.",
-    template: "Sample",
     inProgress: "In progress",
     viewCase: "View case",
   },
