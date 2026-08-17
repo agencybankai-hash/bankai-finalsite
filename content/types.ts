@@ -96,6 +96,12 @@ export type ServiceLanding = {
   audience?: string[];
   /** Своё «кому не подойдёт»; не задано - блок канала. */
   problem?: { title: string; items: string[] };
+  /** Свой состав работ под интент (обязателен для уникальности; фолбэк - канал). */
+  includes?: Feature[];
+  /** Свой процесс под интент (фолбэк - канал). */
+  process?: Step[];
+  /** Доказательство текстом: 1-2 кейса, пересказанные под интент страницы. */
+  proof?: { title: string; items: { case: string; slug: string; text: string }[] };
   faq: FaqItem[];
   /** Приписка к блоку тарифов канала. */
   pricingNote?: string;

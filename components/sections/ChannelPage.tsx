@@ -67,6 +67,8 @@ export function ChannelPage({
     landing?.keyPhrase.process ??
     (channel.slug === "web" ? "делаем сайты" : `ведём ${forms.acc}`);
   const hero = landing?.hero ?? channel.hero;
+  const includes = landing?.includes ?? channel.includes;
+  const process = landing?.process ?? channel.process;
   const audience = landing?.audience ?? channel.audience;
   const faq = landing?.faq ?? channel.faq;
   // У лендинга гео уже внутри ключевой фразы - город второй раз не добавляем.
@@ -112,8 +114,8 @@ export function ChannelPage({
 
       {landing && <AnswerBlock answer={landing.answer} />}
 
-      {/* Яблочная аналогия */}
-      {channel.metaphor && (
+      {/* Метафора - только у канала, на лендингах дубль */}
+      {!landing && channel.metaphor && (
         <div className="border-b border-border bg-surface">
           <Container>
             <div className="max-w-3xl py-8">
@@ -154,7 +156,7 @@ export function ChannelPage({
           align="center"
         />
         <div className="mt-10">
-          <FeatureGrid items={channel.includes} />
+          <FeatureGrid items={includes} />
         </div>
       </Section>
 
@@ -166,23 +168,50 @@ export function ChannelPage({
           align="center"
         />
         <div className="mt-10">
-          <ProcessSteps steps={channel.process} />
+          <ProcessSteps steps={process} />
         </div>
       </Section>
 
-      {/* Как даёт заявки */}
-      <Section>
-        <SectionHeader
-          title={channel.funnel.title}
-          lead={channel.funnel.lead}
-        />
-        <div className="mt-10">
-          <FunnelChain chain={channel.funnel.chain} note={channel.funnel.note} />
-        </div>
-      </Section>
+      {/* Как даёт заявки - только у канала, на лендингах дублировать нечего */}
+      {!landing && (
+        <Section>
+          <SectionHeader
+            title={channel.funnel.title}
+            lead={channel.funnel.lead}
+          />
+          <div className="mt-10">
+            <FunnelChain chain={channel.funnel.chain} note={channel.funnel.note} />
+          </div>
+        </Section>
+      )}
 
-      {/* Кейсы по каналу */}
-      {relatedCases.length > 0 && (
+      {/* Лендинг: доказательство текстом под интент */}
+      {landing?.proof && (
+        <Section tone="surface">
+          <SectionHeader title={landing.proof.title} />
+          <Reveal stagger className="mt-10 grid gap-5 lg:grid-cols-2">
+            {landing.proof.items.map((it) => (
+              <Link
+                key={it.slug}
+                href={`/cases/${it.slug}`}
+                data-reveal
+                className="group flex flex-col rounded-xl border border-border bg-bg p-7 shadow-card transition duration-300 ease-osmo hover:-translate-y-1 hover:border-ink hover:shadow-card-hover"
+              >
+                <h3 className="text-lg font-semibold tracking-tight text-ink">
+                  {it.case}
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-ink-2">{it.text}</p>
+                <span className="mt-5 text-sm font-medium text-ink group-hover:text-accent">
+                  Смотреть кейс →
+                </span>
+              </Link>
+            ))}
+          </Reveal>
+        </Section>
+      )}
+
+      {/* Кейсы по каналу - карточками только у канала */}
+      {!landing && relatedCases.length > 0 && (
         <Section tone="surface">
           <SectionHeader title="Где это сработало" />
           <div className="mt-10">
@@ -266,7 +295,8 @@ export function ChannelPage({
         )}
       </Section>
 
-      {/* Место канала в системе + открытый гайд */}
+      {/* Место канала в системе + открытый гайд - только у канала */}
+      {!landing && (
       <Section tone="surface">
         <SectionHeader
           eyebrow="Прозрачность"
@@ -314,6 +344,7 @@ export function ChannelPage({
           )}
         </Reveal>
       </Section>
+      )}
 
       {/* FAQ */}
       <Section>
