@@ -9,6 +9,9 @@
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, sans-serif;
+  /* Заголовки — TikTok Sans; текст остаётся на Inter. */
+  --font-display: var(--font-tiktok), var(--font-inter), ui-sans-serif,
+    system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   /* ── Цвет: тёплая нейтраль (база stone, ink = Osmo near-black) ── */
   --color-bg: #faf8f5; /* тёплый off-white — база страницы */
@@ -124,6 +127,15 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
 }
 
 /* Плавный ховер ссылок шапки/подвала (на токенах моторики). */

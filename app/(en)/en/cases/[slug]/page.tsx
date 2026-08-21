@@ -10,7 +10,7 @@ import { CTASection } from "@/components/sections/CTASection";
 import { casesEn, getCaseEn, caseUiEn, casesCtaEn } from "@/content/en/cases";
 import { ui } from "@/content/ui";
 import { pageMetadata } from "@/lib/metadata";
-import type { CaseChannel, CaseStudy } from "@/content/types";
+import type { CaseChannel, CaseStudy, StatItem } from "@/content/types";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -33,20 +33,60 @@ function shortGeo(geo: string) {
   return last.length <= 24 ? last : parts[0];
 }
 
-/* Краткий результат из заголовка кейса; если его нет - каналы и гео. */
-function caseSummary(c: CaseStudy) {
-  const lead = c.headline
-    ? c.headline.split(/:| - /)[0].replace(/\s*\([^)]*\)/g, "").trim()
-    : "";
-  if (lead.length > 16) return lead;
+/* Каналы и гео - запасной хвост title, когда цифр результата нет. */
+function channelSummary(c: CaseStudy) {
   const channels = c.channels.map((ch) => channelWord[ch]).join(" + ");
   return `${channels}, ${shortGeo(c.geo)}`;
 }
 
+/* Метрика карточки как результат в title: без скобочных уточнений. */
+function metricPhrase(m: StatItem) {
+  return `${m.value} ${m.label}`
+    .replace(/\s*\([^)]*\)/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/* Layout дописывает « · Bankai» (9 символов), поэтому свой хвост - до 50. */
+const TITLE_MAX = 50;
+const DESC_MAX = 155;
+
+/**
+ * Title кейса: клиент + ключевой результат из cardMetrics. Кандидаты идут от
+ * самого информативного к самому короткому, берём первый, влезающий в лимит.
+ */
+function metaTitle(c: CaseStudy) {
+  const client = c.client.split(" - ")[0].trim();
+  const short = client.split(/\s(?:and|&)\s|,/)[0].trim();
+  const metrics = c.cardMetrics
+    .filter((m) => /\d/.test(m.value))
+    .map(metricPhrase);
+  const bases = [
+    ...metrics.map((m) => `${client}: ${m}`),
+    ...(short === client ? [] : metrics.map((m) => `${short}: ${m}`)),
+    `${client}: ${channelSummary(c)}`,
+    client,
+  ];
+  const variants = bases.flatMap((b) => [`${b} - case study`, b]);
+  return (
+    variants.find((v) => v.length <= TITLE_MAX) ??
+    client.slice(0, TITLE_MAX).replace(/\s+\S*$/, "")
+  );
+}
+
+/* Description: обрезаем по границе предложения, иначе по слову с многоточием. */
 function metaDescription(text: string) {
-  if (text.length <= 160) return text;
-  const cut = text.slice(0, 160);
-  return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[,.;:-]$/, "")}...`;
+  const t = text.replace(/\s+/g, " ").trim();
+  if (t.length <= DESC_MAX) return t;
+  const head = t.slice(0, DESC_MAX);
+  const sentence = Math.max(
+    head.lastIndexOf(". "),
+    head.lastIndexOf("! "),
+    head.lastIndexOf("? "),
+  );
+  if (sentence >= 110) return head.slice(0, sentence + 1);
+  const cut = t.slice(0, DESC_MAX - 3);
+  return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[,.;:-]+$/, "")}...`;
 }
 
 /* EN-версия - выжимка: существуют только кейсы из content/en/cases.ts. */
@@ -64,7 +104,7 @@ export async function generateMetadata(
   return {
     /* Слаги EN-кейсов зеркалят RU, поэтому пару pageMetadata считает из пути. */
     ...(await pageMetadata({
-      title: `${c.client}: ${caseSummary(c)} - case study`,
+      title: metaTitle(c),
       description: metaDescription(c.teaser),
       path: `/en/cases/${c.slug}`,
       locale: "en",

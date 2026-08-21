@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, TikTok_Sans } from "next/font/google";
 import "../globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -14,6 +14,13 @@ import { ldJson, organizationLd } from "@/lib/jsonld";
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+/* Заголовочный шрифт: вариативный, с кириллицей. */
+const tiktokSans = TikTok_Sans({
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-tiktok",
   display: "swap",
 });
 
@@ -49,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" className={`${inter.variable} h-full antialiased`}>
+    <html lang="ru" className={`${inter.variable} ${tiktokSans.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <Analytics />
         <script
