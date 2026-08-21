@@ -1,4 +1,5 @@
 import type { ClientLogo, Cta, Feature, NavItem, StatItem, Step } from "./types";
+import { landingsByChannel } from "./landings";
 
 export const siteMeta = {
   name: "Bankai",
@@ -19,14 +20,31 @@ export const contacts = {
   youtubeUrl: "#",
 };
 
+/** Три канала-услуги: пункты меню и колонка футера. */
+export const serviceChannelsNav: NavItem[] = [
+  { label: "SEO-продвижение", href: "/services/seo" },
+  { label: "Контекстная реклама", href: "/services/context" },
+  { label: "Разработка сайтов", href: "/services/web" },
+];
+
+/* Посадочные под НЧ-запросы берём из данных: список сам подхватит
+   добавленный или удалённый лендинг, а анкор - ключ страницы. */
+const landingNav = (channel: string): NavItem[] =>
+  landingsByChannel(channel).map((l) => ({ label: l.hero.title, href: l.path }));
+
+/* Header рендерит только два уровня, поэтому посадочные идут плоским списком
+   внутри «Услуг» - каждая сразу за своим каналом. */
 export const nav: NavItem[] = [
   {
     label: "Услуги",
     href: "/#services",
     children: [
-      { label: "SEO-продвижение", href: "/services/seo" },
-      { label: "Контекстная реклама", href: "/services/context" },
-      { label: "Разработка сайтов", href: "/services/web" },
+      serviceChannelsNav[0],
+      ...landingNav("seo"),
+      serviceChannelsNav[1],
+      ...landingNav("context"),
+      serviceChannelsNav[2],
+      ...landingNav("web"),
     ],
   },
   { label: "Кейсы", href: "/cases" },
@@ -35,10 +53,10 @@ export const nav: NavItem[] = [
     href: "/guides",
     children: [
       { label: "Маркетинг под заявки", href: "/guides/marketing" },
-      { label: "SEO-продвижение", href: "/guides/seo" },
+      { label: "Гайд по SEO", href: "/guides/seo" },
       { label: "ИИ для SEO-стратегии", href: "/guides/ai-seo" },
-      { label: "Контекстная реклама", href: "/guides/context" },
-      { label: "Лендинг под конверсию", href: "/guides/landing" },
+      { label: "Гайд по контекстной рекламе", href: "/guides/context" },
+      { label: "Гайд по лендингам", href: "/guides/landing" },
     ],
   },
   { label: "О нас", href: "/about" },

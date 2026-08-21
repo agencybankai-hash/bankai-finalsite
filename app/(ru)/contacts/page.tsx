@@ -1,16 +1,15 @@
-import type { Metadata } from "next";
 import { Section } from "@/components/ui/Section";
 import { Hero } from "@/components/sections/Hero";
 import { ContactForm } from "@/components/sections/ContactForm";
 import { contacts } from "@/content/site";
-import { pairAlternates } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const generateMetadata = pageMetadata({
   title: "Контакты",
   description:
     "Расскажите о бизнесе и задаче - проведём бесплатный аудит и предложим план.",
-  alternates: pairAlternates("/contacts", "/en/contacts"),
-};
+  path: "/contacts",
+});
 
 export default function ContactsPage() {
   return (

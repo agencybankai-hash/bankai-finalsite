@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Pill } from "@/components/ui/Pill";
 import { Icon } from "@/components/ui/Icon";
 import { Hero } from "@/components/sections/Hero";
+import { Breadcrumbs, serviceCrumbs } from "@/components/sections/Breadcrumbs";
 import { AnswerBlock } from "@/components/sections/AnswerBlock";
 import { BulletList } from "@/components/sections/BulletList";
 import { FeatureGrid } from "@/components/sections/FeatureGrid";
@@ -71,10 +72,11 @@ export function ChannelPage({
   const process = landing?.process ?? channel.process;
   const audience = landing?.audience ?? channel.audience;
   const faq = landing?.faq ?? channel.faq;
-  // У лендинга гео уже внутри ключевой фразы - город второй раз не добавляем.
-  const pricingTitle = landing
-    ? `Стоимость ${forms.gen}`
-    : `Стоимость ${forms.gen} в Алматы`;
+  const plans = landing?.plans ?? channel.plans;
+  const pricing = landing?.pricing ?? channel.pricing;
+  /* Гео в заголовке тарифов - только если оно уже есть в самой услуге или
+     ключевой фразе лендинга; SEO-хаб гео-нейтральный, город ему не дописываем. */
+  const pricingTitle = `Стоимость ${forms.gen}`;
 
   /* Перелинковка: у лендинга - смежные лендинги плюс родительская услуга,
      у канала - его спутники. Спутников нет - секции нет. */
@@ -93,6 +95,8 @@ export function ChannelPage({
 
   return (
     <>
+      {landing && <Breadcrumbs items={serviceCrumbs(channel, landing)} />}
+
       <Hero
         title={hero.title}
         subtitle={hero.subtitle}
@@ -227,9 +231,9 @@ export function ChannelPage({
           title={pricingTitle}
           align="center"
         />
-        {channel.plans ? (
+        {plans ? (
           <Reveal stagger className="mt-10 grid gap-5 lg:grid-cols-3">
-            {channel.plans.map((p) => (
+            {plans.map((p) => (
               <div
                 key={p.name}
                 data-reveal
@@ -271,13 +275,13 @@ export function ChannelPage({
             <div>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-semibold tracking-tight text-ink">
-                  {channel.pricing.value}
+                  {pricing.value}
                 </span>
-                <span className="text-sm text-muted">{channel.pricing.sub}</span>
+                <span className="text-sm text-muted">{pricing.sub}</span>
               </div>
-              {channel.pricing.note && (
+              {pricing.note && (
                 <p className="mt-2 max-w-md text-sm text-ink-2">
-                  {channel.pricing.note}
+                  {pricing.note}
                 </p>
               )}
             </div>
@@ -344,6 +348,26 @@ export function ChannelPage({
           )}
         </Reveal>
       </Section>
+      )}
+
+      {/* Лендинг: только половина «Без чёрных ящиков» - гайд по каналу.
+          «Часть системы» не дублируем, она живёт на странице канала. */}
+      {landing && guideSlug && (
+        <Section tone="surface">
+          <Reveal className="flex flex-col gap-5 rounded-2xl border border-border bg-bg p-7 shadow-card transition duration-300 ease-osmo hover:border-ink hover:shadow-card-hover sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-h3 text-ink">Нет секретов</h2>
+              <p className="mt-3 max-w-xl text-base leading-relaxed text-ink-2">
+                Хотите разобраться сами? Мы выложили полный гайд по этому каналу
+                - с формулами, порогами и чек-листом. Бесплатно, без всяких
+                email.
+              </p>
+            </div>
+            <Button href={`/guides/${guideSlug}`} size="lg" variant="secondary">
+              Читать гайд
+            </Button>
+          </Reveal>
+        </Section>
       )}
 
       {/* FAQ */}

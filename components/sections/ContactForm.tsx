@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ui } from "@/content/ui";
 import type { Locale } from "@/content/types";
@@ -10,8 +11,24 @@ const fieldBase =
 const labelBase = "mb-1.5 block text-sm font-medium text-ink";
 const errorBase = "mt-1.5 text-xs font-medium text-accent";
 
+type AnalyticsWindow = Window & {
+  dataLayer?: unknown[];
+  gtag?: (...args: unknown[]) => void;
+};
+
+// Событие заявки в GTM и GA4. Если аналитика не подключена - молча выходим.
+function trackLead(service: string, source: string) {
+  if (typeof window === "undefined") return;
+  const w = window as AnalyticsWindow;
+  try {
+    w.dataLayer?.push({ event: "generate_lead", service, source });
+    w.gtag?.("event", "generate_lead", { service, source });
+  } catch {}
+}
+
 export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
   const t = ui(locale).form;
+  const pathname = usePathname();
   const [status, setStatus] = useState<"idle" | "error" | "success">("idle");
   const [errors, setErrors] = useState<{ name?: boolean; contact?: boolean }>({});
   const [pending, setPending] = useState(false);
@@ -46,6 +63,7 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
       });
       if (!res.ok) throw new Error(`status ${res.status}`);
       setStatus("success");
+      trackLead(String(data.get("service") ?? ""), pathname);
     } catch {
       setSendErr(true);
     } finally {

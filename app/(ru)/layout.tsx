@@ -7,6 +7,7 @@ import { FloatingCta } from "@/components/sections/FloatingCta";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { Preloader } from "@/components/motion/Preloader";
 import { Cursor } from "@/components/motion/Cursor";
+import { Analytics } from "@/components/analytics/Analytics";
 import { siteMeta } from "@/content/site";
 import { ldJson, organizationLd } from "@/lib/jsonld";
 
@@ -18,6 +19,7 @@ const inter = Inter({
 
 const homeTitle = "Маркетинговое агентство в Алматы - лидогенерация | Bankai";
 
+/* Карточка главной; вложенные страницы задают свою через pageMetadata. */
 export const metadata: Metadata = {
   metadataBase: new URL(siteMeta.url),
   title: {
@@ -49,6 +51,7 @@ export default function RootLayout({
   return (
     <html lang="ru" className={`${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
+        <Analytics />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={ldJson(organizationLd)}

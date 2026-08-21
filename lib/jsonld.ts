@@ -52,20 +52,53 @@ export const organizationLdEn = {
   ],
 };
 
-export function serviceLd(name: string, description: string, path: string) {
+/* Гео из контента приходит строками - страна это или город, знаем по списку. */
+const countryNames = new Set(["Казахстан", "США", "Россия", "Узбекистан"]);
+
+function areaLd(name: string) {
+  return { "@type": countryNames.has(name) ? "Country" : "City", name };
+}
+
+const currencyBySign: Record<string, string> = { "₸": "KZT", $: "USD" };
+
+/** «250 000 ₸/мес» → Offer с price 250000 и priceCurrency KZT. */
+function offerLd(priceFrom: string) {
+  const price = priceFrom.replace(/\D/g, "");
+  const sign = Object.keys(currencyBySign).find((s) => priceFrom.includes(s));
+  if (!price || !sign) return undefined;
+  return { "@type": "Offer", price, priceCurrency: currencyBySign[sign] };
+}
+
+type ServiceLdOptions = {
+  /** Короткое название услуги: «SEO-продвижение», а не meta title с гео и хвостом. */
+  serviceType?: string;
+  /** Гео обслуживания. Не задано - Алматы, Казахстан, США. */
+  areaServed?: string | string[];
+  /** Цена «от» строкой из контента, напр. «250 000 ₸/мес». */
+  priceFrom?: string;
+};
+
+export function serviceLd(
+  name: string,
+  description: string,
+  path: string,
+  options: ServiceLdOptions = {},
+) {
+  const url = `${base}${path}`;
+  const areas = options.areaServed
+    ? [options.areaServed].flat()
+    : ["Алматы", "Казахстан", "США"];
+  const offer = options.priceFrom ? offerLd(options.priceFrom) : undefined;
   return {
     "@context": "https://schema.org",
     "@type": "Service",
     name,
     description,
-    url: `${base}${path}`,
-    serviceType: name,
+    url,
+    serviceType: options.serviceType ?? name,
     provider: { ...publisher, address: organizationLd.address },
-    areaServed: [
-      { "@type": "City", name: "Алматы" },
-      { "@type": "Country", name: "Казахстан" },
-      { "@type": "Country", name: "США" },
-    ],
+    areaServed: areas.map(areaLd),
+    ...(offer && { offers: { ...offer, url } }),
   };
 }
 

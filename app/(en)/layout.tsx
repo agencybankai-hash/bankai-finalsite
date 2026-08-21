@@ -7,6 +7,7 @@ import { FloatingCta } from "@/components/sections/FloatingCta";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { Preloader } from "@/components/motion/Preloader";
 import { Cursor } from "@/components/motion/Cursor";
+import { Analytics } from "@/components/analytics/Analytics";
 import { siteMeta } from "@/content/site";
 import { siteMetaEn } from "@/content/en/ui";
 import { ldJson, organizationLdEn } from "@/lib/jsonld";
@@ -20,6 +21,7 @@ const inter = Inter({
 const homeTitle = siteMetaEn.title;
 const description = siteMetaEn.description;
 
+/* Карточка EN-главной; вложенные страницы задают свою через pageMetadata. */
 export const metadata: Metadata = {
   metadataBase: new URL(siteMeta.url),
   title: {
@@ -51,6 +53,7 @@ export default function EnRootLayout({
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
+        <Analytics />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={ldJson(organizationLdEn)}

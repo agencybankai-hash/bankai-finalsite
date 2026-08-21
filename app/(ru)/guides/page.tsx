@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Section } from "@/components/ui/Section";
 import { Badge } from "@/components/ui/Badge";
@@ -6,13 +5,14 @@ import { Hero } from "@/components/sections/Hero";
 import { Reveal } from "@/components/motion/Reveal";
 import { nbsp } from "@/lib/utils";
 import { guides } from "@/content/guides";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const generateMetadata = pageMetadata({
   title: "Гайды по интернет-маркетингу, SEO, контексту и лендингам",
   description:
     "Бесплатные гайды Bankai: SEO, контекстная реклама, лендинги и связка каналов в систему лидогенерации. С формулами, порогами и чек-листами.",
-  alternates: { canonical: "/guides" },
-};
+  path: "/guides",
+});
 
 export default function GuidesPage() {
   return (

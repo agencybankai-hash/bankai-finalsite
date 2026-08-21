@@ -101,31 +101,19 @@ export function HeroVisual() {
             <div className="mt-0.5 text-sm text-bg/55">ROAS в проектах</div>
           </div>
         </div>
-      </div>
 
-      {/* Floating-карточка-отзыв (донор metatag — стеклянные карточки) */}
-      <div
-        className="float-soft absolute -left-7 -top-14 w-48 rounded-xl border border-border bg-bg p-3.5 shadow-float"
-        style={{ animationDelay: "-1.5s" }}
-      >
-        <div className="flex gap-0.5 text-accent" aria-hidden>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <span key={i} className="text-xs">
-              ★
-            </span>
-          ))}
-        </div>
-        <p className="mt-1.5 text-xs leading-snug text-ink-2">
-          «Заявки пошли с первого месяца»
+        {/* Дисклеймер: график и карточка — схема, а не выгрузка одного клиента */}
+        <p className="mt-4 max-w-[58%] text-[11px] leading-snug text-bg/50">
+          Иллюстрация. Цифры - средние по нашим проектам.
         </p>
       </div>
 
-      {/* Floating-карточка-метрика */}
+      {/* Floating-карточка-метрика (пример, не данные конкретного клиента) */}
       <div className="absolute -bottom-12 -right-7 w-44">
         <FloatCard
           float
           style={{ animationDelay: "-3.5s" }}
-          label="Заявок / мес"
+          label="Заявок / мес · пример"
           value="86"
           delta="↑ 38%"
           icon="trending"

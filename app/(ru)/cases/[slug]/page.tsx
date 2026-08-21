@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
@@ -11,8 +11,8 @@ import { CTASection } from "@/components/sections/CTASection";
 import { cases, getCase } from "@/content/cases";
 import { finalCta } from "@/content/site";
 import { ui } from "@/content/ui";
-import { enPairOf, pairAlternates } from "@/lib/i18n";
-import type { CaseChannel, CaseStudy } from "@/content/types";
+import { pageMetadata } from "@/lib/metadata";
+import type { CaseChannel, CaseStudy, Cta, StatItem } from "@/content/types";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -25,6 +25,13 @@ const channelWord: Record<CaseChannel, string> = {
   Сайт: "разработка сайта",
 };
 
+/* Канал кейса → страница услуги: связь кейс→услуга, а не только услуга→кейс. */
+const channelService: Record<CaseChannel, Cta> = {
+  SEO: { label: "SEO-продвижение", href: "/services/seo" },
+  Контекст: { label: "Контекстная реклама", href: "/services/context" },
+  Сайт: { label: "Разработка сайтов", href: "/services/web" },
+};
+
 /* Гео для title: город, если он короткий, иначе страна. */
 function shortGeo(geo: string) {
   const parts = geo
@@ -35,37 +42,80 @@ function shortGeo(geo: string) {
   return last.length <= 24 ? last : parts[0];
 }
 
-/* Краткий результат из заголовка кейса; если его нет - каналы и гео. */
-function caseSummary(c: CaseStudy) {
-  const lead = c.headline
-    ? c.headline.split(/:| - /)[0].replace(/\s*\([^)]*\)/g, "").trim()
-    : "";
-  if (lead.length > 16) return lead;
+/* Каналы и гео - запасной хвост title, когда цифр результата нет. */
+function channelSummary(c: CaseStudy) {
   const channels = c.channels.map((ch) => channelWord[ch]).join(" + ");
   return `${channels}, ${shortGeo(c.geo)}`;
 }
 
+/* Метрика карточки как результат в title: без скобочных уточнений. */
+function metricPhrase(m: StatItem) {
+  return `${m.value} ${m.label}`
+    .replace(/\s*\([^)]*\)/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/* Layout дописывает « · Bankai» (9 символов), поэтому свой хвост - до 50. */
+const TITLE_MAX = 50;
+const DESC_MAX = 155;
+
+/**
+ * Title кейса: клиент + ключевой результат из cardMetrics. Кандидаты идут от
+ * самого информативного к самому короткому, берём первый, влезающий в лимит.
+ */
+function metaTitle(c: CaseStudy) {
+  const client = c.client.split(" - ")[0].trim();
+  const short = client.split(/\s(?:и|×)\s|,/)[0].trim();
+  const metrics = c.cardMetrics
+    .filter((m) => /\d/.test(m.value))
+    .map(metricPhrase);
+  const bases = [
+    ...metrics.map((m) => `${client}: ${m}`),
+    ...(short === client ? [] : metrics.map((m) => `${short}: ${m}`)),
+    `${client}: ${channelSummary(c)}`,
+    client,
+  ];
+  const variants = bases.flatMap((b) => [`${b} - кейс`, b]);
+  return (
+    variants.find((v) => v.length <= TITLE_MAX) ??
+    client.slice(0, TITLE_MAX).replace(/\s+\S*$/, "")
+  );
+}
+
+/* Description: обрезаем по границе предложения, иначе по слову с многоточием. */
 function metaDescription(text: string) {
-  if (text.length <= 160) return text;
-  const cut = text.slice(0, 160);
-  return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[,.;:-]$/, "")}...`;
+  const t = text.replace(/\s+/g, " ").trim();
+  if (t.length <= DESC_MAX) return t;
+  const head = t.slice(0, DESC_MAX);
+  const sentence = Math.max(
+    head.lastIndexOf(". "),
+    head.lastIndexOf("! "),
+    head.lastIndexOf("? "),
+  );
+  if (sentence >= 110) return head.slice(0, sentence + 1);
+  const cut = t.slice(0, DESC_MAX - 3);
+  return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[,.;:-]+$/, "")}...`;
 }
 
 export function generateStaticParams() {
   return cases.map((c) => ({ slug: c.slug }));
 }
 
-export async function generateMetadata({ params }: Params): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: Params,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { slug } = await params;
   const c = getCase(slug);
   if (!c) return {};
-  /* hreflang - только у кейсов с EN-версией; у остальных остаётся один canonical. */
-  const path = `/cases/${c.slug}`;
-  const en = enPairOf(path);
+  /* hreflang - только у кейсов с EN-версией; остальным pageMetadata оставит один canonical. */
   return {
-    title: `${c.client}: ${caseSummary(c)} - кейс`,
-    description: metaDescription(c.teaser),
-    alternates: en ? pairAlternates(path, en) : { canonical: path },
+    ...(await pageMetadata({
+      title: metaTitle(c),
+      description: metaDescription(c.teaser),
+      path: `/cases/${c.slug}`,
+    })(params, parent)),
     ...(c.template && { robots: { index: false, follow: false } }),
   };
 }
@@ -102,7 +152,16 @@ export default async function CaseDetailPage({ params }: Params) {
                 </Badge>
               )}
               {c.channels.map((ch) => (
-                <Badge key={ch}>{t.channels[ch]}</Badge>
+                <Link
+                  key={ch}
+                  href={channelService[ch].href}
+                  title={channelService[ch].label}
+                  className="transition duration-300 ease-osmo hover:opacity-80"
+                >
+                  <Badge className="hover:border-ink hover:text-ink">
+                    {t.channels[ch]}
+                  </Badge>
+                </Link>
               ))}
             </div>
             <h1 className="mt-4 text-2xl font-semibold leading-tight tracking-tight text-ink sm:text-3xl">
@@ -215,30 +274,46 @@ export default async function CaseDetailPage({ params }: Params) {
       <Section>
         <SectionHeader title="Работа по каналам" />
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {c.work.map((w) => (
-            <div
-              key={w.channel}
-              className="rounded-xl border border-border bg-bg p-6"
-            >
-              <Badge>{w.channel}</Badge>
-              <ul className="mt-4 space-y-2.5">
-                {w.points.map((p) => (
-                  <li key={p} className="flex gap-2.5 text-sm text-ink-2">
-                    <span aria-hidden className="text-muted">
-                      —
-                    </span>
-                    <span>{p}</span>
-                  </li>
-                ))}
-              </ul>
-              {w.why && (
-                <p className="mt-4 border-t border-border pt-4 text-sm leading-relaxed text-ink-2">
-                  <span className="font-medium text-ink">Почему так: </span>
-                  {w.why}
-                </p>
-              )}
-            </div>
-          ))}
+          {c.work.map((w) => {
+            /* Блоки работы называются свободно - ссылку вешаем только там,
+               где название совпало с каналом (SEO / Контекст / Сайт). */
+            const service = channelService[w.channel as CaseChannel];
+            return (
+              <div
+                key={w.channel}
+                className="rounded-xl border border-border bg-bg p-6"
+              >
+                <Badge>{w.channel}</Badge>
+                <ul className="mt-4 space-y-2.5">
+                  {w.points.map((p) => (
+                    <li key={p} className="flex gap-2.5 text-sm text-ink-2">
+                      <span aria-hidden className="text-muted">
+                        —
+                      </span>
+                      <span>{p}</span>
+                    </li>
+                  ))}
+                </ul>
+                {w.why && (
+                  <p className="mt-4 border-t border-border pt-4 text-sm leading-relaxed text-ink-2">
+                    <span className="font-medium text-ink">Почему так: </span>
+                    {w.why}
+                  </p>
+                )}
+                {service && (
+                  <div className="mt-4 border-t border-border pt-4">
+                    <Link
+                      href={service.href}
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-ink transition duration-300 ease-osmo hover:text-accent"
+                    >
+                      Услуга: {service.label}
+                      <span aria-hidden>→</span>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </Section>
 

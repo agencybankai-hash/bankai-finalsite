@@ -103,8 +103,14 @@ export type ServiceLanding = {
   /** Доказательство текстом: 1-2 кейса, пересказанные под интент страницы. */
   proof?: { title: string; items: { case: string; slug: string; text: string }[] };
   faq: FaqItem[];
-  /** Приписка к блоку тарифов канала. */
+  /** Свои тарифы под интент; не заданы - тарифы канала. */
+  plans?: ServicePlan[];
+  /** Своя цена «от» (когда тарифов-карточек нет); не задана - цена канала. */
+  pricing?: { value: string; sub: string; note?: string };
+  /** Приписка к блоку тарифов. */
   pricingNote?: string;
+  /** Гео обслуживания для Service.areaServed; не задано - Алматы и Казахстан. */
+  geo?: string[];
   /** Слаги смежных лендингов для перелинковки. */
   related?: string[];
 };

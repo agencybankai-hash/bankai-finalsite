@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { contacts, siteMeta } from "@/content/site";
-import { pairAlternates } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const generateMetadata = pageMetadata({
   title: "Условия использования",
   description: "Условия использования сайта и обращения за услугами.",
-  alternates: pairAlternates("/terms", "/en/terms"),
-};
+  path: "/terms",
+});
 
 export default function TermsPage() {
   return (
@@ -16,10 +15,9 @@ export default function TermsPage() {
         <h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
           Условия использования
         </h1>
-        <p className="mt-3 text-sm text-muted">Редакция от 29 мая 2026 года</p>
-        <div className="mt-4 rounded-lg border border-border bg-surface p-4 text-sm text-ink-2">
-          Черновик-шаблон. Перед публикацией требует вычитки юристом.
-        </div>
+        <p className="mt-3 text-sm text-muted">
+          Обновлено 21 августа 2026 года
+        </p>
 
         <div className="prose-legal mt-8">
           <h2>1. Общие положения</h2>

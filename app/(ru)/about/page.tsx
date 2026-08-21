@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Stat } from "@/components/ui/Stat";
 import { Hero } from "@/components/sections/Hero";
@@ -8,12 +7,13 @@ import { CTASection } from "@/components/sections/CTASection";
 import { Reveal } from "@/components/motion/Reveal";
 import { about } from "@/content/about";
 import { process, finalCta } from "@/content/site";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const generateMetadata = pageMetadata({
   title: "О нас",
   description: about.hero.lead,
-  alternates: { canonical: "/about" },
-};
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (

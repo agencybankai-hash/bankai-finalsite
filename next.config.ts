@@ -16,6 +16,12 @@ const nextConfig: NextConfig = {
       { source: "/ru/cases/ak-cabinet", destination: "/cases/ak-cabinet-craft", permanent: true },
       { source: "/en/cases/ak-cabinet", destination: "/en/cases/ak-cabinet-craft", permanent: true },
       { source: "/ru/:path*", destination: "/:path*", permanent: true },
+      // Лендинг «создание сайтов» слит с родительской услугой (один интент).
+      {
+        source: "/services/web/sozdanie-saitov-almaty",
+        destination: "/services/web",
+        permanent: true,
+      },
       { source: "/policy-privacy", destination: "/privacy", permanent: true },
       { source: "/en/policy-privacy", destination: "/en/privacy", permanent: true },
     ];

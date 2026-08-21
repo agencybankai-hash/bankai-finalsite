@@ -34,3 +34,17 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Переменные окружения
+
+Полный список - в `.env.example`, локальные значения кладутся в `.env.local`.
+
+Аналитика подключается только если заданы переменные, иначе скрипты не рендерятся
+(локальная разработка и превью остаются чистыми):
+
+- `NEXT_PUBLIC_GA_ID` - GA4 measurement ID, формат `G-XXXXXXXXXX`
+- `NEXT_PUBLIC_GTM_ID` - Google Tag Manager container ID, формат `GTM-XXXXXXX`
+
+Обе переменные читаются на этапе сборки, поэтому после их изменения в Vercel нужен
+редеплой. Форма заявки при успешной отправке шлёт событие `generate_lead`
+в `dataLayer` и `gtag` с параметрами `service` и `source`.

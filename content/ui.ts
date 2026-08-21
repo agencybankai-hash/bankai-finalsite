@@ -1,8 +1,23 @@
-import type { Locale, UiDict } from "./types";
-import { contacts, floatingCta, headerCta, legalLinks, nav, siteMeta, slogan } from "./site";
+import type { Cta, Locale, UiDict } from "./types";
+import {
+  contacts,
+  floatingCta,
+  headerCta,
+  legalLinks,
+  nav,
+  serviceChannelsNav,
+  siteMeta,
+  slogan,
+} from "./site";
+import { landings } from "./landings";
 import { uiEn } from "./en/ui";
 
-const servicesNav = nav.find((n) => n.label === "Услуги")?.children ?? [];
+/* Сквозной футерный анкор ведёт на посадочную лидогенерации, а не на «/»:
+   у главной свои анкоры (логотип, хлебные крошки), а лендингу нужен ключ. */
+const leadgen = landings.find((l) => l.slug === "lidogeneraciya-almaty");
+const leadgenLink: Cta[] = leadgen
+  ? [{ label: leadgen.hero.title, href: leadgen.path }]
+  : [];
 
 /** RU-строки обвязки: ровно то, что раньше было хардкодом в компонентах. */
 export const uiRu: UiDict = {
@@ -19,8 +34,8 @@ export const uiRu: UiDict = {
       {
         title: "Услуги",
         links: [
-          { label: "Лидогенерация под ключ", href: "/" },
-          ...servicesNav.map((n) => ({ label: n.label, href: n.href })),
+          ...serviceChannelsNav.map((n) => ({ label: n.label, href: n.href })),
+          ...leadgenLink,
         ],
       },
       {

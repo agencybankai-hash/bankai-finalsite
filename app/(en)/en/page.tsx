@@ -24,6 +24,7 @@ import {
 } from "@/content/en/site";
 import { pairAlternates } from "@/lib/i18n";
 
+/* title/description/OG - из layout'а группы; здесь только hreflang-пара с RU. */
 export const metadata: Metadata = {
   title: { absolute: siteMetaEn.title },
   description: siteMetaEn.description,

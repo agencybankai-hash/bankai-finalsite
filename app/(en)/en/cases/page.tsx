@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Hero } from "@/components/sections/Hero";
 import { TrustBar } from "@/components/sections/TrustBar";
@@ -12,14 +11,15 @@ import {
   casesCtaEn,
 } from "@/content/en/cases";
 import { breadcrumbLd, ldJson } from "@/lib/jsonld";
-import { pairAlternates } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const generateMetadata = pageMetadata({
   title: "Case studies: SEO, PPC and web for US and global clients",
   description:
     "Results from projects in the US, Europe, Kazakhstan and Mongolia: leads, organic growth and revenue.",
-  alternates: pairAlternates("/cases", "/en/cases", "en"),
-};
+  path: "/en/cases",
+  locale: "en",
+});
 
 const breadcrumb = breadcrumbLd([
   { name: "Home", path: "/en" },

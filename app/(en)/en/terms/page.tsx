@@ -1,16 +1,16 @@
-import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { contacts, siteMeta } from "@/content/site";
 import { ui } from "@/content/ui";
-import { pairAlternates } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/metadata";
 
 const t = ui("en");
 
-export const metadata: Metadata = {
+export const generateMetadata = pageMetadata({
   title: "Terms of Use",
   description: "Terms for using the site and requesting our services.",
-  alternates: pairAlternates("/terms", "/en/terms", "en"),
-};
+  path: "/en/terms",
+  locale: "en",
+});
 
 export default function EnTermsPage() {
   return (
@@ -19,11 +19,7 @@ export default function EnTermsPage() {
         <h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
           Terms of Use
         </h1>
-        <p className="mt-3 text-sm text-muted">Version of 29 May 2026</p>
-        <div className="mt-4 rounded-lg border border-border bg-surface p-4 text-sm text-ink-2">
-          Draft - pending legal review. Before publication this template needs to
-          be reviewed by a lawyer.
-        </div>
+        <p className="mt-3 text-sm text-muted">Updated 21 August 2026</p>
 
         <div className="prose-legal mt-8">
           <h2>1. General</h2>

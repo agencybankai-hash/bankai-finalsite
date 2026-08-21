@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Section } from "@/components/ui/Section";
@@ -12,6 +12,7 @@ import { GuideOutroCta } from "@/components/sections/GuideOutroCta";
 import { extractSections } from "@/lib/guide-toc";
 import { articleLd, breadcrumbLd, ldJson } from "@/lib/jsonld";
 import { guides, getGuide } from "@/content/guides";
+import { pageMetadata } from "@/lib/metadata";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -19,15 +20,18 @@ export function generateStaticParams() {
   return guides.map((g) => ({ slug: g.slug }));
 }
 
-export async function generateMetadata({ params }: Params): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: Params,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { slug } = await params;
   const g = getGuide(slug);
   if (!g) return {};
-  return {
+  return pageMetadata({
     title: g.title,
     description: g.description,
-    alternates: { canonical: `/guides/${g.slug}` },
-  };
+    path: `/guides/${g.slug}`,
+  })(params, parent);
 }
 
 export default async function GuidePage({ params }: Params) {

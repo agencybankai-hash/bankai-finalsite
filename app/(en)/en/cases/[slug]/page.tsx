@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
@@ -9,7 +9,7 @@ import { CaseGrid } from "@/components/sections/CaseGrid";
 import { CTASection } from "@/components/sections/CTASection";
 import { casesEn, getCaseEn, caseUiEn, casesCtaEn } from "@/content/en/cases";
 import { ui } from "@/content/ui";
-import { pairAlternates } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/metadata";
 import type { CaseChannel, CaseStudy } from "@/content/types";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -54,15 +54,21 @@ export function generateStaticParams() {
   return casesEn.map((c) => ({ slug: c.slug }));
 }
 
-export async function generateMetadata({ params }: Params): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: Params,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { slug } = await params;
   const c = getCaseEn(slug);
   if (!c) return {};
   return {
-    title: `${c.client}: ${caseSummary(c)} - case study`,
-    description: metaDescription(c.teaser),
-    /* Слаги EN-кейсов зеркалят RU, поэтому пара считается напрямую. */
-    alternates: pairAlternates(`/cases/${c.slug}`, `/en/cases/${c.slug}`, "en"),
+    /* Слаги EN-кейсов зеркалят RU, поэтому пару pageMetadata считает из пути. */
+    ...(await pageMetadata({
+      title: `${c.client}: ${caseSummary(c)} - case study`,
+      description: metaDescription(c.teaser),
+      path: `/en/cases/${c.slug}`,
+      locale: "en",
+    })(params, parent)),
     robots: { index: true, follow: true },
   };
 }

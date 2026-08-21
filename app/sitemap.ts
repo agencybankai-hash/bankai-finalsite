@@ -8,8 +8,9 @@ import { enPairOf, ruPairOf } from "@/lib/i18n";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteMeta.url.replace(/\/$/, "");
-  // Дат публикации в контенте нет - берём дату сборки, одну на все страницы.
-  const lastModified = new Date();
+  /* lastModified не отдаём: дат правок в контенте нет, а дата сборки менялась бы
+     при каждом деплое на всех 45 URL - такому полю поисковики перестают верить.
+     Появятся реальные даты в контенте - проставим их точечно. */
 
   const staticPaths = [
     "",
@@ -66,7 +67,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...guidePaths,
   ].map((p) => ({
     url: url(p),
-    lastModified,
     changeFrequency: "monthly" as const,
     priority: priorityOf(p),
     ...alternates(p, enPairOf(p)),
@@ -74,7 +74,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const enEntries = [...enStaticPaths, ...enCasePaths].map((p) => ({
     url: url(p),
-    lastModified,
     changeFrequency: "monthly" as const,
     priority: p === "/en" ? 1 : 0.6,
     ...alternates(ruPairOf(p), p),
