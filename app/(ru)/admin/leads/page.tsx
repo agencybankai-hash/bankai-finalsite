@@ -1,3 +1,4 @@
+import { DeleteLeadButton } from "@/components/admin/DeleteLeadButton";
 import { Container } from "@/components/ui/Container";
 import { getSql } from "@/lib/db";
 
@@ -17,6 +18,8 @@ type Lead = {
     niche?: string;
     revenue?: string;
     comment?: string;
+    page?: string;
+    locale?: string;
   } | null;
   user_agent: string | null;
   created_at: string;
@@ -38,7 +41,12 @@ function fmtDate(v: string) {
 
 function details(r: Lead) {
   const p = r.payload;
-  return [p?.service, p?.niche, p?.guide, p?.comment].filter(Boolean).join(" · ");
+  return [p?.service, p?.niche, p?.revenue, p?.guide, p?.comment].filter(Boolean).join(" · ");
+}
+
+/** Подпись лида для подтверждения удаления. */
+function leadLabel(r: Lead) {
+  return [r.name, r.payload?.contact || r.email].filter(Boolean).join(", ") || `#${r.id}`;
 }
 
 export default async function LeadsPage() {
@@ -98,6 +106,9 @@ export default async function LeadsPage() {
                   <th className="px-4 py-3 font-medium text-ink">Источник</th>
                   <th className="px-4 py-3 font-medium text-ink">Детали</th>
                   <th className="px-4 py-3 font-medium text-ink">Устройство</th>
+                  <th className="px-4 py-3 font-medium text-ink">
+                    <span className="sr-only">Действия</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -107,9 +118,19 @@ export default async function LeadsPage() {
                       {fmtDate(r.created_at)}
                     </td>
                     <td className="px-4 py-3 text-ink">
-                      {r.payload?.contact || r.email || "—"}
+                      {r.name && <div className="font-medium">{r.name}</div>}
+                      <div className={r.name ? "text-ink-2" : ""}>
+                        {r.payload?.contact || r.email || "—"}
+                      </div>
                     </td>
-                    <td className="px-4 py-3 text-ink-2">{r.source}</td>
+                    <td className="px-4 py-3 text-ink-2">
+                      {r.source}
+                      {r.payload?.page && (
+                        <div className="max-w-[28ch] truncate text-xs text-muted" title={r.payload.page}>
+                          {r.payload.page}
+                        </div>
+                      )}
+                    </td>
                     <td
                       className="max-w-[40ch] truncate px-4 py-3 text-ink-2"
                       title={details(r)}
@@ -121,6 +142,9 @@ export default async function LeadsPage() {
                       title={r.user_agent ?? ""}
                     >
                       {r.user_agent ?? "—"}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <DeleteLeadButton id={r.id} label={leadLabel(r)} />
                     </td>
                   </tr>
                 ))}
