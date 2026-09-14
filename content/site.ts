@@ -6,7 +6,7 @@ export const siteMeta = {
   fullName: "Bankai Agency",
   tagline: "Лидогенерация под ключ",
   description:
-    "Маркетинговое агентство в Алматы: лидогенерация под ключ. Сайт, SEO и контекстная реклама как единая система привлечения клиентов и заявок. Работаем по Казахстану и США.",
+    "Маркетинговое агентство в Алматы: лидогенерация под ключ. Сайт, SEO и контекстная реклама как одна система привлечения заявок. Казахстан и США.",
   url: "https://bankai.agency",
 };
 
@@ -15,9 +15,15 @@ export const contacts = {
   email: "info@bankai.agency",
   telegram: "@may_work",
   telegramUrl: "https://t.me/may_work",
+  /* Телефон в международном формате (+7...). Пустая строка - в разметку
+     Organization и contactPoint не попадает. */
+  phone: "",
   // Каналы агентства пока не созданы - заглушки, заменить на реальные URL позже.
   telegramChannelUrl: "#",
   youtubeUrl: "#",
+  instagramUrl: "#",
+  linkedinUrl: "#",
+  facebookUrl: "#",
 };
 
 /** Три канала-услуги: пункты меню и колонка футера. */

@@ -9,7 +9,7 @@ const path = "/services/web";
 
 export const generateMetadata = pageMetadata({
   title: channel?.title ?? "",
-  description: channel?.hero.subtitle ?? "",
+  description: channel?.description ?? "",
   path,
 });
 

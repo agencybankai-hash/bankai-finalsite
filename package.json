@@ -8,7 +8,8 @@
     "prebuild": "node scripts/copy-flags.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "lastmod": "node scripts/lastmod.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

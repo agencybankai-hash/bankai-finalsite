@@ -74,6 +74,19 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 с&nbsp;превью). Без них роут пишет только в&nbsp;Neon и&nbsp;логирует ошибку канала.
 FormSubmit для почты не&nbsp;подходит: он за&nbsp;Cloudflare и&nbsp;серверам Vercel отдаёт челлендж 403.
 
+## SEO: даты правок и разметка
+
+- `npm run lastmod` пересчитывает `content/lastmod.json` из истории git: дата последней правки
+  и&nbsp;появления каждого файла контента. Из него берутся `lastmod` в&nbsp;sitemap и&nbsp;даты
+  `datePublished`/`dateModified` статей-гайдов. Запускать локально после правок контента
+  и&nbsp;коммитить JSON: на&nbsp;Vercel клон неполный, там даты не&nbsp;посчитать.
+- Meta description страниц каналов услуг - поле `description` в&nbsp;`content/services.ts`
+  (hero-подзаголовок для этого слишком длинный). Держать до&nbsp;160 символов, title до&nbsp;52
+  (шаблон добавляет « · Bankai»).
+- Организация в&nbsp;JSON-LD (`lib/jsonld.ts`) берёт телефон и&nbsp;соцсети из&nbsp;`contacts`
+  в&nbsp;`content/site.ts`: заполните `phone` и&nbsp;URL профилей вместо `#`, и&nbsp;они попадут
+  в&nbsp;разметку без правок кода. Логотип - `app/apple-icon.png`.
+
 ## Переменные окружения
 
 Полный список - в `.env.example`, локальные значения кладутся в `.env.local`.

@@ -11,6 +11,7 @@ import { GuideToc } from "@/components/sections/GuideToc";
 import { GuideOutroCta } from "@/components/sections/GuideOutroCta";
 import { extractSections } from "@/lib/guide-toc";
 import { articleLd, breadcrumbLd, ldJson } from "@/lib/jsonld";
+import { createdAt, modifiedAt } from "@/lib/lastmod";
 import { guides, getGuide } from "@/content/guides";
 import { pageMetadata } from "@/lib/metadata";
 
@@ -60,7 +61,10 @@ export default async function GuidePage({ params }: Params) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={ldJson(
-          articleLd(guide.title, guide.description, href),
+          articleLd(guide.title, guide.description, href, {
+            published: createdAt(`content/guides/${guide.file}`),
+            modified: modifiedAt(`content/guides/${guide.file}`, "content/guides.ts"),
+          }),
         )}
       />
       <script

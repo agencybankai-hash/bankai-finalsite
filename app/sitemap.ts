@@ -5,12 +5,38 @@ import { casesEn } from "@/content/en/cases";
 import { guides } from "@/content/guides";
 import { landings } from "@/content/landings";
 import { enPairOf, ruPairOf } from "@/lib/i18n";
+import { modifiedAt } from "@/lib/lastmod";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteMeta.url.replace(/\/$/, "");
-  /* lastModified не отдаём: дат правок в контенте нет, а дата сборки менялась бы
-     при каждом деплое на всех 45 URL - такому полю поисковики перестают верить.
-     Появятся реальные даты в контенте - проставим их точечно. */
+  /* lastModified - дата последней правки файлов-источников страницы из git
+     (content/lastmod.json, обновляется командой npm run lastmod). Дата сборки
+     не годится: она менялась бы при каждом деплое на всех URL сразу. */
+  const sources: Record<string, string[]> = {
+    "": ["content/site.ts", "app/(ru)/page.tsx"],
+    "/about": ["content/about.ts", "app/(ru)/about/page.tsx"],
+    "/cases": ["content/cases.ts"],
+    "/contacts": ["app/(ru)/contacts/page.tsx"],
+    "/guides": ["content/guides.ts"],
+    "/privacy": ["app/(ru)/privacy/page.tsx"],
+    "/terms": ["app/(ru)/terms/page.tsx"],
+    "/en": ["content/en/ui.ts", "app/(en)/en/page.tsx"],
+    "/en/cases": ["content/en/cases.ts"],
+    "/en/contacts": ["app/(en)/en/contacts/page.tsx"],
+    "/en/privacy": ["app/(en)/en/privacy/page.tsx"],
+    "/en/terms": ["app/(en)/en/terms/page.tsx"],
+  };
+  const lastModifiedOf = (p: string): Date | undefined => {
+    const files =
+      sources[p] ??
+      (p.startsWith("/services/") ? (landings.some((l) => l.path === p) ? ["content/landings.ts"] : ["content/services.ts"])
+      : p.startsWith("/guides/") ? [`content/guides/${guides.find((g) => `/guides/${g.slug}` === p)?.file ?? ""}`, "content/guides.ts"]
+      : p.startsWith("/en/cases/") ? ["content/en/cases.ts"]
+      : p.startsWith("/cases/") ? ["content/cases.ts"]
+      : []);
+    const d = modifiedAt(...files);
+    return d ? new Date(d) : undefined;
+  };
 
   const staticPaths = [
     "",
@@ -67,6 +93,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...guidePaths,
   ].map((p) => ({
     url: url(p),
+    lastModified: lastModifiedOf(p),
     changeFrequency: "monthly" as const,
     priority: priorityOf(p),
     ...alternates(p, enPairOf(p)),
@@ -74,6 +101,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const enEntries = [...enStaticPaths, ...enCasePaths].map((p) => ({
     url: url(p),
+    lastModified: lastModifiedOf(p),
     changeFrequency: "monthly" as const,
     priority: p === "/en" ? 1 : 0.6,
     ...alternates(ruPairOf(p), p),

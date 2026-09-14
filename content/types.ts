@@ -35,6 +35,8 @@ export type ServiceChannel = {
   slug: string;
   navLabel: string;
   title: string;
+  /** Meta description страницы канала, до 160 символов. Hero-подзаголовок для этого длинный. */
+  description: string;
   hero: { title: string; subtitle: string };
   badges?: string[];
   metaphor?: string;

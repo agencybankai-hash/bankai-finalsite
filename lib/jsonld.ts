@@ -9,7 +9,29 @@ const sameAs = [
   contacts.telegramUrl,
   contacts.telegramChannelUrl,
   contacts.youtubeUrl,
+  contacts.instagramUrl,
+  contacts.linkedinUrl,
+  contacts.facebookUrl,
 ].filter((u) => u.startsWith("http"));
+
+/* Логотип для карточки организации в поиске: Google просит минимум 112×112. */
+const logo = {
+  "@type": "ImageObject",
+  url: `${base}/apple-icon.png`,
+  width: 180,
+  height: 180,
+};
+
+const phone = contacts.phone.trim();
+
+const contactPoint = {
+  "@type": "ContactPoint",
+  contactType: "sales",
+  email: contacts.email,
+  ...(phone && { telephone: phone }),
+  availableLanguage: ["ru", "en"],
+  areaServed: ["KZ", "US"],
+};
 
 const publisher = {
   "@type": "Organization",
@@ -23,7 +45,11 @@ export const organizationLd = {
   name: siteMeta.name,
   legalName: siteMeta.fullName,
   url: base,
+  logo,
+  image: logo.url,
   email: contacts.email,
+  ...(phone && { telephone: phone }),
+  contactPoint: [contactPoint],
   description: siteMeta.description,
   address: {
     "@type": "PostalAddress",
@@ -102,7 +128,12 @@ export function serviceLd(
   };
 }
 
-export function articleLd(headline: string, description: string, path: string) {
+export function articleLd(
+  headline: string,
+  description: string,
+  path: string,
+  dates: { published?: string; modified?: string } = {},
+) {
   return {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -110,6 +141,8 @@ export function articleLd(headline: string, description: string, path: string) {
     description,
     inLanguage: "ru",
     mainEntityOfPage: `${base}${path}`,
+    ...(dates.published && { datePublished: dates.published }),
+    ...(dates.modified && { dateModified: dates.modified }),
     author: publisher,
     publisher,
   };
