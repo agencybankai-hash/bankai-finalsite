@@ -35,6 +35,22 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
+## Заявки с&nbsp;сайта
+
+Форма на&nbsp;`/contacts` (`components/sections/ContactForm.tsx`) шлёт POST в&nbsp;`app/api/contact/route.ts`.
+Роут параллельно отправляет заявку трём получателям, ошибка одного не&nbsp;блокирует остальные
+(ответ `ok`, если сработал хотя&nbsp;бы один; сбои видны в&nbsp;логах Vercel как `contact <канал> failed`):
+
+- **Neon**, таблица `leads` - просмотр на&nbsp;`/admin/leads` (Basic Auth: `ADMIN_USER` / `ADMIN_PASSWORD`),
+  CSV на&nbsp;`/api/admin/export`.
+- **Telegram**, группа «Обработка заявок - Bankai.Agency» через бота `@BankaiApplicationsBot`
+  (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`). Код в&nbsp;`lib/notify.ts`.
+- **Почта** через FormSubmit (`formsubmit.co/ajax/<адрес>`), адрес из&nbsp;`LEAD_EMAIL_TO`
+  (по умолчанию `agency.bankai@gmail.com`). Адрес должен быть один раз активирован на&nbsp;formsubmit.co.
+
+Переменные для уведомлений задаются в&nbsp;Vercel для Production (и&nbsp;Preview, если нужны уведомления
+с&nbsp;превью). Без них роут пишет только в&nbsp;Neon и&nbsp;логирует ошибку канала.
+
 ## Переменные окружения
 
 Полный список - в `.env.example`, локальные значения кладутся в `.env.local`.
