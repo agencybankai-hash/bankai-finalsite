@@ -4,6 +4,7 @@ import { ContactForm } from "@/components/sections/ContactForm";
 import { contacts } from "@/content/site";
 import { ui } from "@/content/ui";
 import { pageMetadata } from "@/lib/metadata";
+import { visitorCountry } from "@/lib/geo";
 
 const t = ui("en");
 
@@ -15,7 +16,8 @@ export const generateMetadata = pageMetadata({
   locale: "en",
 });
 
-export default function EnContactsPage() {
+export default async function EnContactsPage() {
+  const country = await visitorCountry();
   return (
     <>
       {/* visual={false}: HeroVisual - иллюстрация с русскими подписями и без
@@ -30,7 +32,7 @@ export default function EnContactsPage() {
       <Section>
         <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr]">
           <div>
-            <ContactForm locale="en" />
+            <ContactForm locale="en" defaultCountry={country} />
           </div>
 
           <aside className="space-y-8">

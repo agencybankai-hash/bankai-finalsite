@@ -7,7 +7,14 @@ import { Turnstile } from "@/components/Turnstile";
 import { ui } from "@/content/ui";
 import { normalizeContact } from "@/lib/contact";
 import { PhoneFlag } from "@/components/PhoneFlag";
-import { detectPhoneCountry, formatPhoneInput, normalizePhone } from "@/lib/phone";
+import {
+  EMPTY_PHONE,
+  detectPhoneCountry,
+  formatPhoneInput,
+  normalizePhone,
+  phonePlaceholder,
+  type CountryCode,
+} from "@/lib/phone";
 import type { Locale } from "@/content/types";
 
 const fieldBase =
@@ -32,7 +39,26 @@ function trackLead(service: string, source: string) {
   } catch {}
 }
 
-export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
+/** Галочка валидного поля: показывается сразу, как только значение стало правильным. */
+function ValidMark() {
+  return (
+    <span className="pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-success">
+      <svg viewBox="0 0 20 20" width={18} height={18} aria-hidden fill="none" stroke="currentColor" strokeWidth={2}>
+        <circle cx="10" cy="10" r="8" />
+        <path d="M6.5 10.5l2.3 2.3L13.5 8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </span>
+  );
+}
+
+export function ContactForm({
+  locale = "ru",
+  defaultCountry = "KZ",
+}: {
+  locale?: Locale;
+  /** Стартовая страна телефона, обычно по IP посетителя (lib/geo.ts). */
+  defaultCountry?: CountryCode;
+}) {
   const t = ui(locale).form;
   const pathname = usePathname();
   const [status, setStatus] = useState<"idle" | "error" | "success">("idle");
@@ -44,17 +70,24 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
   const [touched, setTouched] = useState<{ name?: boolean; phone?: boolean; contact?: boolean }>(
     {},
   );
-  // Телефон контролируемый: маска форматирует значение при каждом вводе.
-  const [phone, setPhone] = useState("");
+  // Телефон контролируемый: маска форматирует значение при каждом вводе,
+  // `auto` помнит, что «+код» подставлен автоматически (см. lib/phone.ts).
+  const [phoneState, setPhoneState] = useState(EMPTY_PHONE);
+  const phone = phoneState.value;
+
+  // Зелёная галочка у имени и контакта появляется сразу при валидном значении.
+  const [valid, setValid] = useState<{ name?: boolean; contact?: boolean }>({});
 
   const validators = {
     name: (v: string) => v.trim().length > 0,
-    phone: (v: string) => normalizePhone(v) !== null,
+    phone: (v: string) => normalizePhone(v, defaultCountry) !== null,
     contact: (v: string) => normalizeContact(v) !== null,
   };
   type Field = keyof typeof validators;
   const check = (field: Field, value: string) =>
     setErrors((prev) => ({ ...prev, [field]: !validators[field](value) }));
+  const markValid = (field: "name" | "contact", value: string) =>
+    setValid((prev) => ({ ...prev, [field]: validators[field](value) }));
   const onBlurField = (field: Field, value: string) => {
     setTouched((prev) => ({ ...prev, [field]: true }));
     check(field, value);
@@ -71,7 +104,7 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
     const data = new FormData(e.currentTarget);
     if (String(data.get("company") ?? "")) return; // honeypot
     const name = String(data.get("name") ?? "").trim();
-    const phoneE164 = normalizePhone(phone);
+    const phoneE164 = normalizePhone(phone, defaultCountry);
     const contact = normalizeContact(String(data.get("contact") ?? ""));
     const next = { name: !name, phone: !phoneE164, contact: !contact };
     setTouched({ name: true, phone: true, contact: true });
@@ -163,16 +196,22 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
           <label htmlFor="name" className={labelBase}>
             {t.nameLabel} <span className="text-muted">*</span>
           </label>
-          <input
-            id="name"
-            name="name"
-            autoComplete="name"
-            className={fieldBase}
-            placeholder={t.namePlaceholder}
-            aria-invalid={errors.name || undefined}
-            onBlur={(e) => onBlurField("name", e.target.value)}
-            onChange={(e) => onChangeField("name", e.target.value)}
-          />
+          <div className="relative">
+            <input
+              id="name"
+              name="name"
+              autoComplete="name"
+              className={`${fieldBase} pr-10`}
+              placeholder={t.namePlaceholder}
+              aria-invalid={errors.name || undefined}
+              onBlur={(e) => onBlurField("name", e.target.value)}
+              onChange={(e) => {
+                onChangeField("name", e.target.value);
+                markValid("name", e.target.value);
+              }}
+            />
+            {valid.name && <ValidMark />}
+          </div>
           {errors.name && (
             <p role="alert" className={errorBase}>
               {t.nameError}
@@ -185,7 +224,7 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
           </label>
           <div className="relative">
             <span className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center">
-              <PhoneFlag country={detectPhoneCountry(phone)} locale={locale} />
+              <PhoneFlag country={detectPhoneCountry(phone, defaultCountry)} locale={locale} />
             </span>
             <input
               id="phone"
@@ -195,13 +234,16 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
               autoComplete="tel"
               value={phone}
               onChange={(e) => {
-                const next = formatPhoneInput(phone, e.target.value);
-                setPhone(next);
-                onChangeField("phone", next);
+                const next = formatPhoneInput(phoneState, e.target.value, defaultCountry);
+                setPhoneState(next);
+                onChangeField("phone", next.value);
               }}
               onBlur={() => onBlurField("phone", phone)}
               className={`${fieldBase} pl-11`}
-              placeholder={t.phonePlaceholder}
+              placeholder={phonePlaceholder(
+                detectPhoneCountry(phone, defaultCountry) ?? defaultCountry,
+                t.phonePlaceholder,
+              )}
               aria-invalid={errors.phone || undefined}
             />
           </div>
@@ -217,16 +259,22 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
         <label htmlFor="contact" className={labelBase}>
           {t.contactLabel} <span className="text-muted">*</span>
         </label>
-        <input
-          id="contact"
-          name="contact"
-          autoComplete="off"
-          className={fieldBase}
-          placeholder={t.contactPlaceholder}
-          aria-invalid={errors.contact || undefined}
-          onBlur={(e) => onBlurField("contact", e.target.value)}
-          onChange={(e) => onChangeField("contact", e.target.value)}
-        />
+        <div className="relative">
+          <input
+            id="contact"
+            name="contact"
+            autoComplete="off"
+            className={`${fieldBase} pr-10`}
+            placeholder={t.contactPlaceholder}
+            aria-invalid={errors.contact || undefined}
+            onBlur={(e) => onBlurField("contact", e.target.value)}
+            onChange={(e) => {
+              onChangeField("contact", e.target.value);
+              markValid("contact", e.target.value);
+            }}
+          />
+          {valid.contact && <ValidMark />}
+        </div>
         {errors.contact && (
           <p role="alert" className={errorBase}>
             {t.contactError}
