@@ -23,16 +23,20 @@ export function Button({
   size = "md",
   className,
   children,
+  onClick,
 }: {
   href: string;
   variant?: Variant;
   size?: Size;
   className?: string;
   children: React.ReactNode;
+  /** Например, закрыть мобильное меню перед переходом. */
+  onClick?: () => void;
 }) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       data-cursor
       className={cn(base, variants[variant], sizes[size], className)}
     >

@@ -50,6 +50,15 @@ export function Header({ locale = "ru" }: { locale?: Locale }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const { nav, headerCta, home, tagline, menuLabel } = ui(locale);
+
+  // Шапка живёт в layout и переживает переходы между страницами: закрываем
+  // мобильное меню при смене адреса, какой бы ссылкой его ни вызвали.
+  // Сброс в рендере, а не в эффекте: так рекомендует React и требует линтер.
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setOpen(false);
+  }
   const otherLocaleHref = switchHref(pathname, locale);
 
   const isActive = (href: string) =>
@@ -176,7 +185,12 @@ export function Header({ locale = "ru" }: { locale?: Locale }) {
                 </div>
               ))}
               <div className="px-3 pt-3">
-                <Button href={headerCta.href} variant="accent" className="w-full">
+                <Button
+                  href={headerCta.href}
+                  variant="accent"
+                  className="w-full"
+                  onClick={() => setOpen(false)}
+                >
                   {headerCta.label}
                 </Button>
               </div>
