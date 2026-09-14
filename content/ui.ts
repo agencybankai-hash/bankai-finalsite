@@ -76,6 +76,7 @@ export const uiRu: UiDict = {
     phoneError: "Укажите номер телефона в международном формате",
     contactLabel: "Email или Telegram",
     contactPlaceholder: "@username или name@mail.com",
+    contactError: "Укажите email или логин Telegram, например @username",
     nicheLabel: "Ниша",
     nichePlaceholder: "Чем занимается бизнес",
     revenueLabel: "Оборот в месяц",

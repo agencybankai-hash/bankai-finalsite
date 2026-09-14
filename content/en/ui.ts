@@ -70,6 +70,7 @@ export const uiEn: UiDict = {
     phoneError: "Enter a phone number in international format",
     contactLabel: "Email or Telegram",
     contactPlaceholder: "@username or name@mail.com",
+    contactError: "Enter an email or a Telegram username, e.g. @username",
     nicheLabel: "Industry",
     nichePlaceholder: "What your business does",
     revenueLabel: "Monthly revenue",
