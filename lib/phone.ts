@@ -29,14 +29,25 @@ export function detectPhoneCountry(value: string): CountryCode | undefined {
   const exact = t.getCountry();
   if (exact) return exact;
   const code = t.getCallingCode();
-  if (!code) return value.trim().startsWith("+") ? undefined : DEFAULT_COUNTRY;
+  if (!code) {
+    // «+» без цифр или внутренний префикс «0» - страна неизвестна.
+    const v = value.trim();
+    return v.startsWith("+") || v.startsWith("0") ? undefined : DEFAULT_COUNTRY;
+  }
   const list = countriesForCallingCode(code);
   return list.includes(DEFAULT_COUNTRY) ? DEFAULT_COUNTRY : list[0];
 }
 
 const digitsOf = (s: string) => s.replace(/\D/g, "");
 
-/** Значение поля после ввода: форматируем «на лету». */
+/**
+ * Значение поля после ввода: форматируем «на лету».
+ * Ввод без «+» приводим к международному виду сами, чтобы страна
+ * определялась сразу: «8 777…» -> «+7 777…» (8 - междугородний префикс
+ * в Казахстане и России), «7 921…» -> «+7 921…», «44 20…» -> «+44 20…».
+ * Ведущий «0» (внутренний префикс в Европе, Турции и др.) без страны
+ * не расшифровать: оставляем как есть, номер подсветится как невалидный.
+ */
 export function formatPhoneInput(prev: string, next: string): string {
   // Стёрли символ форматирования (пробел, скобку): убираем и цифру перед ним,
   // иначе форматтер вернёт символ обратно и поле «залипнет».
@@ -44,8 +55,12 @@ export function formatPhoneInput(prev: string, next: string): string {
   if (next.length < prev.length && digitsOf(next) === digitsOf(prev)) {
     raw = next.slice(0, -1);
   }
-  const cleaned = raw.replace(/[^\d+]/g, "").replace(/(?!^)\+/g, "");
-  if (!cleaned) return "";
+  let cleaned = raw.replace(/[^\d+]/g, "").replace(/(?!^)\+/g, "");
+  if (!cleaned || cleaned === "+") return cleaned;
+  if (!cleaned.startsWith("+")) {
+    if (cleaned.startsWith("8")) cleaned = `+7${cleaned.slice(1)}`;
+    else if (!cleaned.startsWith("0")) cleaned = `+${cleaned}`;
+  }
   return new AsYouType(DEFAULT_COUNTRY).input(cleaned);
 }
 
