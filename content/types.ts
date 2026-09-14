@@ -229,9 +229,12 @@ export type UiDict = {
     nameLabel: string;
     namePlaceholder: string;
     nameError: string;
+    phoneLabel: string;
+    phonePlaceholder: string;
+    phoneError: string;
+    /** Email или Telegram, необязательное поле. */
     contactLabel: string;
     contactPlaceholder: string;
-    contactError: string;
     nicheLabel: string;
     nichePlaceholder: string;
     revenueLabel: string;

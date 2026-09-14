@@ -13,6 +13,7 @@ type Lead = {
   source: string;
   payload: {
     guide?: string;
+    phone?: string;
     contact?: string;
     service?: string;
     niche?: string;
@@ -46,7 +47,10 @@ function details(r: Lead) {
 
 /** Подпись лида для подтверждения удаления. */
 function leadLabel(r: Lead) {
-  return [r.name, r.payload?.contact || r.email].filter(Boolean).join(", ") || `#${r.id}`;
+  return (
+    [r.name, r.payload?.phone, r.payload?.contact || r.email].filter(Boolean).join(", ") ||
+    `#${r.id}`
+  );
 }
 
 export default async function LeadsPage() {
@@ -119,8 +123,15 @@ export default async function LeadsPage() {
                     </td>
                     <td className="px-4 py-3 text-ink">
                       {r.name && <div className="font-medium">{r.name}</div>}
-                      <div className={r.name ? "text-ink-2" : ""}>
-                        {r.payload?.contact || r.email || "—"}
+                      {r.payload?.phone && (
+                        <div>
+                          <a href={`tel:${r.payload.phone}`} className="text-ink hover:text-accent">
+                            {r.payload.phone}
+                          </a>
+                        </div>
+                      )}
+                      <div className={r.name || r.payload?.phone ? "text-ink-2" : ""}>
+                        {r.payload?.contact || r.email || (r.payload?.phone ? "" : "—")}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-ink-2">

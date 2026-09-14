@@ -38,6 +38,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## Заявки с&nbsp;сайта
 
 Форма на&nbsp;`/contacts` (`components/sections/ContactForm.tsx`) шлёт POST в&nbsp;`app/api/contact/route.ts`.
+Обязательные поля: имя и&nbsp;телефон. Телефон с&nbsp;международной маской (`lib/phone.ts`, libphonenumber-js):
+номер с&nbsp;«+» форматируется по&nbsp;правилам своей страны, без «+» считается казахстанским; в&nbsp;базу
+и&nbsp;уведомления идёт нормализованный E.164. Email или Telegram - отдельное необязательное поле.
 Роут параллельно отправляет заявку трём получателям, ошибка одного не&nbsp;блокирует остальные
 (ответ `ok`, если сработал хотя&nbsp;бы один; сбои видны в&nbsp;логах Vercel как `contact <канал> failed`):
 

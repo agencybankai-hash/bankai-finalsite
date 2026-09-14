@@ -9,6 +9,7 @@ type Row = {
   source: string;
   payload: {
     guide?: string;
+    phone?: string;
     contact?: string;
     service?: string;
     niche?: string;
@@ -44,6 +45,7 @@ export async function GET() {
     "id",
     "created_at",
     "email",
+    "phone",
     "contact",
     "name",
     "source",
@@ -58,6 +60,7 @@ export async function GET() {
       r.id,
       iso(r.created_at),
       r.email,
+      r.payload?.phone ?? "",
       r.payload?.contact ?? "",
       r.name,
       r.source,
