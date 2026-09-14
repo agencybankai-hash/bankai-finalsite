@@ -46,3 +46,6 @@ next-env.d.ts
 # competitor reference lead-magnets (local only, not for git)
 /references/
 .env*.local
+
+# SVG-флаги копируются из country-flag-icons скриптом scripts/copy-flags.mjs
+/public/flags

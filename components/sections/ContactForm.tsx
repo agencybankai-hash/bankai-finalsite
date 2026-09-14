@@ -6,7 +6,8 @@ import { useState } from "react";
 import { Turnstile } from "@/components/Turnstile";
 import { ui } from "@/content/ui";
 import { normalizeContact } from "@/lib/contact";
-import { formatPhoneInput, normalizePhone } from "@/lib/phone";
+import { PhoneFlag } from "@/components/PhoneFlag";
+import { detectPhoneCountry, formatPhoneInput, normalizePhone } from "@/lib/phone";
 import type { Locale } from "@/content/types";
 
 const fieldBase =
@@ -157,18 +158,23 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
           <label htmlFor="phone" className={labelBase}>
             {t.phoneLabel} <span className="text-muted">*</span>
           </label>
-          <input
-            id="phone"
-            name="phone"
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel"
-            value={phone}
-            onChange={(e) => setPhone(formatPhoneInput(phone, e.target.value))}
-            className={fieldBase}
-            placeholder={t.phonePlaceholder}
-            aria-invalid={errors.phone || undefined}
-          />
+          <div className="relative">
+            <span className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center">
+              <PhoneFlag country={detectPhoneCountry(phone)} locale={locale} />
+            </span>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              value={phone}
+              onChange={(e) => setPhone(formatPhoneInput(phone, e.target.value))}
+              className={`${fieldBase} pl-11`}
+              placeholder={t.phonePlaceholder}
+              aria-invalid={errors.phone || undefined}
+            />
+          </div>
           {errors.phone && (
             <p role="alert" className={errorBase}>
               {t.phoneError}
