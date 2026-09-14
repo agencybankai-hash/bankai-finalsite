@@ -2,9 +2,30 @@ import { NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
 import { notifyEmail, notifyTelegram } from "@/lib/notify";
 import type { LeadNotification } from "@/lib/lead-fields";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const clip = (v: unknown, n: number) => String(v ?? "").trim().slice(0, n);
+
+/**
+ * Форму отправляет только браузер с нашего сайта: у fetch-POST всегда есть
+ * Origin. Чужой или отсутствующий Origin отсекает примитивные скрипты
+ * (настоящая защита от ботов - Turnstile ниже).
+ */
+function originAllowed(origin: string | null) {
+  if (!origin) return false;
+  try {
+    const host = new URL(origin).hostname;
+    return (
+      host === "bankai.agency" ||
+      host.endsWith(".bankai.agency") ||
+      host.endsWith(".vercel.app") ||
+      host === "localhost"
+    );
+  } catch {
+    return false;
+  }
+}
 
 /* Лёгкий best-effort рейт-лимит в памяти инстанса (на serverless не строгий). */
 const hits = new Map<string, number[]>();
@@ -24,6 +45,10 @@ function rateLimited(ip: string, max = 5, windowMs = 600_000) {
  * Сбои пишутся в лог Vercel как `contact <канал> failed`.
  */
 export async function POST(req: Request) {
+  if (!originAllowed(req.headers.get("origin"))) {
+    return NextResponse.json({ ok: false, error: "origin" }, { status: 403 });
+  }
+
   const ip = (req.headers.get("x-forwarded-for") ?? "local").split(",")[0].trim();
   if (rateLimited(ip)) {
     return NextResponse.json({ ok: false, error: "rate" }, { status: 429 });
@@ -40,6 +65,18 @@ export async function POST(req: Request) {
 
   // honeypot
   if (String(b.company ?? "")) return NextResponse.json({ ok: true });
+
+  // Turnstile: включён, когда задан секрет. Токен обязателен и должен пройти
+  // проверку; если сам Cloudflare недоступен, заявку пропускаем, чтобы не
+  // терять живых клиентов из-за чужого сбоя (факт пишется в лог).
+  const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+  if (turnstileSecret) {
+    const verdict = await verifyTurnstile(turnstileSecret, clip(b.turnstileToken, 2048), ip);
+    if (verdict === "rejected") {
+      return NextResponse.json({ ok: false, error: "bot" }, { status: 403 });
+    }
+    if (verdict === "unavailable") console.error("turnstile unavailable, lead accepted");
+  }
 
   const name = clip(b.name, 120);
   const contact = clip(b.contact, 200);

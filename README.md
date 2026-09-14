@@ -51,6 +51,20 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
   DNS-записи DKIM и&nbsp;поддомен `send`), получатели `LEAD_EMAIL_TO` через запятую
   (по умолчанию `agency.bankai@gmail.com`). Если контакт лида похож на&nbsp;email, он идёт в&nbsp;Reply-To.
 
+### Защита формы
+
+- **Cloudflare Turnstile.** Включается парой ключей: `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (виджет)
+  и&nbsp;`TURNSTILE_SECRET_KEY` (проверка в&nbsp;роуте, `lib/turnstile.ts`). Без ключей форма работает
+  без проверки. Режим `interaction-only`: посетитель видит виджет, только если Cloudflare
+  решит задать проверку. Если сам Cloudflare недоступен, заявка принимается, факт пишется в&nbsp;лог.
+  Тестовые ключи для локалки: site `1x00000000000000000000AA`, secret `1x0000000000000000000000000000000AA`.
+- **Origin.** Роут принимает POST только с&nbsp;`bankai.agency`, `*.bankai.agency`, `*.vercel.app`
+  и&nbsp;`localhost`; иначе 403. Отсекает примитивные скрипты, настоящая защита - Turnstile.
+- **Honeypot** `company` и&nbsp;лёгкий лимит 5&nbsp;заявок за&nbsp;10&nbsp;минут с&nbsp;IP в&nbsp;памяти
+  инстанса (на&nbsp;serverless не&nbsp;строгий; строгий лимит - правило Vercel Firewall или Upstash).
+- Заголовки безопасности (`X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`,
+  `Permissions-Policy`) задаются в&nbsp;`next.config.ts`. Полного CSP нет.
+
 Переменные уведомлений задаются в&nbsp;Vercel для Production (и&nbsp;Preview, если нужны уведомления
 с&nbsp;превью). Без них роут пишет только в&nbsp;Neon и&nbsp;логирует ошибку канала.
 FormSubmit для почты не&nbsp;подходит: он за&nbsp;Cloudflare и&nbsp;серверам Vercel отдаёт челлендж 403.

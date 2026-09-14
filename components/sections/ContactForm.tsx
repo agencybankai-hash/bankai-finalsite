@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { Turnstile } from "@/components/Turnstile";
 import { ui } from "@/content/ui";
 import type { Locale } from "@/content/types";
 
@@ -10,6 +11,8 @@ const fieldBase =
   "w-full rounded-lg border border-border bg-bg px-3.5 py-2.5 text-sm text-ink placeholder:text-muted aria-invalid:border-accent focus-visible:border-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
 const labelBase = "mb-1.5 block text-sm font-medium text-ink";
 const errorBase = "mt-1.5 text-xs font-medium text-accent";
+// Turnstile включён, если задан публичный сайт-ключ (секрет проверяет сервер).
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 type AnalyticsWindow = Window & {
   dataLayer?: unknown[];
@@ -33,6 +36,7 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
   const [errors, setErrors] = useState<{ name?: boolean; contact?: boolean }>({});
   const [pending, setPending] = useState(false);
   const [sendErr, setSendErr] = useState(false);
+  const [captchaErr, setCaptchaErr] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,8 +47,15 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
     const next = { name: !name, contact: !contact };
     setErrors(next);
     setSendErr(false);
+    setCaptchaErr(false);
     if (next.name || next.contact) {
       setStatus("error");
+      return;
+    }
+    // Токен Turnstile кладёт сам виджет скрытым полем внутри формы.
+    const turnstileToken = String(data.get("cf-turnstile-response") ?? "");
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+      setCaptchaErr(true);
       return;
     }
     setPending(true);
@@ -62,8 +73,12 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(lead),
+        body: JSON.stringify({ ...lead, turnstileToken }),
       });
+      if (res.status === 403) {
+        setCaptchaErr(true);
+        return;
+      }
       if (!res.ok) throw new Error(`status ${res.status}`);
       setStatus("success");
       trackLead(lead.service, pathname);
@@ -197,6 +212,12 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
           {t.sendError}
         </p>
       )}
+      {captchaErr && (
+        <p role="alert" className="text-sm font-medium text-accent">
+          {t.captchaError}
+        </p>
+      )}
+      {TURNSTILE_SITE_KEY && <Turnstile siteKey={TURNSTILE_SITE_KEY} locale={locale} />}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <button
