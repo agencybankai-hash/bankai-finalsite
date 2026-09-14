@@ -232,9 +232,10 @@ export type UiDict = {
     phoneLabel: string;
     phonePlaceholder: string;
     phoneError: string;
-    /** Email или Telegram, необязательное поле. */
+    /** Email или логин Telegram, обязательное поле. */
     contactLabel: string;
     contactPlaceholder: string;
+    contactError: string;
     nicheLabel: string;
     nichePlaceholder: string;
     revenueLabel: string;

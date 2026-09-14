@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Turnstile } from "@/components/Turnstile";
 import { ui } from "@/content/ui";
+import { normalizeContact } from "@/lib/contact";
 import { formatPhoneInput, normalizePhone } from "@/lib/phone";
 import type { Locale } from "@/content/types";
 
@@ -34,7 +35,9 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
   const t = ui(locale).form;
   const pathname = usePathname();
   const [status, setStatus] = useState<"idle" | "error" | "success">("idle");
-  const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean }>({});
+  const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean; contact?: boolean }>(
+    {},
+  );
   // Телефон контролируемый: маска форматирует значение при каждом вводе.
   const [phone, setPhone] = useState("");
   const [pending, setPending] = useState(false);
@@ -47,12 +50,12 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
     if (String(data.get("company") ?? "")) return; // honeypot
     const name = String(data.get("name") ?? "").trim();
     const phoneE164 = normalizePhone(phone);
-    const contact = String(data.get("contact") ?? "").trim();
-    const next = { name: !name, phone: !phoneE164 };
+    const contact = normalizeContact(String(data.get("contact") ?? ""));
+    const next = { name: !name, phone: !phoneE164, contact: !contact };
     setErrors(next);
     setSendErr(false);
     setCaptchaErr(false);
-    if (next.name || next.phone) {
+    if (next.name || next.phone || next.contact) {
       setStatus("error");
       return;
     }
@@ -67,7 +70,7 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
       service: String(data.get("service") ?? ""),
       name,
       phone: phoneE164,
-      contact,
+      contact: contact?.value,
       niche: String(data.get("niche") ?? ""),
       revenue: String(data.get("revenue") ?? ""),
       comment: String(data.get("comment") ?? ""),
@@ -176,7 +179,7 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
 
       <div>
         <label htmlFor="contact" className={labelBase}>
-          {t.contactLabel} <span className="text-muted">{t.optional}</span>
+          {t.contactLabel} <span className="text-muted">*</span>
         </label>
         <input
           id="contact"
@@ -184,7 +187,13 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
           autoComplete="off"
           className={fieldBase}
           placeholder={t.contactPlaceholder}
+          aria-invalid={errors.contact || undefined}
         />
+        {errors.contact && (
+          <p role="alert" className={errorBase}>
+            {t.contactError}
+          </p>
+        )}
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2">

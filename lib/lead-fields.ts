@@ -3,7 +3,7 @@
 export type LeadNotification = {
   name: string;
   phone: string;
-  /** Email или Telegram, может быть пустым. */
+  /** Email или @username Telegram. */
   contact: string;
   service?: string;
   niche?: string;
