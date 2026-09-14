@@ -242,6 +242,7 @@ export type UiDict = {
     optional: string;
     formError: string;
     sendError: string;
+    captchaError: string;
     submit: string;
     submitting: string;
     /** Согласие: текст до ссылки, текст ссылки, хвост после. */

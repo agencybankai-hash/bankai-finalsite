@@ -31,6 +31,20 @@ const nextConfig: NextConfig = {
   // чтобы дубли сайта не попадали в индекс.
   async headers() {
     return [
+      // Базовые заголовки безопасности для всех ответов. Полный CSP отдельно:
+      // ему нужны nonce для inline-скриптов Next.
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+          },
+        ],
+      },
       {
         source: "/guides/:file(.*\\.pdf)",
         headers: [{ key: "X-Robots-Tag", value: "noindex" }],

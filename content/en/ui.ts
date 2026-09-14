@@ -77,6 +77,7 @@ export const uiEn: UiDict = {
     optional: "- optional",
     formError: "Fill in the required fields above.",
     sendError: "Could not send. Try again or message us on Telegram.",
+    captchaError: "We could not verify you are human. Reload the page and try again.",
     submit: "Send request",
     submitting: "Sending…",
     consent: "By sending this form you agree to our",
