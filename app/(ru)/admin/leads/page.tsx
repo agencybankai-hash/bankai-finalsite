@@ -206,7 +206,9 @@ export default async function LeadsPage() {
                     <th className="px-4 py-3 font-medium text-ink">Источник</th>
                     <th className="px-4 py-3 font-medium text-ink">Детали</th>
                     <th className="px-4 py-3 font-medium text-ink">Устройство</th>
-                    <th className="px-4 py-3 font-medium text-ink">
+                    {/* relative: иначе sr-only-подпись позиционируется относительно
+                        страницы и растягивает документ по ширине на мобильных. */}
+                    <th className="relative px-4 py-3 font-medium text-ink">
                       <span className="sr-only">Действия</span>
                     </th>
                   </tr>
