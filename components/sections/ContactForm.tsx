@@ -59,6 +59,8 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
           niche: data.get("niche"),
           revenue: data.get("revenue"),
           comment: data.get("comment"),
+          page: pathname,
+          locale,
         }),
       });
       if (!res.ok) throw new Error(`status ${res.status}`);
