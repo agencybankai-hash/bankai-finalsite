@@ -39,8 +39,29 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
   const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean; contact?: boolean }>(
     {},
   );
+  // Живая валидация: поле проверяется при уходе из него и при каждом
+  // изменении после первого касания, ошибка исчезает сразу после исправления.
+  const [touched, setTouched] = useState<{ name?: boolean; phone?: boolean; contact?: boolean }>(
+    {},
+  );
   // Телефон контролируемый: маска форматирует значение при каждом вводе.
   const [phone, setPhone] = useState("");
+
+  const validators = {
+    name: (v: string) => v.trim().length > 0,
+    phone: (v: string) => normalizePhone(v) !== null,
+    contact: (v: string) => normalizeContact(v) !== null,
+  };
+  type Field = keyof typeof validators;
+  const check = (field: Field, value: string) =>
+    setErrors((prev) => ({ ...prev, [field]: !validators[field](value) }));
+  const onBlurField = (field: Field, value: string) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    check(field, value);
+  };
+  const onChangeField = (field: Field, value: string) => {
+    if (touched[field] || errors[field]) check(field, value);
+  };
   const [pending, setPending] = useState(false);
   const [sendErr, setSendErr] = useState(false);
   const [captchaErr, setCaptchaErr] = useState(false);
@@ -53,6 +74,7 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
     const phoneE164 = normalizePhone(phone);
     const contact = normalizeContact(String(data.get("contact") ?? ""));
     const next = { name: !name, phone: !phoneE164, contact: !contact };
+    setTouched({ name: true, phone: true, contact: true });
     setErrors(next);
     setSendErr(false);
     setCaptchaErr(false);
@@ -144,9 +166,12 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
           <input
             id="name"
             name="name"
+            autoComplete="name"
             className={fieldBase}
             placeholder={t.namePlaceholder}
             aria-invalid={errors.name || undefined}
+            onBlur={(e) => onBlurField("name", e.target.value)}
+            onChange={(e) => onChangeField("name", e.target.value)}
           />
           {errors.name && (
             <p role="alert" className={errorBase}>
@@ -169,7 +194,12 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
               inputMode="tel"
               autoComplete="tel"
               value={phone}
-              onChange={(e) => setPhone(formatPhoneInput(phone, e.target.value))}
+              onChange={(e) => {
+                const next = formatPhoneInput(phone, e.target.value);
+                setPhone(next);
+                onChangeField("phone", next);
+              }}
+              onBlur={() => onBlurField("phone", phone)}
               className={`${fieldBase} pl-11`}
               placeholder={t.phonePlaceholder}
               aria-invalid={errors.phone || undefined}
@@ -194,6 +224,8 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
           className={fieldBase}
           placeholder={t.contactPlaceholder}
           aria-invalid={errors.contact || undefined}
+          onBlur={(e) => onBlurField("contact", e.target.value)}
+          onChange={(e) => onChangeField("contact", e.target.value)}
         />
         {errors.contact && (
           <p role="alert" className={errorBase}>
