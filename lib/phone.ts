@@ -24,16 +24,15 @@ function countriesForCallingCode(code: string): CountryCode[] {
  * «+» без цифр - неизвестно.
  */
 export function detectPhoneCountry(value: string): CountryCode | undefined {
+  // Внутренний префикс «0» (Европа, Турция и др.) без страны не расшифровать.
+  if (value.trim().startsWith("0")) return undefined;
   const t = new AsYouType(DEFAULT_COUNTRY);
   t.input(value);
   const exact = t.getCountry();
   if (exact) return exact;
   const code = t.getCallingCode();
-  if (!code) {
-    // «+» без цифр или внутренний префикс «0» - страна неизвестна.
-    const v = value.trim();
-    return v.startsWith("+") || v.startsWith("0") ? undefined : DEFAULT_COUNTRY;
-  }
+  // «+» без цифр - страна ещё неизвестна; пустое поле - страна по умолчанию.
+  if (!code) return value.trim().startsWith("+") ? undefined : DEFAULT_COUNTRY;
   const list = countriesForCallingCode(code);
   return list.includes(DEFAULT_COUNTRY) ? DEFAULT_COUNTRY : list[0];
 }
