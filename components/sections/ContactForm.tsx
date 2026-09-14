@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Turnstile } from "@/components/Turnstile";
 import { ui } from "@/content/ui";
+import { formatPhoneInput, normalizePhone } from "@/lib/phone";
 import type { Locale } from "@/content/types";
 
 const fieldBase =
@@ -33,7 +34,9 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
   const t = ui(locale).form;
   const pathname = usePathname();
   const [status, setStatus] = useState<"idle" | "error" | "success">("idle");
-  const [errors, setErrors] = useState<{ name?: boolean; contact?: boolean }>({});
+  const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean }>({});
+  // Телефон контролируемый: маска форматирует значение при каждом вводе.
+  const [phone, setPhone] = useState("");
   const [pending, setPending] = useState(false);
   const [sendErr, setSendErr] = useState(false);
   const [captchaErr, setCaptchaErr] = useState(false);
@@ -43,12 +46,13 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
     const data = new FormData(e.currentTarget);
     if (String(data.get("company") ?? "")) return; // honeypot
     const name = String(data.get("name") ?? "").trim();
+    const phoneE164 = normalizePhone(phone);
     const contact = String(data.get("contact") ?? "").trim();
-    const next = { name: !name, contact: !contact };
+    const next = { name: !name, phone: !phoneE164 };
     setErrors(next);
     setSendErr(false);
     setCaptchaErr(false);
-    if (next.name || next.contact) {
+    if (next.name || next.phone) {
       setStatus("error");
       return;
     }
@@ -62,6 +66,7 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
     const lead = {
       service: String(data.get("service") ?? ""),
       name,
+      phone: phoneE164,
       contact,
       niche: String(data.get("niche") ?? ""),
       revenue: String(data.get("revenue") ?? ""),
@@ -146,22 +151,40 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
           )}
         </div>
         <div>
-          <label htmlFor="contact" className={labelBase}>
-            {t.contactLabel} <span className="text-muted">*</span>
+          <label htmlFor="phone" className={labelBase}>
+            {t.phoneLabel} <span className="text-muted">*</span>
           </label>
           <input
-            id="contact"
-            name="contact"
+            id="phone"
+            name="phone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            value={phone}
+            onChange={(e) => setPhone(formatPhoneInput(phone, e.target.value))}
             className={fieldBase}
-            placeholder={t.contactPlaceholder}
-            aria-invalid={errors.contact || undefined}
+            placeholder={t.phonePlaceholder}
+            aria-invalid={errors.phone || undefined}
           />
-          {errors.contact && (
+          {errors.phone && (
             <p role="alert" className={errorBase}>
-              {t.contactError}
+              {t.phoneError}
             </p>
           )}
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="contact" className={labelBase}>
+          {t.contactLabel} <span className="text-muted">{t.optional}</span>
+        </label>
+        <input
+          id="contact"
+          name="contact"
+          autoComplete="off"
+          className={fieldBase}
+          placeholder={t.contactPlaceholder}
+        />
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2">

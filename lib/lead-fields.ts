@@ -2,6 +2,8 @@
 
 export type LeadNotification = {
   name: string;
+  phone: string;
+  /** Email или Telegram, может быть пустым. */
   contact: string;
   service?: string;
   niche?: string;
@@ -14,7 +16,8 @@ export type LeadNotification = {
 // Подписи полей в уведомлениях.   - неразрывный пробел после предлога.
 const FIELDS: Array<[keyof LeadNotification, string]> = [
   ["name", "Имя"],
-  ["contact", "Контакт"],
+  ["phone", "Телефон"],
+  ["contact", "Email / Telegram"],
   ["service", "Услуга"],
   ["niche", "Ниша"],
   ["revenue", "Оборот в месяц"],

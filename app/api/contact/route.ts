@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
 import { notifyEmail, notifyTelegram } from "@/lib/notify";
 import type { LeadNotification } from "@/lib/lead-fields";
+import { formatPhoneDisplay, normalizePhone } from "@/lib/phone";
 import { verifyTurnstile } from "@/lib/turnstile";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -79,13 +80,15 @@ export async function POST(req: Request) {
   }
 
   const name = clip(b.name, 120);
+  const phone = normalizePhone(clip(b.phone, 40));
   const contact = clip(b.contact, 200);
-  if (!name || !contact) {
+  if (!name || !phone) {
     return NextResponse.json({ ok: false, error: "required" }, { status: 422 });
   }
 
   const payload = {
     service: clip(b.service, 120),
+    phone,
     contact,
     niche: clip(b.niche, 200),
     revenue: clip(b.revenue, 120),
@@ -94,7 +97,7 @@ export async function POST(req: Request) {
     locale: clip(b.locale, 5),
   };
   const email = EMAIL_RE.test(contact) ? contact.toLowerCase() : null;
-  const lead: LeadNotification = { name, ...payload };
+  const lead: LeadNotification = { name, ...payload, phone: formatPhoneDisplay(phone) };
 
   const insert = async () => {
     const sql = getSql();
