@@ -48,24 +48,25 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
       return;
     }
     setPending(true);
+    const lead = {
+      service: String(data.get("service") ?? ""),
+      name,
+      contact,
+      niche: String(data.get("niche") ?? ""),
+      revenue: String(data.get("revenue") ?? ""),
+      comment: String(data.get("comment") ?? ""),
+      page: pathname,
+      locale,
+    };
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          service: data.get("service"),
-          name,
-          contact,
-          niche: data.get("niche"),
-          revenue: data.get("revenue"),
-          comment: data.get("comment"),
-          page: pathname,
-          locale,
-        }),
+        body: JSON.stringify(lead),
       });
       if (!res.ok) throw new Error(`status ${res.status}`);
       setStatus("success");
-      trackLead(String(data.get("service") ?? ""), pathname);
+      trackLead(lead.service, pathname);
     } catch {
       setSendErr(true);
     } finally {

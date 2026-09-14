@@ -1,53 +1,23 @@
+import { filledFields, type LeadNotification } from "@/lib/lead-fields";
+
 /**
- * Уведомления о новой заявке с сайта: Telegram-группа и почта.
- *
- * Оба канала best-effort: ошибка одного не мешает другому и не ломает
- * запись в БД (см. app/api/contact/route.ts). Секреты только в env:
+ * Серверные уведомления о новой заявке. Секреты только в env:
  *   TELEGRAM_BOT_TOKEN - токен бота от @BotFather
  *   TELEGRAM_CHAT_ID   - id группы/чата (для групп отрицательный)
- *   LEAD_EMAIL_TO      - адрес для писем (необязательно, по умолчанию ниже)
+ *   RESEND_API_KEY     - ключ Resend (https://resend.com/api-keys)
+ *   LEAD_EMAIL_FROM    - отправитель, домен должен быть подтверждён в Resend
+ *   LEAD_EMAIL_TO      - получатели через запятую
  */
 
-export type LeadNotification = {
-  name: string;
-  contact: string;
-  service?: string;
-  niche?: string;
-  revenue?: string;
-  comment?: string;
-  page?: string;
-  locale?: string;
-};
-
-const DEFAULT_EMAIL_TO = "agency.bankai@gmail.com";
-// FormSubmit принимает запросы только «с веб-страницы»: проверяет Origin/Referer.
-const SITE_ORIGIN = "https://bankai.agency";
 const TIMEOUT_MS = 8000;
-
-// Подписи полей в уведомлениях.   - неразрывный пробел после предлога.
-const FIELDS: Array<[keyof LeadNotification, string]> = [
-  ["name", "Имя"],
-  ["contact", "Контакт"],
-  ["service", "Услуга"],
-  ["niche", "Ниша"],
-  ["revenue", "Оборот в месяц"],
-  ["comment", "Комментарий"],
-  ["page", "Страница"],
-  ["locale", "Язык"],
-];
+const DEFAULT_EMAIL_FROM = "Bankai Agency <leads@bankai.agency>";
+const DEFAULT_EMAIL_TO = "agency.bankai@gmail.com";
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const escapeHtml = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-/** Только заполненные поля, в порядке FIELDS. */
-function filledFields(lead: LeadNotification): Array<[string, string]> {
-  return FIELDS.flatMap(([key, label]) => {
-    const v = String(lead[key] ?? "").trim();
-    return v ? [[label, v] as [string, string]] : [];
-  });
-}
-
-async function readBody(res: Response) {
+async function readDetail(res: Response) {
   try {
     return (await res.text()).slice(0, 300);
   } catch {
@@ -81,43 +51,49 @@ export async function notifyTelegram(lead: LeadNotification): Promise<void> {
     signal: AbortSignal.timeout(TIMEOUT_MS),
   });
   if (!res.ok) {
-    throw new Error(`Telegram ${res.status}: ${await readBody(res)}`);
+    throw new Error(`Telegram ${res.status}: ${await readDetail(res)}`);
   }
 }
 
 /**
- * Письмо через FormSubmit (formsubmit.co/ajax). Адрес должен быть один раз
- * активирован на formsubmit.co, иначе сервис отвечает success:false.
+ * Письмо через Resend (REST API, без SDK). Если контакт лида похож
+ * на email, он подставляется в Reply-To, чтобы отвечать прямо из почты.
  */
 export async function notifyEmail(lead: LeadNotification): Promise<void> {
-  const to = process.env.LEAD_EMAIL_TO || DEFAULT_EMAIL_TO;
+  const key = process.env.RESEND_API_KEY;
+  if (!key) throw new Error("RESEND_API_KEY not set");
+
+  const from = process.env.LEAD_EMAIL_FROM || DEFAULT_EMAIL_FROM;
+  const to = (process.env.LEAD_EMAIL_TO || DEFAULT_EMAIL_TO)
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const fields = filledFields(lead);
   const subject =
     `Новая заявка с сайта: ${lead.name}` +
     (lead.service ? ` | ${lead.service}` : "");
+  const text = fields.map(([label, v]) => `${label}: ${v}`).join("\n");
+  const html =
+    `<h2 style="margin:0 0 16px;font:600 18px/1.3 sans-serif">Новая заявка с сайта bankai.agency</h2>` +
+    `<table style="border-collapse:collapse;font:14px/1.5 sans-serif">` +
+    fields
+      .map(
+        ([label, v]) =>
+          `<tr><td style="padding:4px 12px 4px 0;color:#6b7280;white-space:nowrap;vertical-align:top">${escapeHtml(label)}</td>` +
+          `<td style="padding:4px 0;white-space:pre-wrap">${escapeHtml(v)}</td></tr>`,
+      )
+      .join("") +
+    `</table>`;
+  const replyTo = EMAIL_RE.test(lead.contact.trim()) ? lead.contact.trim() : undefined;
 
-  const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
+  const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Origin: SITE_ORIGIN,
-      Referer: `${SITE_ORIGIN}/contacts`,
-    },
-    body: JSON.stringify({
-      _subject: subject,
-      _template: "table",
-      ...Object.fromEntries(filledFields(lead)),
-    }),
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ from, to, subject, text, html, reply_to: replyTo }),
     signal: AbortSignal.timeout(TIMEOUT_MS),
   });
-
-  const body = await readBody(res);
-  let success = false;
-  try {
-    const j = JSON.parse(body) as { success?: boolean | string };
-    success = j.success === true || j.success === "true";
-  } catch {}
-  if (!res.ok || !success) {
-    throw new Error(`FormSubmit ${res.status}: ${body}`);
+  if (!res.ok) {
+    throw new Error(`Resend ${res.status}: ${await readDetail(res)}`);
   }
 }
