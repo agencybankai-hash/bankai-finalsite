@@ -1,0 +1,118 @@
+{
+  "content/about.ts": {
+    "modified": "2026-08-07",
+    "created": "2026-05-31"
+  },
+  "content/cases.ts": {
+    "modified": "2026-08-07",
+    "created": "2026-05-31"
+  },
+  "content/checklist.ts": {
+    "modified": "2026-08-07",
+    "created": "2026-06-01"
+  },
+  "content/faq.ts": {
+    "modified": "2026-08-21",
+    "created": "2026-05-31"
+  },
+  "content/guides.ts": {
+    "modified": "2026-08-07",
+    "created": "2026-05-31"
+  },
+  "content/landings.ts": {
+    "modified": "2026-08-21",
+    "created": "2026-08-17"
+  },
+  "content/pricing.ts": {
+    "modified": "2026-08-07",
+    "created": "2026-05-31"
+  },
+  "content/services.ts": {
+    "modified": "2026-08-21",
+    "created": "2026-05-31"
+  },
+  "content/site.ts": {
+    "modified": "2026-08-21",
+    "created": "2026-05-31"
+  },
+  "content/testimonials.ts": {
+    "modified": "2026-05-31",
+    "created": "2026-05-31"
+  },
+  "content/types.ts": {
+    "modified": "2026-09-14",
+    "created": "2026-05-31"
+  },
+  "content/ui.ts": {
+    "modified": "2026-09-14",
+    "created": "2026-08-07"
+  },
+  "content/en/cases.ts": {
+    "modified": "2026-08-07",
+    "created": "2026-08-07"
+  },
+  "content/en/site.ts": {
+    "modified": "2026-08-07",
+    "created": "2026-08-07"
+  },
+  "content/en/ui.ts": {
+    "modified": "2026-09-14",
+    "created": "2026-08-07"
+  },
+  "content/guides/ai-seo-guide.md": {
+    "modified": "2026-08-21",
+    "created": "2026-06-09"
+  },
+  "content/guides/context-guide.md": {
+    "modified": "2026-08-21",
+    "created": "2026-05-31"
+  },
+  "content/guides/landing-guide.md": {
+    "modified": "2026-08-21",
+    "created": "2026-05-31"
+  },
+  "content/guides/marketing-guide.md": {
+    "modified": "2026-08-21",
+    "created": "2026-05-31"
+  },
+  "content/guides/seo-guide.md": {
+    "modified": "2026-08-21",
+    "created": "2026-05-31"
+  },
+  "app/(ru)/page.tsx": {
+    "modified": "2026-08-21",
+    "created": "2026-08-07"
+  },
+  "app/(ru)/about/page.tsx": {
+    "modified": "2026-08-21",
+    "created": "2026-08-07"
+  },
+  "app/(ru)/contacts/page.tsx": {
+    "modified": "2026-09-14",
+    "created": "2026-08-07"
+  },
+  "app/(ru)/privacy/page.tsx": {
+    "modified": "2026-08-21",
+    "created": "2026-08-07"
+  },
+  "app/(ru)/terms/page.tsx": {
+    "modified": "2026-08-21",
+    "created": "2026-08-07"
+  },
+  "app/(en)/en/page.tsx": {
+    "modified": "2026-08-21",
+    "created": "2026-08-07"
+  },
+  "app/(en)/en/contacts/page.tsx": {
+    "modified": "2026-09-14",
+    "created": "2026-08-07"
+  },
+  "app/(en)/en/privacy/page.tsx": {
+    "modified": "2026-08-21",
+    "created": "2026-08-07"
+  },
+  "app/(en)/en/terms/page.tsx": {
+    "modified": "2026-08-21",
+    "created": "2026-08-07"
+  }
+}
