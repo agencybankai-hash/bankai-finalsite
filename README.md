@@ -42,14 +42,18 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 (ответ `ok`, если сработал хотя&nbsp;бы один; сбои видны в&nbsp;логах Vercel как `contact <канал> failed`):
 
 - **Neon**, таблица `leads` - просмотр на&nbsp;`/admin/leads` (Basic Auth: `ADMIN_USER` / `ADMIN_PASSWORD`),
-  CSV на&nbsp;`/api/admin/export`.
+  CSV на&nbsp;`/api/admin/export`, удаление строки кнопкой в&nbsp;таблице (`DELETE /api/admin/leads/:id`).
+  Статусов пока нет.
 - **Telegram**, группа «Обработка заявок - Bankai.Agency» через бота `@BankaiApplicationsBot`
-  (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`). Код в&nbsp;`lib/notify.ts`.
-- **Почта** через FormSubmit (`formsubmit.co/ajax/<адрес>`), адрес из&nbsp;`LEAD_EMAIL_TO`
-  (по умолчанию `agency.bankai@gmail.com`). Адрес должен быть один раз активирован на&nbsp;formsubmit.co.
+  (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`).
+- **Почта** через Resend (REST API, `lib/notify.ts`): `RESEND_API_KEY`, отправитель `LEAD_EMAIL_FROM`
+  (по умолчанию `Bankai Agency <leads@bankai.agency>`, домен должен быть подтверждён в&nbsp;Resend:
+  DNS-записи DKIM и&nbsp;поддомен `send`), получатели `LEAD_EMAIL_TO` через запятую
+  (по умолчанию `agency.bankai@gmail.com`). Если контакт лида похож на&nbsp;email, он идёт в&nbsp;Reply-To.
 
-Переменные для уведомлений задаются в&nbsp;Vercel для Production (и&nbsp;Preview, если нужны уведомления
+Переменные уведомлений задаются в&nbsp;Vercel для Production (и&nbsp;Preview, если нужны уведомления
 с&nbsp;превью). Без них роут пишет только в&nbsp;Neon и&nbsp;логирует ошибку канала.
+FormSubmit для почты не&nbsp;подходит: он за&nbsp;Cloudflare и&nbsp;серверам Vercel отдаёт челлендж 403.
 
 ## Переменные окружения
 

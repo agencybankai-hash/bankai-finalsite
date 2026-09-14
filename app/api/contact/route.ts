@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
-import { notifyEmail, notifyTelegram, type LeadNotification } from "@/lib/notify";
+import { notifyEmail, notifyTelegram } from "@/lib/notify";
+import type { LeadNotification } from "@/lib/lead-fields";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const clip = (v: unknown, n: number) => String(v ?? "").trim().slice(0, n);
@@ -17,9 +18,10 @@ function rateLimited(ip: string, max = 5, windowMs = 600_000) {
 
 /**
  * Приём заявки из основной контакт-формы.
- * Три независимых получателя: Neon (таблица leads), Telegram-группа, почта.
- * Запускаются параллельно; ответ ok, если сработал хотя бы один, чтобы
- * заявка не терялась из-за сбоя одного канала. Сбои пишутся в лог Vercel.
+ * Три независимых получателя: Neon (таблица leads), Telegram-группа
+ * и почта через Resend. Запускаются параллельно; ответ ok, если сработал
+ * хотя бы один, чтобы заявка не терялась из-за сбоя одного канала.
+ * Сбои пишутся в лог Vercel как `contact <канал> failed`.
  */
 export async function POST(req: Request) {
   const ip = (req.headers.get("x-forwarded-for") ?? "local").split(",")[0].trim();
