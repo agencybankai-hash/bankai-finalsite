@@ -3,6 +3,7 @@ import { Hero } from "@/components/sections/Hero";
 import { ContactForm } from "@/components/sections/ContactForm";
 import { contacts } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
+import { visitorCountry } from "@/lib/geo";
 
 export const generateMetadata = pageMetadata({
   title: "Контакты",
@@ -11,7 +12,8 @@ export const generateMetadata = pageMetadata({
   path: "/contacts",
 });
 
-export default function ContactsPage() {
+export default async function ContactsPage() {
+  const country = await visitorCountry();
   return (
     <>
       <Hero
@@ -22,7 +24,7 @@ export default function ContactsPage() {
       <Section>
         <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr]">
           <div>
-            <ContactForm />
+            <ContactForm defaultCountry={country} />
           </div>
 
           <aside className="space-y-8">

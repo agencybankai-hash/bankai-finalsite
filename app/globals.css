@@ -28,6 +28,7 @@
   --color-accent-strong: #d63324; /* заливка CTA — алиас базового */
   --color-accent-bright: #f14736; /* исходный коралл — декор и тёмные секции */
   --color-accent-fg: #ffffff; /* текст на акценте */
+  --color-success: #2f855a; /* зелёный: галочка валидного поля, 4.6:1 на bg */
   /* Мягкий тон акцента (донор metatag): icon-бейджи, eyebrow-pill,
      заливка активных pill-фильтров. Коралл на тёплом фоне. */
   --color-accent-soft: #fde6e2; /* ~12% */
@@ -113,6 +114,7 @@
   --color-border: #38332f;
   --color-muted: #8a857d;
   --color-accent: var(--color-accent-bright);
+  --color-success: #5cbf8a;
   --color-ink-2: #b8b3aa;
   --color-ink: #f4f2ee;
   background-color: var(--color-bg);
