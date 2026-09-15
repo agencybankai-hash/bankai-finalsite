@@ -1,17 +1,7 @@
 "use client";
 
-import { useRef } from "react";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "gsap";
-import {
-  registerGsap,
-  prefersReducedMotion,
-  introReady,
-  onEnter,
-  EASE,
-  DUR,
-  REVEAL,
-} from "@/lib/motion";
+import { useLayoutEffect, useRef } from "react";
+import { prefersReducedMotion, onEnter, EASE_CSS, DUR, REVEAL } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -27,15 +17,15 @@ type Props = {
   stagger?: boolean | number;
   /** Повтор при обратном скролле (по умолчанию однократно). */
   once?: boolean;
-  /** scroll — по входу в вьюпорт (деф); load — после прелоадера (первый экран). */
+  /** scroll — по входу в вьюпорт (деф); load — сразу после гидратации. */
   trigger?: "scroll" | "load";
 };
 
 /**
- * Переиспользуемая входная анимация. Триггер по скроллу — на
- * IntersectionObserver (надёжно: срабатывает и для уже видимых блоков,
- * не зависит от Lenis/ScrollTrigger). useGSAP применяет стартовое
- * состояние в layout-эффекте (до краски) — без вспышки.
+ * Переиспользуемая входная анимация без GSAP: стартовое состояние
+ * ставится инлайн в layout-эффекте (до краски), раскрытие - CSS-переход
+ * по входу в вьюпорт (IntersectionObserver). После перехода инлайновые
+ * стили снимаются, чтобы не мешать hover-переходам детей.
  * prefers-reduced-motion → контент сразу видим, без движения.
  */
 export function Reveal({
@@ -50,49 +40,63 @@ export function Reveal({
 }: Props) {
   const ref = useRef<HTMLElement>(null);
 
-  useGSAP(
-    () => {
-      registerGsap();
-      const el = ref.current;
-      if (!el) return;
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el || prefersReducedMotion()) return;
 
-      const targets = stagger
-        ? el.querySelectorAll<HTMLElement>("[data-reveal]")
-        : el;
-      const step = stagger
-        ? typeof stagger === "number"
-          ? stagger
-          : REVEAL.stagger
-        : 0;
+    const targets = stagger
+      ? Array.from(el.querySelectorAll<HTMLElement>("[data-reveal]"))
+      : [el];
+    const step = stagger ? (typeof stagger === "number" ? stagger : REVEAL.stagger) : 0;
+    let timer: ReturnType<typeof setTimeout> | null = null;
 
-      if (prefersReducedMotion()) {
-        gsap.set(targets, { autoAlpha: 1, y: 0 });
-        return;
-      }
+    const hide = () => {
+      targets.forEach((t) => {
+        t.style.transition = "none";
+        t.style.opacity = "0";
+        t.style.visibility = "hidden";
+        t.style.transform = `translateY(${y}px)`;
+      });
+    };
+    const play = () => {
+      targets.forEach((t, i) => {
+        const d = `${delay + i * step}s`;
+        // фиксируем стартовое состояние, затем включаем переход
+        void t.offsetWidth;
+        t.style.transition =
+          `opacity ${DUR.base}s ${EASE_CSS} ${d}, transform ${DUR.base}s ${EASE_CSS} ${d}, ` +
+          `visibility 0s linear ${d}`;
+        t.style.opacity = "";
+        t.style.visibility = "";
+        t.style.transform = "";
+      });
+      const total = (delay + (targets.length - 1) * step + DUR.base) * 1000 + 50;
+      timer = setTimeout(() => targets.forEach((t) => (t.style.transition = "")), total);
+    };
 
-      const play = () =>
-        gsap.to(targets, {
-          autoAlpha: 1,
-          y: 0,
-          duration: DUR.base,
-          ease: EASE,
-          delay,
-          stagger: step,
-        });
-
-      gsap.set(targets, { autoAlpha: 0, y });
-
-      if (trigger === "load") {
-        // первый экран: раскрыть после прелоадера (синхрон с занавесом)
-        introReady(play);
-        return;
-      }
-
-      // по входу в вьюпорт
-      return onEnter(el, play, { once });
-    },
-    { scope: ref },
-  );
+    hide();
+    if (trigger === "load") {
+      play();
+      return () => {
+        if (timer) clearTimeout(timer);
+      };
+    }
+    const stop = onEnter(el, play, { once });
+    let leave: (() => void) | undefined;
+    if (!once) {
+      // повтор: прячем, когда блок полностью ушёл из вьюпорта
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) if (!e.isIntersecting) hide();
+      });
+      io.observe(el);
+      leave = () => io.disconnect();
+    }
+    return () => {
+      stop();
+      leave?.();
+      if (timer) clearTimeout(timer);
+    };
+  }, [y, delay, stagger, once, trigger]);
 
   return (
     <Tag ref={ref} className={cn(className)}>

@@ -3,7 +3,8 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
-import { registerGsap, prefersReducedMotion, EASE, markIntroDone } from "@/lib/motion";
+import { registerGsap } from "@/lib/motion-gsap";
+import { prefersReducedMotion, EASE, markIntroDone } from "@/lib/motion";
 
 const SEEN_KEY = "bankai:intro";
 

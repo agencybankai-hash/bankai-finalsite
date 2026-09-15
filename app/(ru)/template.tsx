@@ -1,27 +1,31 @@
 "use client";
 
-import { useRef } from "react";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "gsap";
-import { registerGsap, prefersReducedMotion, EASE, DUR } from "@/lib/motion";
+import { useEffect, useRef } from "react";
 
 /**
  * template.tsx ремаунтится на каждую навигацию → enter-анимация
- * контента при переходе между страницами. Конверсионно-безопасно:
- * быстро, без блокировки. reduced-motion → без движения.
+ * контента при переходе между страницами (CSS-класс .page-enter,
+ * см. globals.css). Первую загрузку не анимируем: контент уже отрисован
+ * сервером, прятать и заново проявлять его - вспышка и поздний LCP.
+ * reduced-motion → без движения (правило в CSS).
  */
+let firstMount = true;
+
 export default function Template({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  useGSAP(
-    () => {
-      registerGsap();
-      const el = ref.current;
-      if (!el || prefersReducedMotion()) return;
-      gsap.from(el, { autoAlpha: 0, y: 16, duration: DUR.base, ease: EASE });
-    },
-    { scope: ref },
-  );
+  useEffect(() => {
+    if (firstMount) {
+      firstMount = false;
+      return;
+    }
+    const el = ref.current;
+    if (!el) return;
+    el.classList.add("page-enter");
+    const done = () => el.classList.remove("page-enter");
+    el.addEventListener("animationend", done, { once: true });
+    return () => el.removeEventListener("animationend", done);
+  }, []);
 
   return <div ref={ref}>{children}</div>;
 }

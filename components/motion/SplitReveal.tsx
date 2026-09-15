@@ -5,13 +5,13 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { SplitText } from "gsap/SplitText";
 import {
-  registerGsap,
   prefersReducedMotion,
   introReady,
   onEnter,
   EASE,
   DUR,
 } from "@/lib/motion";
+import { registerGsap } from "@/lib/motion-gsap";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -46,6 +46,7 @@ export function SplitReveal({
   useGSAP(
     () => {
       registerGsap();
+      gsap.registerPlugin(SplitText);
       const el = ref.current;
       if (!el) return;
 

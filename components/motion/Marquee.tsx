@@ -1,16 +1,15 @@
 "use client";
 
-import { useRef } from "react";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "gsap";
-import { registerGsap, prefersReducedMotion } from "@/lib/motion";
+import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 /**
  * Бесконечная лента (донор Osmo «CSS Marquee» / «Logo Wall Cycle»).
- * Контент дублируется в две одинаковые группы, трек едет на −50% —
- * бесшовно. Отступы несут сами дети (трек без gap), иначе шов рвётся.
- * Hover — замедление. reduced-motion → статично, без анимации.
+ * Контент дублируется в две одинаковые группы, трек едет на −50% CSS-анимацией
+ * (см. .marquee-track в globals.css) — бесшовно и без JS в цикле. JS только
+ * измеряет ширину, чтобы задать длительность под скорость px/сек.
+ * Отступы несут сами дети (трек без gap), иначе шов рвётся.
+ * Hover — пауза. reduced-motion → статично (правило в CSS).
  */
 export function Marquee({
   children,
@@ -24,39 +23,22 @@ export function Marquee({
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
 
-  useGSAP(
-    () => {
-      registerGsap();
-      const track = trackRef.current;
-      if (!track || prefersReducedMotion()) return;
-
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const setDuration = () => {
       const half = track.scrollWidth / 2;
-      if (!half) return;
-
-      const tween = gsap.to(track, {
-        x: -half,
-        duration: half / pxPerSecond,
-        ease: "none",
-        repeat: -1,
-      });
-
-      const slow = () => gsap.to(tween, { timeScale: 0.2, duration: 0.4 });
-      const back = () => gsap.to(tween, { timeScale: 1, duration: 0.4 });
-      track.addEventListener("mouseenter", slow);
-      track.addEventListener("mouseleave", back);
-
-      return () => {
-        tween.kill();
-        track.removeEventListener("mouseenter", slow);
-        track.removeEventListener("mouseleave", back);
-      };
-    },
-    { scope: trackRef },
-  );
+      if (half) track.style.setProperty("--marquee-duration", `${half / pxPerSecond}s`);
+    };
+    setDuration();
+    const ro = new ResizeObserver(setDuration);
+    ro.observe(track);
+    return () => ro.disconnect();
+  }, [pxPerSecond]);
 
   return (
-    <div className={cn("overflow-hidden", className)}>
-      <div ref={trackRef} className="flex w-max">
+    <div className={cn("marquee overflow-hidden", className)}>
+      <div ref={trackRef} className="marquee-track flex w-max">
         <div className="flex shrink-0">{children}</div>
         <div className="flex shrink-0" aria-hidden>
           {children}

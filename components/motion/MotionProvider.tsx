@@ -1,47 +1,52 @@
 "use client";
 
-import { useRef } from "react";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Lenis from "lenis";
-import { registerGsap, prefersReducedMotion } from "@/lib/motion";
+import { useEffect } from "react";
+import { prefersReducedMotion } from "@/lib/motion";
 
 /**
- * Корневой провайдер моторики:
- * - регистрирует плагины GSAP один раз;
- * - запускает Lenis (smooth scroll) и синхронит его со ScrollTrigger
- *   через общий тикер GSAP;
- * - при prefers-reduced-motion не инициализирует Lenis вовсе.
- * Чистка — на размонтировании через useGSAP.
+ * Плавный скролл Lenis для устройств с мышью. Библиотека подгружается
+ * динамически после простоя браузера: не попадает в стартовый бандл и
+ * не отнимает главный поток у первой краски. На тач-устройствах и при
+ * prefers-reduced-motion не запускается вовсе (колесо там не сглаживается,
+ * а rAF-цикл только грузил бы процессор).
  */
 export function MotionProvider({ children }: { children: React.ReactNode }) {
-  const lenisRef = useRef<Lenis | null>(null);
+  useEffect(() => {
+    if (prefersReducedMotion() || window.matchMedia("(pointer: coarse)").matches) return;
 
-  useGSAP(() => {
-    registerGsap();
-    if (prefersReducedMotion()) return;
+    let cancelled = false;
+    let destroy: (() => void) | null = null;
 
-    const lenis = new Lenis({
-      duration: 1.1,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-    });
-    lenisRef.current = lenis;
+    const start = async () => {
+      const { default: Lenis } = await import("lenis");
+      if (cancelled) return;
+      const lenis = new Lenis({
+        duration: 1.1,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+      });
+      let raf = 0;
+      const loop = (time: number) => {
+        lenis.raf(time);
+        raf = requestAnimationFrame(loop);
+      };
+      raf = requestAnimationFrame(loop);
+      destroy = () => {
+        cancelAnimationFrame(raf);
+        lenis.destroy();
+      };
+    };
 
-    lenis.on("scroll", ScrollTrigger.update);
-    const ticker = (time: number) => lenis.raf(time * 1000);
-    gsap.ticker.add(ticker);
-    gsap.ticker.lagSmoothing(0);
-
-    // Триггеры дочерних reveal уже созданы (эффекты детей раньше родителя) —
-    // пересчитываем позиции под Lenis, чтобы below-fold reveal не залипал.
-    ScrollTrigger.refresh();
+    const hasIdle = typeof window.requestIdleCallback === "function";
+    const idle = hasIdle
+      ? window.requestIdleCallback(() => void start(), { timeout: 2000 })
+      : window.setTimeout(() => void start(), 200);
 
     return () => {
-      gsap.ticker.remove(ticker);
-      lenis.destroy();
-      lenisRef.current = null;
+      cancelled = true;
+      if (hasIdle) window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
+      destroy?.();
     };
   }, []);
 
