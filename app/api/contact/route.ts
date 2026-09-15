@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
+import { UTM_KEYS, type UtmKey } from "@/lib/attribution";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const clip = (v: unknown, n: number) => String(v ?? "").trim().slice(0, n);
@@ -48,12 +49,22 @@ export async function POST(req: Request) {
   };
   const email = EMAIL_RE.test(contact) ? contact.toLowerCase() : null;
 
+  const a = (typeof b.attribution === "object" && b.attribution ? b.attribution : {}) as Record<string, unknown>;
+  const utmRaw = (typeof a.utm === "object" && a.utm ? a.utm : {}) as Record<string, unknown>;
+  const utm: Partial<Record<UtmKey, string>> = {};
+  for (const k of UTM_KEYS) {
+    const v = clip(utmRaw[k], 200);
+    if (v) utm[k] = v;
+  }
+  const referrer = clip(a.referrer, 2000) || null;
+  const landing = clip(a.landing, 2000) || null;
+
   try {
     const sql = getSql();
     const ua = (req.headers.get("user-agent") ?? "").slice(0, 300);
     await sql`
-      INSERT INTO leads (email, name, source, payload, user_agent)
-      VALUES (${email}, ${name}, ${"contact-form"}, ${JSON.stringify(payload)}::jsonb, ${ua})
+      INSERT INTO leads (email, name, source, payload, user_agent, referrer, landing, utm)
+      VALUES (${email}, ${name}, ${"contact-form"}, ${JSON.stringify(payload)}::jsonb, ${ua}, ${referrer}, ${landing}, ${JSON.stringify(utm)}::jsonb)
     `;
     return NextResponse.json({ ok: true });
   } catch (e) {

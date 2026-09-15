@@ -19,6 +19,9 @@ await sql`CREATE TABLE IF NOT EXISTS leads (
 )`;
 await sql`CREATE INDEX IF NOT EXISTS leads_created_at_idx ON leads (created_at DESC)`;
 await sql`CREATE INDEX IF NOT EXISTS leads_source_idx ON leads (source)`;
+await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS referrer text`;
+await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS landing text`;
+await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS utm jsonb NOT NULL DEFAULT '{}'::jsonb`;
 
 // Апрувы контент-чеклиста (страница /checklist). API создаёт таблицу сам,
 // здесь — для полноты схемы.

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ui } from "@/content/ui";
+import { readAttribution } from "@/lib/attribution";
 import type { Locale } from "@/content/types";
 
 const fieldBase =
@@ -59,6 +60,7 @@ export function ContactForm({ locale = "ru" }: { locale?: Locale }) {
           niche: data.get("niche"),
           revenue: data.get("revenue"),
           comment: data.get("comment"),
+          attribution: readAttribution(),
         }),
       });
       if (!res.ok) throw new Error(`status ${res.status}`);
