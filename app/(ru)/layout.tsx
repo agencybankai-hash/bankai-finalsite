@@ -8,6 +8,7 @@ import { MotionProvider } from "@/components/motion/MotionProvider";
 import { Preloader } from "@/components/motion/Preloader";
 import { Cursor } from "@/components/motion/Cursor";
 import { Analytics } from "@/components/analytics/Analytics";
+import { AttributionTracker } from "@/components/analytics/AttributionTracker";
 import { siteMeta } from "@/content/site";
 import { ldJson, organizationLd } from "@/lib/jsonld";
 
@@ -59,6 +60,7 @@ export default function RootLayout({
     <html lang="ru" className={`${inter.variable} ${tiktokSans.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <Analytics />
+        <AttributionTracker />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={ldJson(organizationLd)}
