@@ -1,4 +1,5 @@
 import { getSql } from "@/lib/db";
+import { UTM_KEYS, type UtmKey } from "@/lib/attribution";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,9 @@ type Row = {
     comment?: string;
   } | null;
   user_agent: string | null;
+  referrer: string | null;
+  landing: string | null;
+  utm: Partial<Record<UtmKey, string>> | null;
   created_at: string;
 };
 
@@ -35,7 +39,7 @@ function iso(v: string) {
 export async function GET() {
   const sql = getSql();
   const rows = (await sql`
-    SELECT id, email, name, source, payload, user_agent, created_at
+    SELECT id, email, name, source, payload, user_agent, referrer, landing, utm, created_at
     FROM leads
     ORDER BY created_at DESC
   `) as Row[];
@@ -47,6 +51,9 @@ export async function GET() {
     "contact",
     "name",
     "source",
+    "referrer",
+    "landing",
+    ...UTM_KEYS,
     "service",
     "niche",
     "comment",
@@ -61,6 +68,9 @@ export async function GET() {
       r.payload?.contact ?? "",
       r.name,
       r.source,
+      r.referrer,
+      r.landing,
+      ...UTM_KEYS.map((k) => r.utm?.[k] ?? ""),
       r.payload?.service ?? "",
       r.payload?.niche ?? "",
       r.payload?.comment ?? "",

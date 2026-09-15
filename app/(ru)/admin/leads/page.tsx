@@ -1,5 +1,6 @@
 import { Container } from "@/components/ui/Container";
 import { getSql } from "@/lib/db";
+import { UTM_KEYS, type UtmKey } from "@/lib/attribution";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,9 @@ type Lead = {
     comment?: string;
   } | null;
   user_agent: string | null;
+  referrer: string | null;
+  landing: string | null;
+  utm: Partial<Record<UtmKey, string>> | null;
   created_at: string;
 };
 
@@ -41,13 +45,48 @@ function details(r: Lead) {
   return [p?.service, p?.niche, p?.guide, p?.comment].filter(Boolean).join(" · ");
 }
 
+function trafficLabel(r: Lead): string {
+  const u = r.utm;
+  if (u?.utm_source) {
+    return [u.utm_source, u.utm_medium, u.utm_campaign].filter(Boolean).join(" / ");
+  }
+  if (r.referrer) {
+    try {
+      return new URL(r.referrer).hostname;
+    } catch {
+      return r.referrer;
+    }
+  }
+  return "direct";
+}
+
+function landingPath(r: Lead): string {
+  try {
+    const u = new URL(r.landing ?? "");
+    return u.pathname + u.search;
+  } catch {
+    return r.landing ?? "";
+  }
+}
+
+function trafficTitle(r: Lead): string {
+  const lines: string[] = [];
+  if (r.referrer) lines.push(`referrer: ${r.referrer}`);
+  if (r.landing) lines.push(`landing: ${r.landing}`);
+  for (const k of UTM_KEYS) {
+    const v = r.utm?.[k];
+    if (v) lines.push(`${k}: ${v}`);
+  }
+  return lines.join("\n");
+}
+
 export default async function LeadsPage() {
   let rows: Lead[] = [];
   let error = "";
   try {
     const sql = getSql();
     rows = (await sql`
-      SELECT id, email, name, source, payload, user_agent, created_at
+      SELECT id, email, name, source, payload, user_agent, referrer, landing, utm, created_at
       FROM leads
       ORDER BY created_at DESC
       LIMIT 500
@@ -96,6 +135,7 @@ export default async function LeadsPage() {
                   <th className="px-4 py-3 font-medium text-ink">Дата</th>
                   <th className="px-4 py-3 font-medium text-ink">Контакт</th>
                   <th className="px-4 py-3 font-medium text-ink">Источник</th>
+                  <th className="px-4 py-3 font-medium text-ink">Трафик</th>
                   <th className="px-4 py-3 font-medium text-ink">Детали</th>
                   <th className="px-4 py-3 font-medium text-ink">Устройство</th>
                 </tr>
@@ -110,6 +150,12 @@ export default async function LeadsPage() {
                       {r.payload?.contact || r.email || "—"}
                     </td>
                     <td className="px-4 py-3 text-ink-2">{r.source}</td>
+                    <td className="max-w-[28ch] px-4 py-3 text-ink-2" title={trafficTitle(r)}>
+                      <div className="truncate">{trafficLabel(r)}</div>
+                      {landingPath(r) && (
+                        <div className="truncate text-xs text-muted">{landingPath(r)}</div>
+                      )}
+                    </td>
                     <td
                       className="max-w-[40ch] truncate px-4 py-3 text-ink-2"
                       title={details(r)}
