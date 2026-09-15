@@ -16,11 +16,11 @@
     "created": "2026-05-31"
   },
   "content/guides.ts": {
-    "modified": "2026-08-07",
+    "modified": "2026-09-14",
     "created": "2026-05-31"
   },
   "content/landings.ts": {
-    "modified": "2026-08-21",
+    "modified": "2026-09-15",
     "created": "2026-08-17"
   },
   "content/pricing.ts": {
@@ -28,11 +28,11 @@
     "created": "2026-05-31"
   },
   "content/services.ts": {
-    "modified": "2026-08-21",
+    "modified": "2026-09-15",
     "created": "2026-05-31"
   },
   "content/site.ts": {
-    "modified": "2026-08-21",
+    "modified": "2026-09-15",
     "created": "2026-05-31"
   },
   "content/testimonials.ts": {
@@ -40,11 +40,11 @@
     "created": "2026-05-31"
   },
   "content/types.ts": {
-    "modified": "2026-09-14",
+    "modified": "2026-09-15",
     "created": "2026-05-31"
   },
   "content/ui.ts": {
-    "modified": "2026-09-14",
+    "modified": "2026-09-15",
     "created": "2026-08-07"
   },
   "content/en/cases.ts": {
@@ -72,15 +72,15 @@
     "created": "2026-05-31"
   },
   "content/guides/marketing-guide.md": {
-    "modified": "2026-08-21",
+    "modified": "2026-09-15",
     "created": "2026-05-31"
   },
   "content/guides/seo-guide.md": {
-    "modified": "2026-08-21",
+    "modified": "2026-09-15",
     "created": "2026-05-31"
   },
   "app/(ru)/page.tsx": {
-    "modified": "2026-08-21",
+    "modified": "2026-09-15",
     "created": "2026-08-07"
   },
   "app/(ru)/about/page.tsx": {
