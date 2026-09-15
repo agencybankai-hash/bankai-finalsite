@@ -5,9 +5,9 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingCta } from "@/components/sections/FloatingCta";
 import { MotionProvider } from "@/components/motion/MotionProvider";
-import { Preloader } from "@/components/motion/Preloader";
 import { Cursor } from "@/components/motion/Cursor";
 import { Analytics } from "@/components/analytics/Analytics";
+import { TengeFont } from "@/components/layout/TengeFont";
 import { AttributionTracker } from "@/components/analytics/AttributionTracker";
 import { siteMeta } from "@/content/site";
 import { ldJson, organizationLd } from "@/lib/jsonld";
@@ -59,6 +59,7 @@ export default function RootLayout({
   return (
     <html lang="ru" className={`${inter.variable} ${tiktokSans.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
+        <TengeFont />
         <Analytics />
         <AttributionTracker />
         <script
@@ -71,7 +72,6 @@ export default function RootLayout({
           <Footer />
           <FloatingCta />
         </MotionProvider>
-        <Preloader />
         <Cursor />
       </body>
     </html>

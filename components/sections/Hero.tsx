@@ -1,8 +1,6 @@
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { Pill } from "@/components/ui/Pill";
-import { Reveal } from "@/components/motion/Reveal";
-import { SplitReveal } from "@/components/motion/SplitReveal";
 import { HeroVisual } from "@/components/sections/HeroVisual";
 import { cn, nbsp } from "@/lib/utils";
 import type { Cta } from "@/content/types";
@@ -46,10 +44,11 @@ export function Hero({
             visual && "lg:grid-cols-[1.05fr_0.95fr]",
           )}
         >
-          {/* Левая колонка — текст */}
-          <Reveal stagger trigger="load" delay={0.3}>
+          {/* Левая колонка — текст. Появление на CSS (.rise): контент виден
+              с первой краски, LCP не ждёт JS; каскад задержками rise-N. */}
+          <div>
             {badge && (
-              <div data-reveal className="mb-5">
+              <div className="fade-rise rise-1 mb-5">
                 <Pill variant="soft" size="sm" className="uppercase tracking-wide">
                   {badge}
                 </Pill>
@@ -57,14 +56,11 @@ export function Hero({
             )}
             {/* H1 — длинная SEO-строка (ключ+гео), не слоган: размер text-hero
                 (меньше h1), чтобы строка ложилась в 3 строки и не давила колонку */}
-            <SplitReveal as="h1" className="text-hero text-ink">
-              {titleText}
-            </SplitReveal>
+            <h1 className="rise rise-2 text-hero text-ink">{titleText}</h1>
             {subtitle && (
               <p
-                data-reveal
                 className={cn(
-                  "mt-6 text-base leading-relaxed text-ink-2",
+                  "rise rise-3 mt-6 text-base leading-relaxed text-ink-2",
                   visual ? "max-w-md" : "max-w-2xl",
                 )}
               >
@@ -72,7 +68,7 @@ export function Hero({
               </p>
             )}
             {(primary || secondary) && (
-              <div data-reveal className="mt-8 flex flex-wrap gap-3">
+              <div className="fade-rise rise-4 mt-8 flex flex-wrap gap-3">
                 {primary && (
                   <Button href={primary.href} size="lg" variant="accent">
                     {primary.label}
@@ -86,7 +82,7 @@ export function Hero({
               </div>
             )}
             {badges && badges.length > 0 && (
-              <ul data-reveal className="mt-8 flex flex-wrap gap-x-6 gap-y-2">
+              <ul className="fade-rise rise-5 mt-8 flex flex-wrap gap-x-6 gap-y-2">
                 {badges.map((b) => (
                   <li
                     key={b}
@@ -101,11 +97,11 @@ export function Hero({
               </ul>
             )}
             {note && (
-              <p data-reveal className="mt-6 text-sm text-muted">
+              <p className="fade-rise rise-6 mt-6 text-sm text-muted">
                 {note}
               </p>
             )}
-          </Reveal>
+          </div>
 
           {/* Правая колонка — визуал (на мобилке скрыт, текст важнее) */}
           {visual && (

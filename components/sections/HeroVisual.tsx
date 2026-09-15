@@ -1,64 +1,18 @@
-"use client";
-
-import { useRef } from "react";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "gsap";
-import {
-  registerGsap,
-  prefersReducedMotion,
-  introReady,
-  EASE,
-  DUR,
-} from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { FloatCard } from "@/components/ui/FloatCard";
 
 /**
  * Правая колонка hero: тёмная панель-«снимок результата». Контраст
  * light/dark (донор Osmo) + смысл под value-prop («видите, сколько
- * заявок и почём»). Бары растут снизу каскадом на входе.
+ * заявок и почём»). Панель поднимается (.rise), бары растут снизу
+ * каскадом (.grow-y) - всё на CSS, без GSAP и без скрытия до гидратации.
  * Иллюстративная инфографика Hi-Fi-этапа (цифры — из реальных claim'ов).
  */
 const BARS = [30, 42, 36, 54, 62, 78, 92]; // % высоты, по нарастающей
 
 export function HeroVisual() {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useGSAP(
-    () => {
-      registerGsap();
-      const el = ref.current;
-      if (!el) return;
-      const bars = el.querySelectorAll<HTMLElement>("[data-bar]");
-
-      if (prefersReducedMotion()) {
-        gsap.set(el, { autoAlpha: 1 });
-        gsap.set(bars, { scaleY: 1, autoAlpha: 1 });
-        return;
-      }
-
-      // спрятать до краски; раскрыть после прелоадера (синхрон с занавесом)
-      gsap.set(el, { autoAlpha: 0, y: 24 });
-      gsap.set(bars, { scaleY: 0, transformOrigin: "bottom" });
-      introReady(() => {
-        const tl = gsap.timeline({ delay: 0.45 });
-        tl.to(el, { autoAlpha: 1, y: 0, duration: DUR.base, ease: EASE }).to(
-          bars,
-          {
-            scaleY: 1,
-            duration: DUR.base,
-            ease: EASE,
-            stagger: 0.06,
-          },
-          "-=0.35",
-        );
-      });
-    },
-    { scope: ref },
-  );
-
   return (
-    <div ref={ref} className="relative">
+    <div className="fade-rise rise-3 relative">
       {/* Мягкий коралл-радиал позади панели (донор metatag) */}
       <div
         aria-hidden
@@ -81,10 +35,9 @@ export function HeroVisual() {
           {BARS.map((h, i) => (
             <span
               key={i}
-              data-bar
-              style={{ height: `${h}%` }}
+              style={{ height: `${h}%`, animationDelay: `${0.55 + i * 0.06}s` }}
               className={cn(
-                "flex-1 rounded-t-sm",
+                "grow-y flex-1 rounded-t-sm",
                 i >= BARS.length - 2 ? "bg-accent" : "bg-bg/15",
               )}
             />

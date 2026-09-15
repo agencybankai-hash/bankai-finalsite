@@ -167,7 +167,100 @@ footer a {
 .float-soft {
   animation: float-soft 6s var(--ease-osmo) infinite;
 }
+/* Появление первого экрана без JS. .rise - лёгкий подъём заголовка и
+   подзаголовка только через transform, без маски и без opacity: Chrome
+   берёт в LCP элемент по первой краске, а прозрачный или полностью
+   обрезанный маской элемент не считает и позже не пересматривает.
+   .fade-rise - подъём с проявлением для мелких элементов (пилюля, кнопки,
+   список), они на LCP не влияют. Шаг каскада - классы rise-1…rise-6. */
+@keyframes rise {
+  from {
+    transform: translateY(24px);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes fade-rise {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.rise {
+  animation: rise var(--dur-base) var(--ease-osmo) both;
+}
+.fade-rise {
+  animation: fade-rise var(--dur-base) var(--ease-osmo) both;
+}
+.rise-1 { animation-delay: 0.05s; }
+.rise-2 { animation-delay: 0.15s; }
+.rise-3 { animation-delay: 0.3s; }
+.rise-4 { animation-delay: 0.4s; }
+.rise-5 { animation-delay: 0.5s; }
+.rise-6 { animation-delay: 0.6s; }
+
+/* Столбики графика в hero-панели растут снизу каскадом (задержка инлайн). */
+@keyframes grow-y {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+.grow-y {
+  transform-origin: bottom;
+  animation: grow-y var(--dur-base) var(--ease-osmo) both;
+}
+
+/* Бегущая строка: две копии контента, трек едет на -50% - бесшовно.
+   Длительность считает Marquee.tsx по ширине и скорости. Hover - пауза. */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  animation: marquee var(--marquee-duration, 30s) linear infinite;
+  will-change: transform;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Enter-анимация страницы при клиентском переходе (app/(ru)/template.tsx). */
+.page-enter {
+  animation: fade-rise var(--dur-base) var(--ease-osmo) both;
+}
+
+/* Кастомный курсор (components/motion/Cursor.tsx): проявление и рост
+   на интерактиве через классы, движение - transform из rAF. */
+.cursor-dot {
+  opacity: 0;
+  transition:
+    opacity var(--dur-fast) var(--ease-osmo),
+    scale var(--dur-fast) var(--ease-osmo);
+}
+.cursor-dot.is-visible {
+  opacity: 1;
+}
+.cursor-dot.is-active {
+  scale: 2.6;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .page-enter,
+  .rise,
+  .fade-rise,
+  .grow-y {
+    animation: none;
+  }
   .float-soft {
     animation: none;
   }

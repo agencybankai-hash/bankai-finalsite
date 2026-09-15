@@ -1,27 +1,38 @@
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { CustomEase } from "gsap/CustomEase";
-import { SplitText } from "gsap/SplitText";
-
 /**
  * Источник правды моторики. Значения зеркалят токены в globals.css
  * (--ease-osmo, --dur-*). Любая анимация тянет easing/длительности
  * отсюда, а не задаёт их заново.
+ *
+ * Без GSAP: reveal, счётчики, бегущая строка и курсор сделаны на CSS
+ * и requestAnimationFrame, чтобы библиотека не грузилась на каждой
+ * странице. Компоненты на GSAP (SplitReveal, Preloader) берут его из
+ * lib/motion-gsap.ts.
  */
 
-let registered = false;
+/** Имя CustomEase для GSAP-компонентов (см. lib/motion-gsap.ts). */
+export const EASE = "osmo";
 
-/** Регистрирует плагины и сигнатурный easing один раз. */
-export function registerGsap(): void {
-  if (registered || typeof window === "undefined") return;
-  gsap.registerPlugin(ScrollTrigger, CustomEase, SplitText);
-  // Сигнатура Osmo: cubic-bezier(0.625, 0.05, 0, 1)
-  CustomEase.create("osmo", "0.625, 0.05, 0, 1");
-  registered = true;
+/** Тот же easing для CSS-переходов и анимаций. */
+export const EASE_CSS = "cubic-bezier(0.625, 0.05, 0, 1)";
+
+/** Тот же easing как функция для rAF-анимаций (счётчик, курсор). */
+export function easeOsmo(t: number): number {
+  return cubicBezier(0.625, 0.05, 0, 1, Math.min(1, Math.max(0, t)));
 }
 
-/** Имя зарегистрированного CustomEase — основной easing проекта. */
-export const EASE = "osmo";
+/* Решение кубической Безье по x методом Ньютона: достаточно для анимаций. */
+function cubicBezier(x1: number, y1: number, x2: number, y2: number, x: number): number {
+  const sampleX = (t: number) => ((1 - 3 * x2 + 3 * x1) * t + (3 * x2 - 6 * x1)) * t * t + 3 * x1 * t;
+  const sampleY = (t: number) => ((1 - 3 * y2 + 3 * y1) * t + (3 * y2 - 6 * y1)) * t * t + 3 * y1 * t;
+  const slope = (t: number) => 3 * (1 - 3 * x2 + 3 * x1) * t * t + 2 * (3 * x2 - 6 * x1) * t + 3 * x1;
+  let t = x;
+  for (let i = 0; i < 6; i++) {
+    const d = slope(t);
+    if (Math.abs(d) < 1e-6) break;
+    t -= (sampleX(t) - x) / d;
+  }
+  return sampleY(t);
+}
 
 /** Длительности (сек). Зеркало --dur-* в globals.css. */
 export const DUR = { base: 0.6 } as const;
@@ -37,10 +48,11 @@ export function prefersReducedMotion(): boolean {
 }
 
 /* ── Intro-гейт ─────────────────────────────────────────────
-   Анимации первого экрана ждут окончания прелоадера, чтобы
-   раскрываться вместе с уходом занавеса, а не за ним. После
-   первой загрузки гейт открыт — на внутренних переходах не ждём. */
-let introResolved = false;
+   Раньше анимации первого экрана ждали прелоадер-занавес. Прелоадер
+   снят ради LCP (он держал первый экран закрытым ~2 с), поэтому гейт
+   открыт с самого начала: introReady выполняет колбэк сразу. Если
+   прелоадер вернётся, он должен закрыть гейт до эффектов детей. */
+let introResolved = true;
 let introCbs: Array<() => void> = [];
 let introTimer: ReturnType<typeof setTimeout> | null = null;
 
