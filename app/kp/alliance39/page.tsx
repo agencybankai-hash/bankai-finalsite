@@ -11,7 +11,6 @@ export default function KpAlliance39Page() {
 
   return (
     <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 24, textAlign: "center" }}>
-      <meta httpEquiv="refresh" content={`0;url=${TARGET}`} />
       <p style={{ fontSize: 16, lineHeight: 1.5 }}>
         Открываем коммерческое предложение…
         <br />
