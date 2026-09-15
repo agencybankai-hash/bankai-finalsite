@@ -1,15 +1,15 @@
 import Script from "next/script";
+import { YandexMetrika } from "./YandexMetrika";
 
-// Идентификаторы только из env: на локали и в превью, где они не заданы,
-// компонент не рендерит ничего.
+// Идентификаторы GA и GTM только из env: на локали и в превью, где они
+// не заданы, эти теги не рендерятся. Метрика сама проверяет боевой домен.
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 
 export function Analytics() {
-  if (!GA_ID && !GTM_ID) return null;
-
   return (
     <>
+      <YandexMetrika />
       {GTM_ID && (
         <>
           <Script id="gtm-init" strategy="afterInteractive">
