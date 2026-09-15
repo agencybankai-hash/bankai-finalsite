@@ -11,6 +11,8 @@ export type LeadNotification = {
   comment?: string;
   page?: string;
   locale?: string;
+  /** Сводка источника трафика: "google / cpc / brand-kz". */
+  traffic?: string;
 };
 
 // Подписи полей в уведомлениях.   - неразрывный пробел после предлога.
@@ -23,6 +25,7 @@ const FIELDS: Array<[keyof LeadNotification, string]> = [
   ["revenue", "Оборот в месяц"],
   ["comment", "Комментарий"],
   ["page", "Страница"],
+  ["traffic", "Источник"],
   ["locale", "Язык"],
 ];
 

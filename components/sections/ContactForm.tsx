@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Turnstile } from "@/components/Turnstile";
 import { ui } from "@/content/ui";
 import { normalizeContact } from "@/lib/contact";
+import { getAttribution, type Attribution } from "@/lib/attribution";
 import { PhoneFlag } from "@/components/PhoneFlag";
 import {
   EMPTY_PHONE,
@@ -29,13 +30,15 @@ type AnalyticsWindow = Window & {
   gtag?: (...args: unknown[]) => void;
 };
 
-// Событие заявки в GTM и GA4. Если аналитика не подключена - молча выходим.
-function trackLead(service: string, source: string) {
+// Событие заявки в GTM и GA4 вместе с атрибуцией источника (lib/attribution).
+// Если аналитика не подключена - молча выходим.
+function trackLead(service: string, formPage: string, attribution: Attribution) {
   if (typeof window === "undefined") return;
   const w = window as AnalyticsWindow;
+  const params = { service, form_page: formPage, ...attribution };
   try {
-    w.dataLayer?.push({ event: "generate_lead", service, source });
-    w.gtag?.("event", "generate_lead", { service, source });
+    w.dataLayer?.push({ event: "generate_lead", ...params });
+    w.gtag?.("event", "generate_lead", params);
   } catch {}
 }
 
@@ -122,6 +125,8 @@ export function ContactForm({
       return;
     }
     setPending(true);
+    // Откуда пришёл человек - уходит в заявку (БД/Telegram/почта) и в GA4.
+    const attribution = getAttribution();
     const lead = {
       service: String(data.get("service") ?? ""),
       name,
@@ -132,6 +137,7 @@ export function ContactForm({
       comment: String(data.get("comment") ?? ""),
       page: pathname,
       locale,
+      attribution,
     };
     try {
       const res = await fetch("/api/contact", {
@@ -145,7 +151,7 @@ export function ContactForm({
       }
       if (!res.ok) throw new Error(`status ${res.status}`);
       setStatus("success");
-      trackLead(lead.service, pathname);
+      trackLead(lead.service, pathname, attribution);
     } catch {
       setSendErr(true);
     } finally {

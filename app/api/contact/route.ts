@@ -86,6 +86,29 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "required" }, { status: 422 });
   }
 
+  // Атрибуция источника из lib/attribution: собрана браузером, поэтому
+  // берём только известные ключи и режем длину; пустые значения выбрасываем.
+  const rawAttr = (b.attribution ?? {}) as Record<string, unknown>;
+  const attribution = Object.fromEntries(
+    (
+      [
+        ["lead_source", 120],
+        ["lead_medium", 120],
+        ["lead_campaign", 200],
+        ["lead_term", 200],
+        ["lead_content", 200],
+        ["click_id", 300],
+        ["first_source", 120],
+        ["first_medium", 120],
+        ["first_campaign", 200],
+        ["landing_page", 300],
+        ["referrer", 500],
+      ] as const
+    )
+      .map(([key, max]) => [key, clip(rawAttr[key], max)])
+      .filter(([, v]) => v),
+  ) as Record<string, string>;
+
   const payload = {
     service: clip(b.service, 120),
     phone,
@@ -95,9 +118,27 @@ export async function POST(req: Request) {
     comment: clip(b.comment, 4000),
     page: clip(b.page, 300),
     locale: clip(b.locale, 5),
+    attribution,
   };
   const email = contact.kind === "email" ? contact.value : null;
-  const lead: LeadNotification = { name, ...payload, phone: formatPhoneDisplay(phone) };
+
+  // Однострочная сводка источника для Telegram и почты:
+  // "google / cpc / brand-kz (первый визит: instagram / social)".
+  const line = (s?: string, m?: string, c?: string) =>
+    [s, m, c].filter(Boolean).join(" / ");
+  const lastLine = line(attribution.lead_source, attribution.lead_medium, attribution.lead_campaign);
+  const firstLine = line(attribution.first_source, attribution.first_medium, attribution.first_campaign);
+  const traffic =
+    lastLine && firstLine && firstLine !== lastLine
+      ? `${lastLine} (первый визит: ${firstLine})`
+      : lastLine || firstLine;
+
+  const lead: LeadNotification = {
+    name,
+    ...payload,
+    phone: formatPhoneDisplay(phone),
+    traffic,
+  };
 
   const insert = async () => {
     const sql = getSql();
