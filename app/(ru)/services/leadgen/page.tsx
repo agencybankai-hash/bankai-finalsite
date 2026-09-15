@@ -4,8 +4,8 @@ import { getChannel } from "@/content/services";
 import { faqLd, geoNeutralAreas, ldJson, serviceLd } from "@/lib/jsonld";
 import { pageMetadata } from "@/lib/metadata";
 
-const channel = getChannel("seo");
-const path = "/services/seo";
+const channel = getChannel("leadgen");
+const path = "/services/leadgen";
 
 export const generateMetadata = pageMetadata({
   title: channel?.title ?? "",
@@ -13,7 +13,7 @@ export const generateMetadata = pageMetadata({
   path,
 });
 
-export default function SeoPage() {
+export default function LeadgenPage() {
   if (!channel) notFound();
   return (
     <>

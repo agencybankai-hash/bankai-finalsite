@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Pill } from "@/components/ui/Pill";
 import { IconBadge } from "@/components/ui/IconBadge";
 import { Blobs } from "@/components/ui/Blobs";
@@ -73,7 +74,15 @@ export function SystemSection({
         <span className="relative shrink-0 text-label uppercase text-accent">
           Одна система
         </span>
-        <p className="relative text-base leading-relaxed text-bg/90">{result}</p>
+        <div className="relative">
+          <p className="text-base leading-relaxed text-bg/90">{result}</p>
+          <Link
+            href="/services/leadgen"
+            className="mt-3 inline-block text-sm font-medium text-bg underline underline-offset-4"
+          >
+            Смотреть лидогенерацию под ключ →
+          </Link>
+        </div>
       </Reveal>
     </div>
   );

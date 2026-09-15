@@ -103,6 +103,7 @@ export function Header({ locale = "ru" }: { locale?: Locale }) {
                             href={child.href}
                             className={cn(
                               "block rounded-lg px-3 py-2 text-sm text-ink-2 hover:bg-surface hover:text-ink",
+                              child.indent && "pl-7",
                               pathname === child.href && "bg-surface text-ink",
                             )}
                           >
@@ -175,7 +176,10 @@ export function Header({ locale = "ru" }: { locale?: Locale }) {
                           key={child.href}
                           href={child.href}
                           onClick={() => setOpen(false)}
-                          className="block rounded-md px-3 py-2 text-sm text-ink-2 hover:text-ink"
+                          className={cn(
+                            "block rounded-md px-3 py-2 text-sm text-ink-2 hover:text-ink",
+                            child.indent && "pl-7",
+                          )}
                         >
                           {child.label}
                         </Link>

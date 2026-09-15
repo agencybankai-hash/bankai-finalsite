@@ -4,7 +4,13 @@ import { ChannelPage } from "@/components/sections/ChannelPage";
 import { serviceCrumbs } from "@/components/sections/Breadcrumbs";
 import { getChannel } from "@/content/services";
 import { getLanding, landings } from "@/content/landings";
-import { breadcrumbLd, faqLd, ldJson, serviceLd } from "@/lib/jsonld";
+import {
+  breadcrumbLd,
+  faqLd,
+  geoNeutralAreas,
+  ldJson,
+  serviceLd,
+} from "@/lib/jsonld";
 import { pageMetadata } from "@/lib/metadata";
 
 type Params = { params: Promise<{ channel: string; slug: string }> };
@@ -40,7 +46,10 @@ export default async function ServiceLandingPage({ params }: Params) {
         dangerouslySetInnerHTML={ldJson(
           serviceLd(landing.title, landing.description, landing.path, {
             serviceType: parent.navLabel,
-            areaServed: landing.geo ?? ["Алматы", "Казахстан"],
+            areaServed:
+              landing.kind === "subservice"
+                ? geoNeutralAreas
+                : (landing.geo ?? ["Алматы", "Казахстан"]),
             priceFrom: landing.answer.priceFrom,
           }),
         )}

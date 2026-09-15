@@ -17,8 +17,8 @@ import { FAQ } from "@/components/sections/FAQ";
 import { CTASection } from "@/components/sections/CTASection";
 import { Reveal } from "@/components/motion/Reveal";
 import { cases } from "@/content/cases";
-import { channelForms } from "@/content/services";
-import { landings, landingsByChannel } from "@/content/landings";
+import { channelForms, getChannel } from "@/content/services";
+import { cityLandingsOf, landings, subservicesOf } from "@/content/landings";
 import { finalCta } from "@/content/site";
 import type {
   CaseChannel,
@@ -27,7 +27,7 @@ import type {
   ServiceLanding,
 } from "@/content/types";
 
-const channelMap: Record<string, CaseChannel> = {
+const channelMap: Partial<Record<string, CaseChannel>> = {
   seo: "SEO",
   context: "Контекст",
   web: "Сайт",
@@ -38,12 +38,59 @@ const guideSlugMap: Record<string, string> = {
   seo: "seo",
   context: "context",
   web: "landing",
+  leadgen: "marketing",
 };
 
+const landingLink = (l: ServiceLanding): Cta => ({ label: l.hero.title, href: l.path });
+const channelLink = (c: ServiceChannel): Cta => ({
+  label: c.hero.title,
+  href: `/services/${c.slug}`,
+});
+
+/** Смежная страница городовой: слаг лендинга или канала ("leadgen"). */
+function relatedLink(slug: string): Cta | undefined {
+  const l = landings.find((x) => x.slug === slug);
+  if (l) return landingLink(l);
+  const c = getChannel(slug);
+  return c && channelLink(c);
+}
+
+function uniqueLinks(links: (Cta | undefined)[], exclude: string): Cta[] {
+  const seen = new Set([exclude]);
+  return links.filter((l): l is Cta => {
+    if (!l || seen.has(l.href)) return false;
+    seen.add(l.href);
+    return true;
+  });
+}
+
+function LinkGrid({ title, links }: { title: string; links: Cta[] }) {
+  return (
+    <div>
+      <SectionHeader title={title} />
+      <Reveal stagger className="mt-8 grid gap-3 sm:grid-cols-2">
+        {links.map((l) => (
+          <Link
+            key={l.href}
+            href={l.href}
+            data-reveal
+            className="flex items-center justify-between gap-4 rounded-xl border border-border bg-bg px-5 py-4 text-base text-ink shadow-card transition duration-300 ease-osmo hover:border-ink hover:shadow-card-hover"
+          >
+            <span>{l.label}</span>
+            <span aria-hidden className="text-muted">
+              →
+            </span>
+          </Link>
+        ))}
+      </Reveal>
+    </div>
+  );
+}
+
 /**
- * Страница услуги. С `landing` та же страница работает спутниковой посадочной
- * под НЧ-запрос: hero, ключевая фраза в H2, ответный блок, FAQ и «кому
- * подходит» берутся из лендинга, остальное наследуется от канала.
+ * Страница услуги. С `landing` та же страница работает посадочной внутри канала:
+ * подуслугой (гео-нейтральная) или городовой. hero, ключевая фраза в H2, ответный
+ * блок, FAQ и «кому подходит» берутся из лендинга, остальное наследуется от канала.
  */
 export function ChannelPage({
   channel,
@@ -52,8 +99,11 @@ export function ChannelPage({
   channel: ServiceChannel;
   landing?: ServiceLanding;
 }) {
+  const isCity = Boolean(landing) && landing?.kind !== "subservice";
   const tag = channelMap[channel.slug];
-  const relatedCases = cases.filter((c) => c.channels.includes(tag)).slice(0, 3);
+  const relatedCases = tag
+    ? cases.filter((c) => c.channels.includes(tag)).slice(0, 3)
+    : [];
   const guideSlug = guideSlugMap[channel.slug];
   const forms =
     landing?.keyPhrase ??
@@ -66,32 +116,47 @@ export function ChannelPage({
   // «вести» сочетается с продвижением и рекламой, но не с созданием сайта
   const processPhrase =
     landing?.keyPhrase.process ??
-    (channel.slug === "web" ? "делаем сайты" : `ведём ${forms.acc}`);
-  const hero = landing?.hero ?? channel.hero;
+    channelForms[channel.slug]?.process ??
+    `ведём ${forms.acc}`;
+  const source = landing ?? channel;
+  const hero = source.hero;
   const includes = landing?.includes ?? channel.includes;
   const process = landing?.process ?? channel.process;
   const audience = landing?.audience ?? channel.audience;
-  const faq = landing?.faq ?? channel.faq;
-  const plans = landing?.plans ?? channel.plans;
+  const faq = source.faq;
+  /* Своя цена лендинга перекрывает сетку тарифов канала: у подуслуги
+     «Лендинги» не должно быть карточки интернет-магазина с хаба. */
+  const plans = landing
+    ? (landing.plans ?? (landing.pricing ? undefined : channel.plans))
+    : channel.plans;
   const pricing = landing?.pricing ?? channel.pricing;
   /* Гео в заголовке тарифов - только если оно уже есть в самой услуге или
      ключевой фразе лендинга; SEO-хаб гео-нейтральный, город ему не дописываем. */
   const pricingTitle = `Стоимость ${forms.gen}`;
 
-  /* Перелинковка: у лендинга - смежные лендинги плюс родительская услуга,
-     у канала - его спутники. Спутников нет - секции нет. */
-  const relatedLinks: Cta[] = landing
-    ? [
-        ...(landing.related ?? [])
-          .map((s) => landings.find((l) => l.slug === s))
-          .filter((l): l is ServiceLanding => Boolean(l))
-          .map((l) => ({ label: l.hero.title, href: l.path })),
-        { label: channel.title, href: `/services/${channel.slug}` },
-      ]
-    : landingsByChannel(channel.slug).map((l) => ({
-        label: l.hero.title,
-        href: l.path,
-      }));
+  /* Перелинковка внизу:
+     - гео-нейтральные страницы (хаб, подуслуга) - два блока: «Подуслуги»
+       (только у хаба) и городовые страницы этой услуги;
+     - городовая - гео-нейтральная страница её услуги, та же услуга в других
+       городах, затем смежные страницы из `related`. */
+  const subserviceLinks = landing ? [] : subservicesOf(channel.slug).map(landingLink);
+  const cityLinks = isCity
+    ? []
+    : cityLandingsOf(channel.slug, landing?.slug).map(landingLink);
+  const serviceOfCity = landing?.parent
+    ? landings.find((l) => l.slug === landing.parent)
+    : undefined;
+  const cityPageLinks =
+    isCity && landing
+      ? uniqueLinks(
+          [
+            serviceOfCity ? landingLink(serviceOfCity) : channelLink(channel),
+            ...cityLandingsOf(channel.slug, landing.parent).map(landingLink),
+            ...(landing.related ?? []).map(relatedLink),
+          ],
+          landing.path,
+        )
+      : [];
 
   return (
     <>
@@ -105,18 +170,16 @@ export function ChannelPage({
         badges={channel.badges}
       />
 
-      {/* Прямой ответ на запрос лендинга */}
-      {landing?.intro && (
+      {/* Прямой ответ на запрос */}
+      {source.intro && (
         <div className="border-b border-border bg-surface">
           <Container>
-            <p className="max-w-3xl py-8 text-lead text-ink-2">
-              {landing.intro}
-            </p>
+            <p className="max-w-3xl py-8 text-lead text-ink-2">{source.intro}</p>
           </Container>
         </div>
       )}
 
-      {landing && <AnswerBlock answer={landing.answer} />}
+      {source.answer && <AnswerBlock answer={source.answer} />}
 
       {/* Метафора - только у канала, на лендингах дубль */}
       {!landing && channel.metaphor && (
@@ -189,12 +252,12 @@ export function ChannelPage({
         </Section>
       )}
 
-      {/* Лендинг: доказательство текстом под интент */}
-      {landing?.proof && (
+      {/* Доказательство текстом под интент страницы */}
+      {source.proof && (
         <Section tone="surface">
-          <SectionHeader title={landing.proof.title} />
+          <SectionHeader title={source.proof.title} />
           <Reveal stagger className="mt-10 grid gap-5 lg:grid-cols-2">
-            {landing.proof.items.map((it) => (
+            {source.proof.items.map((it) => (
               <Link
                 key={it.slug}
                 href={`/cases/${it.slug}`}
@@ -290,64 +353,69 @@ export function ChannelPage({
             </Button>
           </Reveal>
         )}
-        {landing?.pricingNote && (
+        {source.pricingNote && (
           <Reveal className="mt-8">
             <p className="mx-auto max-w-2xl text-center text-sm leading-relaxed text-ink-2">
-              {landing.pricingNote}
+              {source.pricingNote}
             </p>
           </Reveal>
         )}
       </Section>
 
       {/* Место канала в системе + открытый гайд - только у канала */}
-      {!landing && (
-      <Section tone="surface">
-        <SectionHeader
-          eyebrow="Прозрачность"
-          title="Без чёрных ящиков"
-          align="center"
-        />
-        <Reveal stagger className="mt-10 grid gap-5 sm:grid-cols-2">
-          <div
-            data-reveal
-            className={cn(
-              "flex flex-col rounded-2xl border border-border bg-bg p-8 shadow-card",
-              !guideSlug && "sm:col-span-2",
-            )}
-          >
-            <h3 className="text-h3 text-ink">Часть системы</h3>
-            <p className="mt-3 max-w-3xl text-base leading-relaxed text-ink-2">
-              {channel.partOfSystem}
-            </p>
-            <Link
-              href="/#services"
-              className="mt-auto pt-5 text-sm font-medium text-ink underline underline-offset-4"
-            >
-              Смотреть лидогенерацию под ключ →
-            </Link>
-          </div>
-
-          {guideSlug && (
-            <div
-              data-reveal
-              className="flex flex-col rounded-2xl border border-border bg-bg p-8 shadow-card"
-            >
-              <h3 className="text-h3 text-ink">Нет секретов</h3>
-              <p className="mt-3 max-w-3xl text-base leading-relaxed text-ink-2">
-                Хотите разобраться сами? Мы выложили полный гайд по этому каналу
-                - с формулами, порогами и чек-листом. Бесплатно, без всяких
-                email.
-              </p>
-              <Link
-                href={`/guides/${guideSlug}`}
-                className="mt-auto pt-5 text-sm font-medium text-ink underline underline-offset-4"
+      {!landing && (channel.partOfSystem || guideSlug) && (
+        <Section tone="surface">
+          <SectionHeader
+            eyebrow="Прозрачность"
+            title="Без чёрных ящиков"
+            align="center"
+          />
+          <Reveal stagger className="mt-10 grid gap-5 sm:grid-cols-2">
+            {channel.partOfSystem && (
+              <div
+                data-reveal
+                className={cn(
+                  "flex flex-col rounded-2xl border border-border bg-bg p-8 shadow-card",
+                  !guideSlug && "sm:col-span-2",
+                )}
               >
-                Читать гайд →
-              </Link>
-            </div>
-          )}
-        </Reveal>
-      </Section>
+                <h3 className="text-h3 text-ink">Часть системы</h3>
+                <p className="mt-3 max-w-3xl text-base leading-relaxed text-ink-2">
+                  {channel.partOfSystem}
+                </p>
+                <Link
+                  href="/services/leadgen"
+                  className="mt-auto pt-5 text-sm font-medium text-ink underline underline-offset-4"
+                >
+                  Смотреть лидогенерацию под ключ →
+                </Link>
+              </div>
+            )}
+
+            {guideSlug && (
+              <div
+                data-reveal
+                className={cn(
+                  "flex flex-col rounded-2xl border border-border bg-bg p-8 shadow-card",
+                  !channel.partOfSystem && "sm:col-span-2",
+                )}
+              >
+                <h3 className="text-h3 text-ink">Нет секретов</h3>
+                <p className="mt-3 max-w-3xl text-base leading-relaxed text-ink-2">
+                  Хотите разобраться сами? Мы выложили полный гайд по этому каналу
+                  - с формулами, порогами и чек-листом. Бесплатно, без всяких
+                  email.
+                </p>
+                <Link
+                  href={`/guides/${guideSlug}`}
+                  className="mt-auto pt-5 text-sm font-medium text-ink underline underline-offset-4"
+                >
+                  Читать гайд →
+                </Link>
+              </div>
+            )}
+          </Reveal>
+        </Section>
       )}
 
       {/* Лендинг: только половина «Без чёрных ящиков» - гайд по каналу.
@@ -382,25 +450,22 @@ export function ChannelPage({
         </div>
       </Section>
 
-      {/* Смежные страницы */}
-      {relatedLinks.length > 0 && (
+      {(subserviceLinks.length > 0 || cityLinks.length > 0) && (
         <Section tone="surface">
-          <SectionHeader title="Смежные страницы" />
-          <Reveal stagger className="mt-8 grid gap-3 sm:grid-cols-2">
-            {relatedLinks.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                data-reveal
-                className="flex items-center justify-between gap-4 rounded-xl border border-border bg-bg px-5 py-4 text-base text-ink shadow-card transition duration-300 ease-osmo hover:border-ink hover:shadow-card-hover"
-              >
-                <span>{l.label}</span>
-                <span aria-hidden className="text-muted">
-                  →
-                </span>
-              </Link>
-            ))}
-          </Reveal>
+          <div className="space-y-14">
+            {subserviceLinks.length > 0 && (
+              <LinkGrid title="Подуслуги" links={subserviceLinks} />
+            )}
+            {cityLinks.length > 0 && (
+              <LinkGrid title="Опыт по городам и регионам" links={cityLinks} />
+            )}
+          </div>
+        </Section>
+      )}
+
+      {cityPageLinks.length > 0 && (
+        <Section tone="surface">
+          <LinkGrid title="Смежные страницы" links={cityPageLinks} />
         </Section>
       )}
 

@@ -1,7 +1,13 @@
 /** Локаль сайта. RU - основная версия, EN - выжимка на /en. */
 export type Locale = "ru" | "en";
 
-export type NavItem = { label: string; href: string; children?: NavItem[] };
+/** indent - визуально вложенный пункт (подуслуга под родительской услугой в дропдауне). */
+export type NavItem = {
+  label: string;
+  href: string;
+  children?: NavItem[];
+  indent?: boolean;
+};
 export type Cta = { label: string; href: string };
 export type StatItem = { value: string; label: string };
 export type Step = { n: string; title: string; text: string; duration?: string };
@@ -31,6 +37,22 @@ export type Testimonial = {
   company?: string;
 };
 
+/** Ответный блок: структурированный ответ (этапы + сроки + цена) под AI Overview. */
+export type AnswerBlockData = {
+  title: string;
+  lead?: string;
+  steps: { title: string; text: string }[];
+  timeline?: string;
+  /** Значение без «от»: «250 000 ₸/мес». */
+  priceFrom?: string;
+};
+
+/** Доказательство текстом: 1-2 кейса, пересказанные под интент страницы. */
+export type ProofBlock = {
+  title: string;
+  items: { case: string; slug: string; text: string }[];
+};
+
 export type ServiceChannel = {
   slug: string;
   navLabel: string;
@@ -40,6 +62,9 @@ export type ServiceChannel = {
   hero: { title: string; subtitle: string };
   badges?: string[];
   metaphor?: string;
+  /** Абзац под hero - прямой ответ на запрос (как у лендинга). */
+  intro?: string;
+  answer?: AnswerBlockData;
   audience: string[];
   problem: { title: string; items: string[] };
   includes: Feature[];
@@ -50,10 +75,13 @@ export type ServiceChannel = {
     chain: StatItem[];
     note: string;
   };
+  proof?: ProofBlock;
   pricing: { value: string; sub: string; note?: string };
   plans?: ServicePlan[];
+  pricingNote?: string;
   faq: FaqItem[];
-  partOfSystem: string;
+  /** Карточка «Часть системы»; не задано - карточки нет (у самой лидогенерации). */
+  partOfSystem?: string;
 };
 
 /**
@@ -85,15 +113,7 @@ export type ServiceLanding = {
   };
   /** Абзац под hero - прямой ответ на запрос. */
   intro?: string;
-  /** Ответный блок: структурированный ответ (этапы + сроки + цена) под AI Overview. */
-  answer: {
-    title: string;
-    lead?: string;
-    steps: { title: string; text: string }[];
-    timeline?: string;
-    /** Значение без «от»: «250 000 ₸/мес». */
-    priceFrom?: string;
-  };
+  answer: AnswerBlockData;
   /** Своё «кому подходит»; не задано - берётся от канала. */
   audience?: string[];
   /** Своё «кому не подойдёт»; не задано - блок канала. */
@@ -102,19 +122,27 @@ export type ServiceLanding = {
   includes?: Feature[];
   /** Свой процесс под интент (фолбэк - канал). */
   process?: Step[];
-  /** Доказательство текстом: 1-2 кейса, пересказанные под интент страницы. */
-  proof?: { title: string; items: { case: string; slug: string; text: string }[] };
+  proof?: ProofBlock;
   faq: FaqItem[];
   /** Свои тарифы под интент; не заданы - тарифы канала. */
   plans?: ServicePlan[];
-  /** Своя цена «от» (когда тарифов-карточек нет); не задана - цена канала. */
+  /** Своя цена «от»; задана без plans - тарифы канала не наследуются. */
   pricing?: { value: string; sub: string; note?: string };
   /** Приписка к блоку тарифов. */
   pricingNote?: string;
-  /** Гео обслуживания для Service.areaServed; не задано - Алматы и Казахстан. */
+  /** Гео обслуживания для Service.areaServed городовой; не задано - Алматы и Казахстан. */
   geo?: string[];
-  /** Слаги смежных лендингов для перелинковки. */
+  /** Смежные страницы городовой: слаги лендингов или каналов (напр. "leadgen"). */
   related?: string[];
+  /**
+   * "subservice" - гео-нейтральная подуслуга канала: в дропдауне, без городов в
+   * тексте, areaServed - рынки СНГ и США. Не задано - страница городовая.
+   */
+  kind?: "city" | "subservice";
+  /** Подпись подуслуги в дропдауне и хлебных крошках: «Лендинги». */
+  navLabel?: string;
+  /** Слаг гео-нейтральной подуслуги, городовой версией которой является страница. */
+  parent?: string;
 };
 
 /** Бесплатный бонус внутри гайда (скачиваемый чек-лист). */

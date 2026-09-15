@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { ChannelPage } from "@/components/sections/ChannelPage";
 import { getChannel } from "@/content/services";
-import { faqLd, ldJson, serviceLd } from "@/lib/jsonld";
+import { faqLd, geoNeutralAreas, ldJson, serviceLd } from "@/lib/jsonld";
 import { pageMetadata } from "@/lib/metadata";
 
 const channel = getChannel("web");
@@ -22,7 +22,7 @@ export default function WebPage() {
         dangerouslySetInnerHTML={ldJson(
           serviceLd(channel.title, channel.hero.subtitle, path, {
             serviceType: channel.navLabel,
-            areaServed: ["Алматы", "Казахстан"],
+            areaServed: geoNeutralAreas,
             priceFrom: channel.pricing.value,
           }),
         )}

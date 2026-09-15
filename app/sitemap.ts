@@ -44,12 +44,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/cases",
     "/contacts",
     "/guides",
+    "/services/leadgen",
     "/services/seo",
     "/services/context",
     "/services/web",
     "/privacy",
     "/terms",
   ];
+  /* Кейсы-образцы (template: true) отдают noindex (app/(ru)/cases/[slug]),
+     поэтому в sitemap их нет: URL с noindex в sitemap - ошибка индексации. */
   const casePaths = cases
     .filter((c) => !c.template)
     .map((c) => `/cases/${c.slug}`);

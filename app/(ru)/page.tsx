@@ -34,8 +34,9 @@ import {
   guarantee,
   finalCta,
   clients,
+  cityPagesNote,
 } from "@/content/site";
-import { landingsByChannel } from "@/content/landings";
+import { landings } from "@/content/landings";
 import { homeCases } from "@/content/cases";
 import { testimonials } from "@/content/testimonials";
 import { homeFaq } from "@/content/faq";
@@ -57,13 +58,10 @@ const companyStats: StatItem[] = [
   { value: "3 канала", label: "в одной системе" },
 ];
 
-/* Посадочные под конкретные запросы - список из данных, чтобы правки
-   в content/landings.ts подхватывались без правки главной. */
-const landingGroups = [
-  { title: "SEO-продвижение", items: landingsByChannel("seo") },
-  { title: "Контекстная реклама", items: landingsByChannel("context") },
-  { title: "Разработка сайтов", items: landingsByChannel("web") },
-].filter((g) => g.items.length > 0);
+/* Городовые страницы для подблока под портфолио - список из данных, чтобы
+   правки в content/landings.ts подхватывались без правки главной. Подуслуги
+   (nastroika-google-ads, sozdanie-lendinga) сюда не попадают - у них нет гео. */
+const cityLandings = landings.filter((l) => l.kind !== "subservice");
 
 export default function Home() {
   return (
@@ -161,47 +159,35 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* Посадочные под конкретный запрос и город */}
-      {landingGroups.length > 0 && (
-        <Section tone="surface">
-          <SectionHeader
-            eyebrow="Направления"
-            title="Услуги по городам и задачам"
-            lead="Если задача уже сформулирована - открывайте профильную страницу: там состав работ, сроки и цены под этот запрос, без общих слов про маркетинг."
-          />
-          <div className="mt-10 grid gap-10 lg:grid-cols-3">
-            {landingGroups.map((g) => (
-              <div key={g.title}>
-                <h3 className="text-sm font-medium uppercase tracking-wide text-muted">
-                  {g.title}
-                </h3>
-                <Reveal stagger className="mt-4 space-y-3">
-                  {g.items.map((l) => (
-                    <Link
-                      key={l.path}
-                      href={l.path}
-                      data-reveal
-                      className="flex items-center justify-between gap-4 rounded-xl border border-border bg-bg px-5 py-4 text-base text-ink shadow-card transition duration-300 ease-osmo hover:border-ink hover:shadow-card-hover"
-                    >
-                      <span>{l.hero.title}</span>
-                      <span aria-hidden className="text-muted">
-                        →
-                      </span>
-                    </Link>
-                  ))}
-                </Reveal>
-              </div>
-            ))}
-          </div>
-        </Section>
-      )}
-
       {/* Кейсы — донор #6: pill-фильтры + карточки */}
       <Section>
         <SectionHeader eyebrow="Кейсы" title="Результаты клиентов" />
         <div className="mt-10">
           <CaseExplorer items={homeCases} allHref="/cases" />
         </div>
+
+        {/* Подблок под портфолио: текст и ссылки на все городовые страницы.
+            Без заголовка и карточек - чтобы не читалось как список
+            единственных мест работы. */}
+        {cityLandings.length > 0 && (
+          <Reveal className="mt-12 border-t border-border pt-8">
+            <p className="max-w-3xl text-base leading-relaxed text-ink-2">
+              {cityPagesNote}
+            </p>
+            <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+              {cityLandings.map((l) => (
+                <li key={l.path}>
+                  <Link
+                    href={l.path}
+                    className="text-base text-ink underline underline-offset-4 transition duration-300 ease-osmo hover:text-accent"
+                  >
+                    {l.hero.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        )}
       </Section>
 
       {/* Отзывы */}

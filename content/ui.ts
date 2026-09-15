@@ -1,4 +1,4 @@
-import type { Cta, Locale, UiDict } from "./types";
+import type { Locale, UiDict } from "./types";
 import {
   contacts,
   floatingCta,
@@ -9,15 +9,7 @@ import {
   siteMeta,
   slogan,
 } from "./site";
-import { landings } from "./landings";
 import { uiEn } from "./en/ui";
-
-/* Сквозной футерный анкор ведёт на посадочную лидогенерации, а не на «/»:
-   у главной свои анкоры (логотип, хлебные крошки), а лендингу нужен ключ. */
-const leadgen = landings.find((l) => l.slug === "lidogeneraciya-almaty");
-const leadgenLink: Cta[] = leadgen
-  ? [{ label: leadgen.hero.title, href: leadgen.path }]
-  : [];
 
 /** RU-строки обвязки: ровно то, что раньше было хардкодом в компонентах. */
 export const uiRu: UiDict = {
@@ -33,10 +25,7 @@ export const uiRu: UiDict = {
     columns: [
       {
         title: "Услуги",
-        links: [
-          ...serviceChannelsNav.map((n) => ({ label: n.label, href: n.href })),
-          ...leadgenLink,
-        ],
+        links: serviceChannelsNav.map((n) => ({ label: n.label, href: n.href })),
       },
       {
         title: "Компания",

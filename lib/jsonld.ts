@@ -78,12 +78,21 @@ export const organizationLdEn = {
   ],
 };
 
-/* Гео из контента приходит строками - страна это или город, знаем по списку. */
+/* Гео из контента приходит строками - страна, регион или город, знаем по спискам. */
 const countryNames = new Set(["Казахстан", "США", "Россия", "Узбекистан"]);
+const regionNames = new Set(["СНГ"]);
 
 function areaLd(name: string) {
-  return { "@type": countryNames.has(name) ? "Country" : "City", name };
+  const type = countryNames.has(name)
+    ? "Country"
+    : regionNames.has(name)
+      ? "Place"
+      : "City";
+  return { "@type": type, name };
 }
+
+/** areaServed гео-нейтральных страниц услуг: рынки СНГ и США, без городов. */
+export const geoNeutralAreas = ["СНГ", "США"];
 
 const currencyBySign: Record<string, string> = { "₸": "KZT", $: "USD" };
 

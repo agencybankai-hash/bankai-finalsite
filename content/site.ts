@@ -1,5 +1,4 @@
 import type { ClientLogo, Cta, Feature, NavItem, StatItem, Step } from "./types";
-import { landingsByChannel } from "./landings";
 
 export const siteMeta = {
   name: "Bankai",
@@ -26,31 +25,38 @@ export const contacts = {
   facebookUrl: "#",
 };
 
-/** Три канала-услуги: пункты меню и колонка футера. */
-export const serviceChannelsNav: NavItem[] = [
-  { label: "SEO-продвижение", href: "/services/seo" },
-  { label: "Контекстная реклама", href: "/services/context" },
-  { label: "Разработка сайтов", href: "/services/web" },
-];
+const leadgenNav: NavItem = { label: "Лидогенерация под ключ", href: "/services/leadgen" };
+const seoNav: NavItem = { label: "SEO-продвижение", href: "/services/seo" };
+const contextNav: NavItem = { label: "Контекстная реклама", href: "/services/context" };
+const webNav: NavItem = { label: "Разработка сайтов", href: "/services/web" };
 
-/* Посадочные под НЧ-запросы берём из данных: список сам подхватит
-   добавленный или удалённый лендинг, а анкор - ключ страницы. */
-const landingNav = (channel: string): NavItem[] =>
-  landingsByChannel(channel).map((l) => ({ label: l.hero.title, href: l.path }));
+/** Четыре услуги: колонка футера. Городовых страниц здесь нет. */
+export const serviceChannelsNav: NavItem[] = [leadgenNav, seoNav, contextNav, webNav];
 
-/* Header рендерит только два уровня, поэтому посадочные идут плоским списком
-   внутри «Услуг» - каждая сразу за своим каналом. */
+/* Дропдаун «Услуги»: только услуги и подуслуги (indent - вложены под услугой).
+   Городовые страницы в меню не попадают - они на страницах услуг, в подблоке
+   главной и в sitemap.xml. Подуслуги литералом, а не из content/landings.ts:
+   Header клиентский, импорт лендингов утянул бы весь их текст в бандл.
+   Подпись и путь сверять с navLabel/path подуслуги в landings.ts. */
 export const nav: NavItem[] = [
   {
     label: "Услуги",
     href: "/#services",
     children: [
-      serviceChannelsNav[0],
-      ...landingNav("seo"),
-      serviceChannelsNav[1],
-      ...landingNav("context"),
-      serviceChannelsNav[2],
-      ...landingNav("web"),
+      leadgenNav,
+      seoNav,
+      contextNav,
+      {
+        label: "Настройка Google Ads",
+        href: "/services/context/nastroika-google-ads",
+        indent: true,
+      },
+      webNav,
+      {
+        label: "Лендинги",
+        href: "/services/web/sozdanie-lendinga",
+        indent: true,
+      },
     ],
   },
   { label: "Кейсы", href: "/cases" },
@@ -223,6 +229,11 @@ export const process: { title: string; steps: Step[] } = {
     },
   ],
 };
+
+/* Подблок под портфолио со ссылками на городовые страницы.
+   Текст-заглушка: финальную формулировку утверждает заказчик. */
+export const cityPagesNote =
+  "Работаем с проектами на рынках СНГ и США. По некоторым городам у нас собран отдельный опыт - подробнее на страницах:";
 
 export const servicesPreview = {
   title: "Три канала одной системы",

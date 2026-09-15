@@ -17,10 +17,23 @@ const nextConfig: NextConfig = {
       { source: "/en/cases/ak-cabinet", destination: "/en/cases/ak-cabinet-craft", permanent: true },
       { source: "/ru/:path*", destination: "/:path*", permanent: true },
       // Лендинг «создание сайтов» слит с родительской услугой (один интент).
+      // Появится отдельная городовая sozdanie-saitov-almaty - редирект убрать.
       {
         source: "/services/web/sozdanie-saitov-almaty",
         destination: "/services/web",
         permanent: true,
+      },
+      // Лидогенерация и настройка Google Ads переехали на гео-нейтральные адреса.
+      // statusCode 301, а не permanent: true (Next отдаёт 308): приёмка ждёт 301.
+      {
+        source: "/services/seo/lidogeneraciya-almaty",
+        destination: "/services/leadgen",
+        statusCode: 301,
+      },
+      {
+        source: "/services/context/nastroika-google-ads-almaty",
+        destination: "/services/context/nastroika-google-ads",
+        statusCode: 301,
       },
       { source: "/policy-privacy", destination: "/privacy", permanent: true },
       { source: "/en/policy-privacy", destination: "/en/privacy", permanent: true },
