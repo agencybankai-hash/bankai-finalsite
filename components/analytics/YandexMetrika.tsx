@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
+import { runOnInteractionOrAfter } from "@/lib/defer";
 
 const YM_ID = 112649944;
 const TAG_SRC = `https://mc.yandex.ru/metrika/tag.js?id=${YM_ID}`;
@@ -27,6 +28,8 @@ function loadTag(w: YmWindow) {
   document.head.appendChild(script);
 }
 
+let initScheduled = false;
+
 export function YandexMetrika() {
   const pathname = usePathname();
   const lastUrl = useRef<string | null>(null);
@@ -37,18 +40,26 @@ export function YandexMetrika() {
     const w = window as YmWindow;
     const url = location.href;
     if (!w.ym) {
-      loadTag(w);
-      // init сам отправляет просмотр текущей страницы.
-      w.ym!(YM_ID, "init", {
-        ssr: true,
-        webvisor: true,
-        clickmap: true,
-        ecommerce: "dataLayer",
-        referrer: document.referrer,
-        url,
-        accurateTrackBounce: true,
-        trackLinks: true,
-      });
+      if (!initScheduled) {
+        initScheduled = true;
+        // Счётчик (особенно Вебвизор) тяжёлый: стартуем по первому действию
+        // посетителя или через несколько секунд после загрузки (lib/defer.ts).
+        runOnInteractionOrAfter(() => {
+          if (w.ym) return;
+          loadTag(w);
+          // init сам отправляет просмотр текущей страницы.
+          w.ym!(YM_ID, "init", {
+            ssr: true,
+            webvisor: true,
+            clickmap: true,
+            ecommerce: "dataLayer",
+            referrer: document.referrer,
+            url: location.href,
+            accurateTrackBounce: true,
+            trackLinks: true,
+          });
+        });
+      }
     } else if (url !== lastUrl.current) {
       // Next переключает страницы через History API, а такие переходы
       // счётчик сам не видит - просмотр отправляем вручную.

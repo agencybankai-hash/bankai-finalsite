@@ -1,4 +1,7 @@
-import Script from "next/script";
+"use client";
+
+import { useEffect } from "react";
+import { runOnInteractionOrAfter } from "@/lib/defer";
 import { YandexMetrika } from "./YandexMetrika";
 
 // Идентификаторы GA и GTM только из env: на локали и в превью, где они
@@ -6,32 +9,53 @@ import { YandexMetrika } from "./YandexMetrika";
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 
+function addScript(src: string) {
+  const s = document.createElement("script");
+  s.async = true;
+  s.src = src;
+  document.head.appendChild(s);
+}
+
+type DL = { dataLayer?: unknown[]; gtag?: (...args: unknown[]) => void };
+
+/**
+ * GTM и GA4 подключаются не сразу, а по первому действию посетителя или
+ * через несколько секунд после загрузки (lib/defer.ts): контейнер GTM
+ * с GA4 внутри - это 300 КБ скриптов и заметная нагрузка на главный поток,
+ * первой краске и гидратации они не нужны. dataLayer создаётся сразу,
+ * поэтому события, отправленные до загрузки, не теряются.
+ */
 export function Analytics() {
+  useEffect(() => {
+    if (!GA_ID && !GTM_ID) return;
+    const w = window as Window & DL;
+    w.dataLayer = w.dataLayer || [];
+    return runOnInteractionOrAfter(() => {
+      if (GTM_ID) {
+        w.dataLayer!.push({ "gtm.start": Date.now(), event: "gtm.js" });
+        addScript(`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`);
+      }
+      if (GA_ID) {
+        w.gtag = function gtag() {
+          // eslint-disable-next-line prefer-rest-params
+          w.dataLayer!.push(arguments);
+        };
+        w.gtag("js", new Date());
+        w.gtag("config", GA_ID);
+        addScript(`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`);
+      }
+    });
+  }, []);
+
   return (
     <>
       <YandexMetrika />
       {GTM_ID && (
-        <>
-          <Script id="gtm-init" strategy="afterInteractive">
-            {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');`}
-          </Script>
-          <noscript
-            dangerouslySetInnerHTML={{
-              __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=${GTM_ID}" height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
-            }}
-          />
-        </>
-      )}
-      {GA_ID && (
-        <>
-          <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-            strategy="afterInteractive"
-          />
-          <Script id="ga4-init" strategy="afterInteractive">
-            {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`}
-          </Script>
-        </>
+        <noscript
+          dangerouslySetInnerHTML={{
+            __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=${GTM_ID}" height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
+          }}
+        />
       )}
     </>
   );
