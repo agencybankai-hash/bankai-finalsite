@@ -51,6 +51,11 @@ export const nav: NavItem[] = [
         href: "/services/context/nastroika-google-ads",
         indent: true,
       },
+      {
+        label: "Яндекс Директ",
+        href: "/services/context/nastroika-yandex-direct",
+        indent: true,
+      },
       webNav,
       {
         label: "Лендинги",
