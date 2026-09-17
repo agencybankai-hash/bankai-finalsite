@@ -45,6 +45,11 @@ export const nav: NavItem[] = [
     children: [
       leadgenNav,
       seoNav,
+      {
+        label: "Продвижение интернет-магазинов",
+        href: "/services/seo/prodvizhenie-internet-magazina",
+        indent: true,
+      },
       contextNav,
       {
         label: "Настройка Google Ads",
@@ -60,6 +65,16 @@ export const nav: NavItem[] = [
       {
         label: "Лендинги",
         href: "/services/web/sozdanie-lendinga",
+        indent: true,
+      },
+      {
+        label: "Корпоративные сайты",
+        href: "/services/web/sozdanie-korporativnogo-saita",
+        indent: true,
+      },
+      {
+        label: "Интернет-магазины",
+        href: "/services/web/sozdanie-internet-magazina",
         indent: true,
       },
     ],
