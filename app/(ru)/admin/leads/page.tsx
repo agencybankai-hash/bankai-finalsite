@@ -1,5 +1,6 @@
 import { DeleteLeadButton } from "@/components/admin/DeleteLeadButton";
 import { Container } from "@/components/ui/Container";
+import type { Attribution } from "@/lib/attribution";
 import { getSql } from "@/lib/db";
 import { deviceLabel } from "@/lib/user-agent";
 
@@ -22,6 +23,7 @@ type Lead = {
     comment?: string;
     page?: string;
     locale?: string;
+    attribution?: Attribution;
   } | null;
   user_agent: string | null;
   created_at: string;
@@ -60,6 +62,31 @@ function detailsShort(r: Lead) {
     .join(" · ");
 }
 
+/** Источник заявки одной строкой: «источник / канал / кампания». */
+function trafficShort(r: Lead): string {
+  const a = r.payload?.attribution;
+  if (!a?.lead_source) return "";
+  return [a.lead_source, a.lead_medium, a.lead_campaign].filter(Boolean).join(" / ");
+}
+
+/** Пары «подпись: значение» по атрибуции, только заполненные. */
+function trafficRows(r: Lead): Array<[string, string]> {
+  const a = r.payload?.attribution;
+  if (!a) return [];
+  // Первый визит показываем, только если он отличается от источника заявки.
+  const firstLine = [a.first_source, a.first_medium, a.first_campaign].filter(Boolean).join(" / ");
+  const rows: Array<[string, string | undefined]> = [
+    ["Источник", trafficShort(r)],
+    ["Ключ", a.lead_term],
+    ["Контент", a.lead_content],
+    ["Click ID", a.click_id],
+    ["Первый визит", firstLine && firstLine !== trafficShort(r) ? firstLine : undefined],
+    ["Лендинг", a.landing_page],
+    ["Реферер", a.referrer],
+  ];
+  return rows.flatMap(([k, v]) => (v ? [[k, v] as [string, string]] : []));
+}
+
 /** Подпись лида для подтверждения удаления. */
 function leadLabel(r: Lead) {
   return (
@@ -84,8 +111,7 @@ function Expandable({ short, full }: { short: string; full: React.ReactNode }) {
   );
 }
 
-function DetailsFull({ r }: { r: Lead }) {
-  const rows = detailRows(r);
+function DetailsFull({ rows }: { rows: Array<[string, string]> }) {
   if (rows.length === 0) return <>—</>;
   return (
     <dl className="space-y-1">
@@ -183,12 +209,23 @@ export default async function LeadsPage() {
                         {r.payload.page}
                       </span>
                     )}
+                    {trafficShort(r) && (
+                      <>
+                        {" · "}
+                        {trafficShort(r)}
+                      </>
+                    )}
                     {" · "}
                     {deviceLabel(r.user_agent)}
                   </div>
                   <div className="mt-3 border-t border-border pt-3">
-                    <DetailsFull r={r} />
+                    <DetailsFull rows={detailRows(r)} />
                   </div>
+                  {trafficRows(r).length > 0 && (
+                    <div className="mt-3 border-t border-border pt-3">
+                      <DetailsFull rows={trafficRows(r)} />
+                    </div>
+                  )}
                   <div className="mt-3 flex justify-end">
                     <DeleteLeadButton id={r.id} label={leadLabel(r)} />
                   </div>
@@ -204,6 +241,7 @@ export default async function LeadsPage() {
                     <th className="px-4 py-3 font-medium text-ink">Дата</th>
                     <th className="px-4 py-3 font-medium text-ink">Контакт</th>
                     <th className="px-4 py-3 font-medium text-ink">Источник</th>
+                    <th className="px-4 py-3 font-medium text-ink">Трафик</th>
                     <th className="px-4 py-3 font-medium text-ink">Детали</th>
                     <th className="px-4 py-3 font-medium text-ink">Устройство</th>
                     {/* relative: иначе sr-only-подпись позиционируется относительно
@@ -230,9 +268,22 @@ export default async function LeadsPage() {
                           </div>
                         )}
                       </td>
+                      <td className="max-w-[32ch] px-4 py-3">
+                        {trafficRows(r).length > 0 ? (
+                          <Expandable
+                            short={trafficShort(r) || "—"}
+                            full={<DetailsFull rows={trafficRows(r)} />}
+                          />
+                        ) : (
+                          <span className="text-ink-2">—</span>
+                        )}
+                      </td>
                       <td className="max-w-[44ch] px-4 py-3">
                         {detailRows(r).length > 0 ? (
-                          <Expandable short={detailsShort(r)} full={<DetailsFull r={r} />} />
+                          <Expandable
+                            short={detailsShort(r)}
+                            full={<DetailsFull rows={detailRows(r)} />}
+                          />
                         ) : (
                           <span className="text-ink-2">—</span>
                         )}

@@ -177,3 +177,9 @@ export function getAttribution(): Attribution {
     referrer: first?.referrer ?? last?.referrer,
   };
 }
+
+/** Порядок полей атрибуции в CSV-экспорте. */
+export const ATTRIBUTION_KEYS = [
+  "lead_source", "lead_medium", "lead_campaign", "lead_term", "lead_content",
+  "click_id", "first_source", "first_medium", "first_campaign", "landing_page", "referrer",
+] as const satisfies ReadonlyArray<keyof Attribution>;
