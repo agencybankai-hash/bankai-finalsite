@@ -1,3 +1,4 @@
+import { ATTRIBUTION_KEYS, type Attribution } from "@/lib/attribution";
 import { getSql } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +16,7 @@ type Row = {
     niche?: string;
     revenue?: string;
     comment?: string;
+    attribution?: Attribution;
   } | null;
   user_agent: string | null;
   created_at: string;
@@ -51,6 +53,7 @@ export async function GET() {
     "contact",
     "name",
     "source",
+    ...ATTRIBUTION_KEYS,
     "service",
     "niche",
     "comment",
@@ -66,6 +69,7 @@ export async function GET() {
       r.payload?.contact ?? "",
       r.name,
       r.source,
+      ...ATTRIBUTION_KEYS.map((k) => r.payload?.attribution?.[k] ?? ""),
       r.payload?.service ?? "",
       r.payload?.niche ?? "",
       r.payload?.comment ?? "",
