@@ -30,14 +30,15 @@ export function ClientsBar({
         {items.map((c) => (
           <div
             key={c.name}
-            className="mx-2.5 flex h-16 w-44 shrink-0 items-center justify-center rounded-xl border border-border bg-bg px-4 shadow-card"
+            // group: цвет лого проявляется по ховеру на всю карточку, а не только на картинку
+            className="group mx-2.5 flex h-16 w-44 shrink-0 items-center justify-center rounded-xl border border-border bg-bg px-4 shadow-card transition duration-300 ease-osmo hover:border-ink"
           >
             {c.logo ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={c.logo}
                 alt={c.name}
-                className="max-h-7 w-auto max-w-full rounded-md object-contain grayscale transition duration-300 hover:grayscale-0"
+                className="max-h-7 w-auto max-w-full rounded-md object-contain grayscale transition duration-300 ease-osmo group-hover:grayscale-0"
               />
             ) : (
               <span className="truncate text-sm font-semibold uppercase tracking-wide text-ink">
