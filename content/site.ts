@@ -141,7 +141,7 @@ export const clients: { caption: string; items: ClientLogo[] } = {
     { name: "1kredit.kz", logo: "/logos/1kredit.svg" },
     { name: "Green Moving", logo: "/logos/greenmoving.svg" },
     { name: "AK Cabinet Craft" },
-    { name: "AI Moving" },
+    { name: "AI Moving", logo: "/logos/aimoving.svg" },
   ],
 };
 
