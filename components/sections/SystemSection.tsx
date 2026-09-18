@@ -3,6 +3,7 @@ import { Pill } from "@/components/ui/Pill";
 import { IconBadge } from "@/components/ui/IconBadge";
 import { Blobs } from "@/components/ui/Blobs";
 import { Reveal } from "@/components/motion/Reveal";
+import { Disclosure } from "@/components/ui/Disclosure";
 import {
   SystemIllustration,
   type SystemVisual,
@@ -26,7 +27,8 @@ export function SystemSection({
 }) {
   return (
     <div>
-      <Reveal stagger className="grid gap-5 lg:grid-cols-3">
+      {/* items-start: открытая карточка растёт одна, соседние не тянутся за ней */}
+      <Reveal stagger className="grid items-start gap-5 lg:grid-cols-3">
         {layers.map((l, i) => (
           <div
             key={l.tag}
@@ -47,22 +49,15 @@ export function SystemSection({
             <div className="mt-5 text-h3 text-ink">{l.role}</div>
             <p className="mt-2 text-sm leading-relaxed text-ink-2">{l.text}</p>
             {l.plain && (
-              <details className="group mt-auto rounded-lg border-l-2 border-ink bg-surface-2 pt-4 [&[open]]:pt-0">
-                <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2.5 [&::-webkit-details-marker]:hidden">
-                  <span className="text-label uppercase text-muted">
-                    По-простому
-                  </span>
-                  <span
-                    aria-hidden
-                    className="text-lg leading-none text-muted transition-transform group-open:rotate-45"
-                  >
-                    +
-                  </span>
-                </summary>
-                <p className="px-3 pb-3 text-sm leading-relaxed text-ink">
-                  {l.plain}
-                </p>
-              </details>
+              <Disclosure
+                className="mt-5 rounded-lg bg-surface-2"
+                buttonClassName="px-3.5 py-2.5"
+                iconClassName="text-lg"
+                panelClassName="px-3.5 pb-3.5"
+                label={<span className="text-label uppercase text-muted">По-простому</span>}
+              >
+                <p className="text-sm leading-relaxed text-ink">{l.plain}</p>
+              </Disclosure>
             )}
           </div>
         ))}
