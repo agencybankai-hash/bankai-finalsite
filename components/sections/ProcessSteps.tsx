@@ -34,7 +34,9 @@ export function ProcessSteps({ steps }: { steps: Step[] }) {
                 {s.n}
               </span>
               {s.duration && (
-                <span className="ml-auto rounded-full border border-border px-2.5 py-0.5 text-xs text-muted">
+                // Непрозрачный фон цвета секции + z-10: связующая линия проходит
+                // за биркой и не должна просвечивать (как ring-surface у кружка).
+                <span className="relative z-10 ml-auto rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs text-muted">
                   {s.duration}
                 </span>
               )}
