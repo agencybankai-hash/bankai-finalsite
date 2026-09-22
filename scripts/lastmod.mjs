@@ -15,6 +15,7 @@ const files = [
   ...readdirSync(join(root, "content/guides")).filter((f) => f.endsWith(".md")).map((f) => `content/guides/${f}`),
   "app/(ru)/page.tsx", "app/(ru)/about/page.tsx", "app/(ru)/contacts/page.tsx",
   "app/(ru)/privacy/page.tsx", "app/(ru)/terms/page.tsx",
+  "app/(ru)/marketingovoe-agentstvo-astana/page.tsx",
   "app/(en)/en/page.tsx", "app/(en)/en/contacts/page.tsx",
   "app/(en)/en/privacy/page.tsx", "app/(en)/en/terms/page.tsx",
 ];

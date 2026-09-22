@@ -20,6 +20,7 @@ import { cases } from "@/content/cases";
 import { channelForms, getChannel } from "@/content/services";
 import { cityLandingsOf, landings, subservicesOf } from "@/content/landings";
 import { finalCta } from "@/content/site";
+import { agencyAstana } from "@/content/agency-astana";
 import type {
   CaseChannel,
   Cta,
@@ -47,8 +48,14 @@ const channelLink = (c: ServiceChannel): Cta => ({
   href: `/services/${c.slug}`,
 });
 
-/** Смежная страница городовой: слаг лендинга или канала ("leadgen"). */
+/* Городские страницы вне landings (свой маршрут) - в `related` их указывают путём. */
+const staticCityPages: Cta[] = [
+  { label: agencyAstana.hero.title, href: agencyAstana.path },
+];
+
+/** Смежная страница городовой: слаг лендинга или канала ("leadgen") либо путь страницы из staticCityPages. */
 function relatedLink(slug: string): Cta | undefined {
+  if (slug.startsWith("/")) return staticCityPages.find((p) => p.href === slug);
   const l = landings.find((x) => x.slug === slug);
   if (l) return landingLink(l);
   const c = getChannel(slug);

@@ -4,6 +4,7 @@ import { cases } from "@/content/cases";
 import { casesEn } from "@/content/en/cases";
 import { guides } from "@/content/guides";
 import { landings } from "@/content/landings";
+import { agencyAstana } from "@/content/agency-astana";
 import { enPairOf, ruPairOf } from "@/lib/i18n";
 import { modifiedAt } from "@/lib/lastmod";
 
@@ -20,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/guides": ["content/guides.ts"],
     "/privacy": ["app/(ru)/privacy/page.tsx"],
     "/terms": ["app/(ru)/terms/page.tsx"],
+    [agencyAstana.path]: ["content/agency-astana.ts", "app/(ru)/marketingovoe-agentstvo-astana/page.tsx"],
     "/en": ["content/en/ui.ts", "app/(en)/en/page.tsx"],
     "/en/cases": ["content/en/cases.ts"],
     "/en/contacts": ["app/(en)/en/contacts/page.tsx"],
@@ -48,6 +50,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/services/seo",
     "/services/context",
     "/services/web",
+    agencyAstana.path,
     "/privacy",
     "/terms",
   ];
@@ -85,7 +88,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const priorityOf = (p: string) => {
     if (p === "") return 1;
-    if (landingPaths.includes(p)) return 0.7;
+    if (landingPaths.includes(p) || p === agencyAstana.path) return 0.7;
     return p.startsWith("/guides") || p.startsWith("/services") ? 0.8 : 0.6;
   };
 

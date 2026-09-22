@@ -37,6 +37,7 @@ import {
   cityPagesNote,
 } from "@/content/site";
 import { landings } from "@/content/landings";
+import { agencyAstana } from "@/content/agency-astana";
 import { homeCases } from "@/content/cases";
 import { testimonials } from "@/content/testimonials";
 import { homeFaq } from "@/content/faq";
@@ -60,8 +61,23 @@ const companyStats: StatItem[] = [
 
 /* Городовые страницы для подблока под портфолио - список из данных, чтобы
    правки в content/landings.ts подхватывались без правки главной. Подуслуги
-   (nastroika-google-ads, sozdanie-lendinga) сюда не попадают - у них нет гео. */
-const cityLandings = landings.filter((l) => l.kind !== "subservice");
+   (nastroika-google-ads, sozdanie-lendinga) сюда не попадают - у них нет гео.
+   Порядок: услуга (SEO, контекст, сайты), внутри - город; первой - страница
+   агентства в Астане, у неё свой маршрут. */
+const channelOrder = ["seo", "context", "web"];
+const cityOrder = ["Алматы", "Астана", "Шымкент", "Казахстан"];
+const cityRank = (geo?: string[]) => cityOrder.indexOf(geo?.[0] ?? "Алматы");
+const cityLinks = [
+  { label: agencyAstana.hero.title, href: agencyAstana.path },
+  ...landings
+    .filter((l) => l.kind !== "subservice")
+    .sort(
+      (a, b) =>
+        channelOrder.indexOf(a.channel) - channelOrder.indexOf(b.channel) ||
+        cityRank(a.geo) - cityRank(b.geo),
+    )
+    .map((l) => ({ label: l.hero.title, href: l.path })),
+];
 
 export default function Home() {
   return (
@@ -169,19 +185,19 @@ export default function Home() {
         {/* Подблок под портфолио: текст и ссылки на все городовые страницы.
             Без заголовка и карточек - чтобы не читалось как список
             единственных мест работы. */}
-        {cityLandings.length > 0 && (
+        {cityLinks.length > 0 && (
           <Reveal className="mt-12 border-t border-border pt-8">
             <p className="max-w-3xl text-base leading-relaxed text-ink-2">
               {cityPagesNote}
             </p>
             <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
-              {cityLandings.map((l) => (
-                <li key={l.path}>
+              {cityLinks.map((l) => (
+                <li key={l.href}>
                   <Link
-                    href={l.path}
+                    href={l.href}
                     className="text-base text-ink underline underline-offset-4 transition duration-300 ease-osmo hover:text-accent"
                   >
-                    {l.hero.title}
+                    {l.label}
                   </Link>
                 </li>
               ))}
