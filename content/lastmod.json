@@ -83,6 +83,18 @@
     "modified": "2026-09-15",
     "created": "2026-05-31"
   },
+  "content/city-longreads/prodvizhenie-saitov-almaty.md": {
+    "modified": "2026-09-22",
+    "created": "2026-09-22"
+  },
+  "content/city-longreads/prodvizhenie-saitov-astana.md": {
+    "modified": "2026-09-22",
+    "created": "2026-09-22"
+  },
+  "content/city-longreads/prodvizhenie-saitov-kazakhstan.md": {
+    "modified": "2026-09-22",
+    "created": "2026-09-22"
+  },
   "app/(ru)/page.tsx": {
     "modified": "2026-09-22",
     "created": "2026-08-07"
