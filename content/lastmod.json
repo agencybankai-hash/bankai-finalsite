@@ -3,6 +3,10 @@
     "modified": "2026-08-07",
     "created": "2026-05-31"
   },
+  "content/agency-astana.ts": {
+    "modified": "2026-09-22",
+    "created": "2026-09-22"
+  },
   "content/cases.ts": {
     "modified": "2026-08-07",
     "created": "2026-05-31"
@@ -40,7 +44,7 @@
     "created": "2026-05-31"
   },
   "content/types.ts": {
-    "modified": "2026-09-15",
+    "modified": "2026-09-22",
     "created": "2026-05-31"
   },
   "content/ui.ts": {
@@ -80,7 +84,7 @@
     "created": "2026-05-31"
   },
   "app/(ru)/page.tsx": {
-    "modified": "2026-09-15",
+    "modified": "2026-09-22",
     "created": "2026-08-07"
   },
   "app/(ru)/about/page.tsx": {
@@ -98,6 +102,10 @@
   "app/(ru)/terms/page.tsx": {
     "modified": "2026-08-21",
     "created": "2026-08-07"
+  },
+  "app/(ru)/marketingovoe-agentstvo-astana/page.tsx": {
+    "modified": "2026-09-22",
+    "created": "2026-09-22"
   },
   "app/(en)/en/page.tsx": {
     "modified": "2026-08-21",
