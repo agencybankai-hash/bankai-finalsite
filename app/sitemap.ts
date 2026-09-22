@@ -28,10 +28,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/en/privacy": ["app/(en)/en/privacy/page.tsx"],
     "/en/terms": ["app/(en)/en/terms/page.tsx"],
   };
+  // Городская страница: объект в landings.ts и её лонгрид (content/city-longreads).
+  const landingSources = (p: string): string[] | undefined => {
+    const l = landings.find((x) => x.path === p);
+    if (!l) return undefined;
+    return l.longread ? ["content/landings.ts", `content/city-longreads/${l.longread}`] : ["content/landings.ts"];
+  };
   const lastModifiedOf = (p: string): Date | undefined => {
     const files =
       sources[p] ??
-      (p.startsWith("/services/") ? (landings.some((l) => l.path === p) ? ["content/landings.ts"] : ["content/services.ts"])
+      (p.startsWith("/services/") ? (landingSources(p) ?? ["content/services.ts"])
       : p.startsWith("/guides/") ? [`content/guides/${guides.find((g) => `/guides/${g.slug}` === p)?.file ?? ""}`, "content/guides.ts"]
       : p.startsWith("/en/cases/") ? ["content/en/cases.ts"]
       : p.startsWith("/cases/") ? ["content/cases.ts"]

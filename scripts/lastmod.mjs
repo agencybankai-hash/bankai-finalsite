@@ -13,6 +13,7 @@ const files = [
   ...readdirSync(join(root, "content")).filter((f) => f.endsWith(".ts")).map((f) => `content/${f}`),
   ...readdirSync(join(root, "content/en")).filter((f) => f.endsWith(".ts")).map((f) => `content/en/${f}`),
   ...readdirSync(join(root, "content/guides")).filter((f) => f.endsWith(".md")).map((f) => `content/guides/${f}`),
+  ...readdirSync(join(root, "content/city-longreads")).filter((f) => f.endsWith(".md")).map((f) => `content/city-longreads/${f}`),
   "app/(ru)/page.tsx", "app/(ru)/about/page.tsx", "app/(ru)/contacts/page.tsx",
   "app/(ru)/privacy/page.tsx", "app/(ru)/terms/page.tsx",
   "app/(ru)/marketingovoe-agentstvo-astana/page.tsx",

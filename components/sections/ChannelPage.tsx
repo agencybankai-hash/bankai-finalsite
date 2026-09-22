@@ -15,6 +15,7 @@ import { FunnelChain } from "@/components/sections/FunnelChain";
 import { CaseGrid } from "@/components/sections/CaseGrid";
 import { FAQ } from "@/components/sections/FAQ";
 import { CTASection } from "@/components/sections/CTASection";
+import { CityLongread } from "@/components/sections/CityLongread";
 import { Reveal } from "@/components/motion/Reveal";
 import { cases } from "@/content/cases";
 import { channelForms, getChannel } from "@/content/services";
@@ -102,9 +103,12 @@ function LinkGrid({ title, links }: { title: string; links: Cta[] }) {
 export function ChannelPage({
   channel,
   landing,
+  longread,
 }: {
   channel: ServiceChannel;
   landing?: ServiceLanding;
+  /** Текст лонгрида городской страницы (markdown), см. landing.longread. */
+  longread?: string;
 }) {
   const isCity = Boolean(landing) && landing?.kind !== "subservice";
   const tag = channelMap[channel.slug];
@@ -456,6 +460,9 @@ export function ChannelPage({
           <FAQ items={faq} />
         </div>
       </Section>
+
+      {/* Лонгрид о рынке города - последний содержательный блок */}
+      {longread && <CityLongread markdown={longread} />}
 
       {(subserviceLinks.length > 0 || cityLinks.length > 0) && (
         <Section tone="surface">

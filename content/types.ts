@@ -132,6 +132,8 @@ export type ServiceLanding = {
   pricingNote?: string;
   /** Гео обслуживания для Service.areaServed городовой; не задано - Алматы и Казахстан. */
   geo?: string[];
+  /** Лонгрид о рынке города после FAQ: имя markdown-файла в content/city-longreads. */
+  longread?: string;
   /** Смежные страницы городовой: слаги лендингов или каналов (напр. "leadgen") либо путь городской страницы со своим маршрутом. */
   related?: string[];
   /**
