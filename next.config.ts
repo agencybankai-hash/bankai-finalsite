@@ -26,13 +26,6 @@ const nextConfig: NextConfig = {
         destination: "/cases/ak-cabinet-craft",
         statusCode: 301,
       },
-      // Лендинг «создание сайтов» слит с родительской услугой (один интент).
-      // Появится отдельная городовая sozdanie-saitov-almaty - редирект убрать.
-      {
-        source: "/services/web/sozdanie-saitov-almaty",
-        destination: "/services/web",
-        permanent: true,
-      },
       // Лидогенерация и настройка Google Ads переехали на гео-нейтральные адреса.
       // statusCode 301, а не permanent: true (Next отдаёт 308): приёмка ждёт 301.
       {
