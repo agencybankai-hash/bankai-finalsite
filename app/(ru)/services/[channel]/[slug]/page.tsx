@@ -4,7 +4,7 @@ import { ChannelPage } from "@/components/sections/ChannelPage";
 import { serviceCrumbs } from "@/components/sections/Breadcrumbs";
 import { getChannel } from "@/content/services";
 import { getLanding, landings } from "@/content/landings";
-import { readLongread } from "@/lib/city-longread";
+import { readCityLongread } from "@/lib/longread";
 import {
   breadcrumbLd,
   faqLd,
@@ -39,7 +39,7 @@ export default async function ServiceLandingPage({ params }: Params) {
   const landing = getLanding(channel, slug);
   const parent = landing && getChannel(landing.channel);
   if (!landing || !parent) notFound();
-  const longread = await readLongread(landing.longread);
+  const longread = await readCityLongread(landing.longread);
 
   return (
     <>

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
 import { IconBadge } from "@/components/ui/IconBadge";
@@ -20,6 +19,7 @@ import { Pricing } from "@/components/sections/Pricing";
 import { FAQ } from "@/components/sections/FAQ";
 import { CTASection } from "@/components/sections/CTASection";
 import { LeadMagnet } from "@/components/sections/LeadMagnet";
+import { Longread } from "@/components/sections/Longread";
 import { Reveal } from "@/components/motion/Reveal";
 import {
   hero,
@@ -34,14 +34,13 @@ import {
   guarantee,
   finalCta,
   clients,
-  cityPagesNote,
+  homeLongread,
 } from "@/content/site";
-import { landings } from "@/content/landings";
-import { agencyAstana } from "@/content/agency-astana";
 import { homeCases } from "@/content/cases";
 import { testimonials } from "@/content/testimonials";
 import { homeFaq } from "@/content/faq";
 import { pairAlternates } from "@/lib/i18n";
+import { readLongread } from "@/lib/longread";
 
 /* title/description/OG - из layout'а группы; здесь только hreflang-пара с /en. */
 export const metadata: Metadata = {
@@ -59,27 +58,8 @@ const companyStats: StatItem[] = [
   { value: "3 канала", label: "в одной системе" },
 ];
 
-/* Городовые страницы для подблока под портфолио - список из данных, чтобы
-   правки в content/landings.ts подхватывались без правки главной. Подуслуги
-   (nastroika-google-ads, sozdanie-lendinga) сюда не попадают - у них нет гео.
-   Порядок: услуга (SEO, контекст, сайты), внутри - город; первой - страница
-   агентства в Астане, у неё свой маршрут. */
-const channelOrder = ["seo", "context", "web"];
-const cityOrder = ["Алматы", "Астана", "Шымкент", "Казахстан"];
-const cityRank = (geo?: string[]) => cityOrder.indexOf(geo?.[0] ?? "Алматы");
-const cityLinks = [
-  { label: agencyAstana.hero.title, href: agencyAstana.path },
-  ...landings
-    .filter((l) => l.kind !== "subservice")
-    .sort(
-      (a, b) =>
-        channelOrder.indexOf(a.channel) - channelOrder.indexOf(b.channel) ||
-        cityRank(a.geo) - cityRank(b.geo),
-    )
-    .map((l) => ({ label: l.hero.title, href: l.path })),
-];
-
-export default function Home() {
+export default async function Home() {
+  const longread = await readLongread(homeLongread);
   return (
     <>
       <Hero
@@ -181,29 +161,6 @@ export default function Home() {
         <div className="mt-10">
           <CaseExplorer items={homeCases} allHref="/cases" />
         </div>
-
-        {/* Подблок под портфолио: текст и ссылки на все городовые страницы.
-            Без заголовка и карточек - чтобы не читалось как список
-            единственных мест работы. */}
-        {cityLinks.length > 0 && (
-          <Reveal className="mt-12 border-t border-border pt-8">
-            <p className="max-w-3xl text-base leading-relaxed text-ink-2">
-              {cityPagesNote}
-            </p>
-            <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
-              {cityLinks.map((l) => (
-                <li key={l.href}>
-                  <Link
-                    href={l.href}
-                    className="text-base text-ink underline underline-offset-4 transition duration-300 ease-osmo hover:text-accent"
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-        )}
       </Section>
 
       {/* Отзывы */}
@@ -295,6 +252,9 @@ export default function Home() {
       </Section>
 
       <CTASection title={finalCta.title} lead={finalCta.lead} cta={finalCta.cta} />
+
+      {/* Лонгрид над футером: ссылки на хабы и городские страницы - в тексте */}
+      {longread && <Longread markdown={longread} />}
     </>
   );
 }

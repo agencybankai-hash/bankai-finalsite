@@ -28,6 +28,15 @@ function loadTag(w: YmWindow) {
   document.head.appendChild(script);
 }
 
+/**
+ * Цель Метрики. Счётчик стартует по первому действию посетителя, а клик по
+ * кнопке идёт после pointerdown - вызов встаёт в очередь ym. Вне боевого
+ * домена ym нет, и цель молча не отправляется.
+ */
+export function reachGoal(goal: string) {
+  (window as YmWindow).ym?.(YM_ID, "reachGoal", goal);
+}
+
 let initScheduled = false;
 
 export function YandexMetrika() {

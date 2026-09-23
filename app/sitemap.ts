@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { siteMeta } from "@/content/site";
+import { homeLongread, siteMeta } from "@/content/site";
 import { cases } from "@/content/cases";
 import { casesEn } from "@/content/en/cases";
 import { guides } from "@/content/guides";
@@ -14,7 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
      (content/lastmod.json, обновляется командой npm run lastmod). Дата сборки
      не годится: она менялась бы при каждом деплое на всех URL сразу. */
   const sources: Record<string, string[]> = {
-    "": ["content/site.ts", "app/(ru)/page.tsx"],
+    "": ["content/site.ts", "app/(ru)/page.tsx", `content/longreads/${homeLongread}`],
     "/about": ["content/about.ts", "app/(ru)/about/page.tsx"],
     "/cases": ["content/cases.ts"],
     "/contacts": ["app/(ru)/contacts/page.tsx"],

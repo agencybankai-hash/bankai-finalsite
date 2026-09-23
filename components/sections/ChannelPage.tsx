@@ -15,7 +15,7 @@ import { FunnelChain } from "@/components/sections/FunnelChain";
 import { CaseGrid } from "@/components/sections/CaseGrid";
 import { FAQ } from "@/components/sections/FAQ";
 import { CTASection } from "@/components/sections/CTASection";
-import { CityLongread } from "@/components/sections/CityLongread";
+import { Longread } from "@/components/sections/Longread";
 import { Reveal } from "@/components/motion/Reveal";
 import { cases } from "@/content/cases";
 import { channelForms, getChannel } from "@/content/services";
@@ -107,7 +107,7 @@ export function ChannelPage({
 }: {
   channel: ServiceChannel;
   landing?: ServiceLanding;
-  /** Текст лонгрида городской страницы (markdown), см. landing.longread. */
+  /** Текст лонгрида над футером (markdown). */
   longread?: string;
 }) {
   const isCity = Boolean(landing) && landing?.kind !== "subservice";
@@ -461,9 +461,6 @@ export function ChannelPage({
         </div>
       </Section>
 
-      {/* Лонгрид о рынке города - последний содержательный блок */}
-      {longread && <CityLongread markdown={longread} />}
-
       {(subserviceLinks.length > 0 || cityLinks.length > 0) && (
         <Section tone="surface">
           <div className="space-y-14">
@@ -484,6 +481,9 @@ export function ChannelPage({
       )}
 
       <CTASection title={finalCta.title} lead={finalCta.lead} cta={finalCta.cta} />
+
+      {/* Лонгрид - последний блок страницы, прямо над футером */}
+      {longread && <Longread markdown={longread} />}
     </>
   );
 }
