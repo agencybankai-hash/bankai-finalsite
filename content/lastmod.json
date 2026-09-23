@@ -36,7 +36,7 @@
     "created": "2026-05-31"
   },
   "content/site.ts": {
-    "modified": "2026-09-22",
+    "modified": "2026-09-23",
     "created": "2026-05-31"
   },
   "content/testimonials.ts": {
@@ -44,7 +44,7 @@
     "created": "2026-05-31"
   },
   "content/types.ts": {
-    "modified": "2026-09-22",
+    "modified": "2026-09-23",
     "created": "2026-05-31"
   },
   "content/ui.ts": {
@@ -107,8 +107,12 @@
     "modified": "2026-09-23",
     "created": "2026-09-23"
   },
+  "content/longreads/home.md": {
+    "modified": "2026-09-23",
+    "created": "2026-09-23"
+  },
   "app/(ru)/page.tsx": {
-    "modified": "2026-09-22",
+    "modified": "2026-09-23",
     "created": "2026-08-07"
   },
   "app/(ru)/about/page.tsx": {
