@@ -31,7 +31,7 @@ export function CityLongread({ markdown }: { markdown: string }) {
               return h.startsWith("/") ? (
                 <Link href={h}>{children}</Link>
               ) : (
-                <a href={h} target="_blank" rel="noopener noreferrer">
+                <a href={h} target="_blank" rel="nofollow noopener noreferrer">
                   {children}
                 </a>
               );
