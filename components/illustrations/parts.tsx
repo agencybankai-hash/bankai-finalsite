@@ -8,7 +8,10 @@ import { anim } from "./vars";
 /** Точка заявки - единственный коралл сцены. Кольцо-пульс (до 3 раз) - только в живой сцене. */
 export function LeadDot({ delay = 2.3, className }: { delay?: number; className?: string }) {
   return (
-    <span aria-hidden className={cn("relative inline-block h-[1em] w-[1em] shrink-0", className)}>
+    <span
+      aria-hidden
+      className={cn("relative inline-block h-[max(7px,1em)] w-[max(7px,1em)] shrink-0", className)}
+    >
       <span
         className="a-pulse absolute inset-0 rounded-full bg-accent"
         style={anim({ delay: delay + 0.35 })}
@@ -22,6 +25,7 @@ const chipTones = {
   muted: "bg-surface-2 text-ink-2",
   solid: "bg-ink text-bg",
   outline: "border border-border text-ink-2",
+  dashed: "border border-dashed border-border text-muted",
   struck: "border border-dashed border-border text-muted line-through",
 };
 

@@ -1,1 +1,55 @@
 /* SEO: стили и сценарии движения трека (контракт - illustrations.css). */
+
+/* Сетка выдачи в em сцены: шаг строки, блок линии ТОП-10, ширина рельса,
+   выступ слота сайта за шаг (обводке есть куда дышать). Строки одной высоты -
+   слот (строка 4) и путь его подъёма считаются от шага. */
+.seo-scene {
+  --seo-row: 2.15em;
+  --seo-line: 1.7em;
+  --seo-rail: max(8em, 68px);
+  --seo-pad: 0.2em;
+}
+.seo-store {
+  --seo-row: 2.2em;
+  --seo-pad: 0.3em;
+}
+
+.seo-row {
+  height: var(--seo-row);
+}
+.seo-line {
+  height: var(--seo-line);
+}
+.seo-rail {
+  width: var(--seo-rail);
+}
+.seo-col {
+  padding-right: calc(var(--seo-rail) + 1.4em);
+}
+.seo-slot {
+  top: calc(3 * var(--seo-row) - var(--seo-pad));
+  height: calc(var(--seo-row) + 2 * var(--seo-pad));
+}
+.seo-map {
+  height: calc(3 * var(--seo-row) - 0.9em);
+}
+/* Строка поиска и очередь регионов - в одну строку, запрос при нехватке места обрезается. */
+.seo-top {
+  flex-wrap: nowrap;
+}
+
+/* Телефон: строки 7-10 скрыты (ill-detail), оставшиеся крупнее, рельс шире -
+   подписи упираются в порог 10px; очередь регионов уходит под строку поиска. */
+@container ill (max-width: 22rem) {
+  .seo-scene {
+    --seo-row: 3em;
+    --seo-line: 2.2em;
+    --seo-rail: 11em;
+  }
+  .seo-regions {
+    --seo-row: 2.75em;
+  }
+  .seo-top {
+    flex-wrap: wrap;
+  }
+}

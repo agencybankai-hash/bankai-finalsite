@@ -30,18 +30,19 @@
   line-height: 1.25;
 }
 
-/* Кегли текста сцены: растут со сценой, но не мельче порога. */
+/* Кегли текста сцены: от ширины сцены (не от родителя - вложение не
+   умножает кегль), растут со сценой, но не мельче порога. */
 .ill-t-sm {
-  font-size: max(10px, 1.15em);
+  font-size: max(10px, calc(1.15 * 100cqw / 48));
 }
 .ill-t-md {
-  font-size: max(11px, 1.35em);
+  font-size: max(11px, calc(1.35 * 100cqw / 48));
 }
 .ill-t-lg {
-  font-size: max(12px, 1.7em);
+  font-size: max(12px, calc(1.7 * 100cqw / 48));
 }
 .ill-t-xl {
-  font-size: max(14px, 2.4em);
+  font-size: max(14px, calc(2.4 * 100cqw / 48));
 }
 
 /* Компактная сцена (телефон): второстепенные слои скрыты. */
@@ -61,6 +62,7 @@
 [data-live]
   :is(
     .a-fade,
+    .a-fade-out,
     .a-rise,
     .a-pop,
     .a-draw,
@@ -80,6 +82,9 @@
 }
 [data-live] .a-fade {
   animation-name: ill-fade;
+}
+[data-live] .a-fade-out {
+  animation-name: ill-fade-out;
 }
 [data-live] .a-rise {
   animation-name: ill-rise;
@@ -145,8 +150,9 @@
 .a-draw {
   stroke-dasharray: 1; /* path с pathLength="1" */
 }
-.a-pulse {
-  opacity: 0; /* кольцо-пульс в финальном кадре не видно */
+.a-pulse,
+.a-fade-out {
+  opacity: 0; /* кольцо-пульс и уходящий слой в финальном кадре не видны */
 }
 .a-flow {
   stroke-dasharray: 0 2; /* точка на path с pathLength="1" и round-caps */
@@ -157,6 +163,11 @@
 @keyframes ill-fade {
   from {
     opacity: 0;
+  }
+}
+@keyframes ill-fade-out {
+  from {
+    opacity: 1;
   }
 }
 @keyframes ill-rise {

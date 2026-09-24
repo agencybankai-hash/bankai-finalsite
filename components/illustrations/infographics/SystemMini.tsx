@@ -1,8 +1,105 @@
+import { cn } from "@/lib/utils";
+import { LeadDot } from "../parts";
+
+type Channel = "seo" | "context" | "web";
+
+/* Узлы-пилюли: канал страницы - залит ink, чужие каналы - пунктир и muted. */
+const pill =
+  "relative inline-flex h-6 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 text-xs leading-none";
+const tone = {
+  here: "border-ink bg-ink font-semibold text-bg",
+  other: "border-dashed border-ink/25 bg-bg text-muted",
+  plain: "border-border bg-bg text-ink-2",
+};
+
+/** Ярлык «вы здесь» над узлом (у нижнего источника - под ним). */
+function Here({ below = false }: { below?: boolean }) {
+  return (
+    <span
+      className={cn(
+        "absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-normal leading-none text-ink-2",
+        below ? "top-full mt-1.5" : "bottom-full mb-1.5",
+      )}
+    >
+      вы здесь
+    </span>
+  );
+}
+
+/**
+ * Поток между колонками: SVG без viewBox (единицы = px, x - в % ширины колонки),
+ * поэтому линии не искажаются при любой ширине карточки. У сплошного потока
+ * pathLength="1" - под будущую точку-поток.
+ */
+function Stream({ y1, y2, solid }: { y1: number; y2: number; solid: boolean }) {
+  return solid ? (
+    <line
+      x1="0"
+      y1={y1}
+      x2="100%"
+      y2={y2}
+      pathLength={1}
+      className="text-ink"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
+  ) : (
+    <line
+      x1="0"
+      y1={y1}
+      x2="100%"
+      y2={y2}
+      className="text-ink/30"
+      stroke="currentColor"
+      strokeWidth="1"
+      strokeDasharray="3 3"
+    />
+  );
+}
+
 /**
  * Мини-схема «Реклама / SEO → Сайт → Заявки» для карточки «Часть системы»:
- * канал страницы выделен и подписан «вы здесь». Заглушка фундамента.
+ * канал страницы выделен и подписан «вы здесь», его поток сплошной до заявок,
+ * остальные - пунктиром. Полоса 96px; колонки потоков тянутся под ширину карточки.
  */
-export function SystemMini({ highlight }: { highlight: "seo" | "context" | "web" }) {
-  void highlight;
-  return null;
+export function SystemMini({ highlight }: { highlight: Channel }) {
+  const src = (ch: Exclude<Channel, "web">) => (highlight === ch ? tone.here : tone.other);
+  const siteHere = highlight === "web";
+  // центры узлов по высоте полосы: источники 30/66, сайт и заявки 48
+  return (
+    <div
+      aria-hidden
+      className="mb-6 grid h-24 grid-cols-[auto_minmax(1rem,1fr)_auto_minmax(1rem,1fr)_auto] items-center"
+    >
+      <div className="flex flex-col gap-3">
+        <span className={cn(pill, "w-full", src("context"))}>
+          Реклама
+          {highlight === "context" && <Here />}
+        </span>
+        <span className={cn(pill, "w-full", src("seo"))}>
+          SEO
+          {highlight === "seo" && <Here below />}
+        </span>
+      </div>
+
+      <svg className="h-24 w-full overflow-visible">
+        <Stream y1={30} y2={48} solid={highlight === "context"} />
+        <Stream y1={66} y2={48} solid={highlight === "seo"} />
+      </svg>
+
+      <span className={cn(pill, siteHere ? tone.here : tone.plain)}>
+        Сайт
+        {siteHere && <Here />}
+      </span>
+
+      <svg className="h-24 w-full overflow-visible">
+        <Stream y1={48} y2={48} solid />
+      </svg>
+
+      <span className={cn(pill, tone.plain, "font-medium text-ink")}>
+        <LeadDot className="h-1.5 w-1.5" delay={1.6} />
+        Заявки
+      </span>
+    </div>
+  );
 }

@@ -1,1 +1,81 @@
-/* Эмблемы услуг: стили и сценарии движения трека (контракт - illustrations.css). */
+/* Эмблемы услуг (Emblem.tsx). Базовый кадр - покой. Микродвижение - обратимые
+   переходы по hover/focus родителя .group: переключатель --em-on (0 → 1) задаёт
+   конечный кадр каждой части. Только transform / opacity / stroke-dashoffset;
+   при reduced-motion переключатель не включается. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .group:hover [data-emblem] {
+    --em-on: 1;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .group:focus-visible [data-emblem] {
+    --em-on: 1;
+  }
+}
+
+/* Подвижная часть: своя рамка трансформации, каскад по --em-i. */
+.em-m {
+  transform-box: fill-box;
+  transition-property: transform, opacity, stroke-dashoffset;
+  transition-duration: 0.4s;
+  transition-timing-function: var(--ease-osmo);
+  transition-delay: calc(var(--em-i, 0) * 0.05s);
+}
+
+/* seo: линза наклоняется вокруг центра стекла. */
+.em-seo-lens {
+  transform-origin: 39.5% 39.5%;
+  transform: rotate(calc(var(--em-on, 0) * -8deg));
+}
+
+/* seo-store: пакет приподнимается. */
+.em-bag {
+  transform: translateY(calc(var(--em-on, 0) * -2px));
+}
+
+/* context: курсор тянется к объявлению. */
+.em-cursor {
+  transform: translate(calc(var(--em-on, 0) * -2px), calc(var(--em-on, 0) * -2px));
+}
+
+/* google-ads: ветки перерисовываются - штрих пробегает путь (pathLength=1). */
+.em-branch {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: calc(var(--em-on, 0) * -2px);
+}
+
+/* yandex-direct, corporate: блоки выпрыгивают по очереди. */
+.em-pop {
+  transition-duration: 0.35s;
+  transform-origin: center;
+  transform: scale(calc(1 + var(--em-on, 0) * 0.1));
+}
+
+/* web: телефон поднимается. */
+.em-phone {
+  transform: translateY(calc(var(--em-on, 0) * -2px));
+}
+
+/* landing: страница прокручивается, кнопка остаётся. */
+.em-scroll {
+  transform: translateY(calc(var(--em-on, 0) * -3px));
+}
+
+/* ecommerce: товар опускается в корзину. */
+.em-item {
+  transform: translateY(calc(var(--em-on, 0) * 5.5px));
+}
+
+/* leadgen: потоки втекают в воронку, капля сливок срывается следом. */
+.em-pour {
+  transform: translateY(calc(var(--em-on, 0) * 2.5px));
+}
+.em-drip {
+  --em-i: 2;
+  transform: translateY(calc(var(--em-on, 0) * 1.5px));
+}
+
+/* Пин городской страницы подпрыгивает. */
+.em-pin {
+  transform: translateY(calc(var(--em-on, 0) * -2px));
+}

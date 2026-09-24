@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "@/components/ui/Section";
 import { Reveal } from "@/components/motion/Reveal";
-import { Emblem } from "@/components/illustrations/emblems/Emblem";
+import { Emblem, hasEmblem } from "@/components/illustrations/emblems/Emblem";
 import { emblemForHref } from "@/components/illustrations/resolve";
 import type { Cta } from "@/content/types";
 
@@ -20,17 +20,20 @@ export function LinkRow({
   reveal?: boolean;
 }) {
   const emblem = emblemForHref(href);
+  const shown = emblem && hasEmblem(emblem.name) ? emblem : undefined;
   return (
     <Link
       href={href}
       data-reveal={reveal || undefined}
       className={cn(
-        "group flex items-center gap-4 rounded-xl border border-border bg-bg px-5 py-4 text-base text-ink shadow-card transition duration-300 ease-osmo hover:border-ink hover:shadow-card-hover",
+        "group flex items-center gap-4 rounded-xl border border-border bg-bg text-base text-ink shadow-card transition duration-300 ease-osmo hover:border-ink hover:shadow-card-hover",
+        // с эмблемой - ровный отступ 12px вокруг плитки
+        shown ? "py-3 pl-3 pr-5" : "px-5 py-4",
         className,
       )}
     >
-      {emblem && <Emblem name={emblem.name} geo={emblem.geo} />}
-      <span className="min-w-0 flex-1">{label}</span>
+      {shown && <Emblem name={shown.name} geo={shown.geo} />}
+      <span className="min-w-0 flex-1 text-pretty leading-snug">{label}</span>
       <span
         aria-hidden
         className="text-muted transition-transform duration-300 ease-osmo group-hover:translate-x-1"
