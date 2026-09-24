@@ -1,5 +1,12 @@
 import { notifyTelegramText } from "@/lib/notify";
-import { buildReferrerReport, markAlerted, pruneReferrers } from "@/lib/referrers";
+import {
+  buildReferrerReport,
+  claimRun,
+  currentReportDay,
+  markAlerted,
+  pruneReferrers,
+  releaseRun,
+} from "@/lib/referrers";
 
 export const dynamic = "force-dynamic";
 
@@ -18,25 +25,36 @@ export async function GET(req: Request) {
   }
 
   const params = new URL(req.url).searchParams;
-  const dry = params.has("dry");
-  const report = await buildReferrerReport(
-    dry ? { force: params.has("force"), day: params.get("day") ?? undefined } : {},
-  );
-  if (dry) return Response.json({ ok: true, dry: true, ...report });
-
-  // Отметку ставим только после успешной отправки: при сбое Telegram
-  // следующий запуск сообщит то же самое ещё раз.
-  if (report.text) {
-    await notifyTelegramText(report.text);
-    await markAlerted(report.keys);
+  if (params.has("dry")) {
+    const report = await buildReferrerReport({
+      force: params.has("force"),
+      day: params.get("day") ?? undefined,
+    });
+    return Response.json({ ok: true, dry: true, ...report });
   }
-  await pruneReferrers();
 
-  return Response.json({
-    ok: true,
-    day: report.day,
-    sent: Boolean(report.text),
-    newHosts: report.newHosts.length,
-    spikes: report.spikes.length,
-  });
+  // Vercel может доставить один запуск дважды: второй выходит сразу.
+  const day = await currentReportDay();
+  if (!(await claimRun(day))) return Response.json({ ok: true, day, skipped: "already-ran" });
+
+  try {
+    const report = await buildReferrerReport({ day });
+    if (report.text) {
+      await notifyTelegramText(report.text);
+      await markAlerted(report.keys);
+    }
+    return Response.json({
+      ok: true,
+      day,
+      sent: Boolean(report.text),
+      newHosts: report.newHosts.length,
+      spike: Boolean(report.spike),
+    });
+  } catch (e) {
+    // Сбой отправки или БД: освобождаем день, повторный запуск (vercel crons run) пришлёт отчёт.
+    await releaseRun(day).catch((err) => console.error("referrer run release failed:", err));
+    throw e;
+  } finally {
+    await pruneReferrers().catch((err) => console.error("referrer prune failed:", err));
+  }
 }

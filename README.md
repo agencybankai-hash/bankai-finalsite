@@ -79,10 +79,12 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - **Подозрительные зоны.** `SUSPICIOUS_TLDS` в&nbsp;том&nbsp;же файле (.top, .xyz, .icu и&nbsp;т.&nbsp;п.).
   Режим `SUSPICIOUS_TLD_MODE`: `"log"` - переходы пропускаются и&nbsp;попадают в&nbsp;оповещение,
   `"block"` - 403, как для списка. Исключения - `ALLOWED_REFERRERS`.
-- **Оповещение о&nbsp;новых источниках.** `proxy.ts` считает источник каждой загрузки страницы
-  на&nbsp;боевом домене в&nbsp;`referrer_daily`: домен реферера, `(direct)` или `(hidden)` (чужой сайт
-  скрыл реферер). Cron `/api/cron/referrers` (`vercel.json`, 09:00 Алматы) присылает в&nbsp;Telegram
-  новые домены-источники и&nbsp;всплески прямых и&nbsp;скрытых заходов (`lib/referrers.ts`).
+- **Оповещение о&nbsp;новых источниках.** `proxy.ts` пишет в&nbsp;`referrer_daily` только необычные источники
+  загрузок страниц на&nbsp;боевом домене: незнакомый домен реферера, домен в&nbsp;подозрительной зоне
+  и&nbsp;`(hidden)` (чужой сайт скрыл реферер). Поисковики, соцсети и&nbsp;прямые заходы не&nbsp;пишутся:
+  Neon на&nbsp;бесплатном тарифе, запись на&nbsp;каждый заход съела&nbsp;бы лимит вычислений (прямые заходы -
+  в&nbsp;Метрике). Cron `/api/cron/referrers` (`vercel.json`, 09:00 Алматы) присылает в&nbsp;Telegram
+  новые домены-источники и&nbsp;всплески скрытых заходов (`lib/referrers.ts`).
   Нужен `CRON_SECRET` (в&nbsp;Vercel хранится как sensitive и&nbsp;не&nbsp;читается); чат - `TELEGRAM_ALERTS_CHAT_ID`,
   без него чат заявок. Ручной запуск: `npx -y vercel@latest crons run /api/cron/referrers`.
   Просмотр без отправки (`?dry=1`, `&force=1`, `&day=YYYY-MM-DD`) - на&nbsp;dev-сервере со&nbsp;своим `CRON_SECRET`.

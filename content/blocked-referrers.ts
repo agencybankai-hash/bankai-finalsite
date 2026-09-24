@@ -14,7 +14,9 @@ export const BLOCKED_REFERRERS = [
 /**
  * Дешёвые доменные зоны, в которых обычно живут одноразовые редиректоры.
  * Зоны, где есть живые малые бизнесы и наши клиенты (.shop, .online, .site,
- * .store, .app), сюда не входят. Переходы с доменов в этих зонах:
+ * .store, .app, .rest у ресторанов), сюда не входят. Перед переводом в block
+ * выгрузить хосты этих зон из referrer_daily и живые сайты занести в
+ * ALLOWED_REFERRERS. Переходы с доменов в этих зонах:
  * - "log": пропускаем, а ежедневное оповещение в Telegram показывает такой
  *   домен с первого же захода как кандидата в блок;
  * - "block": 403 и запись в bot_traps, как для списка выше.
@@ -23,7 +25,7 @@ export const BLOCKED_REFERRERS = [
  */
 export const SUSPICIOUS_TLDS = [
   "top", "xyz", "icu", "cyou", "sbs", "cfd", "bond",
-  "buzz", "rest", "click", "quest", "monster", "lol", "mom",
+  "buzz", "click", "quest", "monster", "lol", "mom",
 ];
 export const SUSPICIOUS_TLD_MODE: "log" | "block" = "log";
 /** Исключения из SUSPICIOUS_TLDS: домены (с поддоменами), переходы с которых не трогаем. */
@@ -31,12 +33,13 @@ export const ALLOWED_REFERRERS: string[] = [];
 
 const matches = (host: string, domain: string) => host === domain || host.endsWith(`.${domain}`);
 
+/** Хост из Referer в нижнем регистре и без точки в конце: «kzvoevoda.top.» - тот же домен. */
 function refererHost(referer: string): string {
+  let host = referer;
   try {
-    return new URL(referer).hostname.toLowerCase();
-  } catch {
-    return referer.toLowerCase();
-  }
+    host = new URL(referer).hostname;
+  } catch {}
+  return host.toLowerCase().replace(/\.+$/, "");
 }
 
 /** Хост из Referer совпадает с заблокированным доменом или его поддоменом. */
