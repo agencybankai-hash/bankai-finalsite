@@ -53,5 +53,18 @@ await sql`CREATE TABLE IF NOT EXISTS rejected_submissions (
 )`;
 await sql`CREATE INDEX IF NOT EXISTS rejected_submissions_created_idx ON rejected_submissions (created_at DESC)`;
 
+// Источники заходов по дням (lib/referrers.ts) и отметки об уже отправленных
+// оповещениях cron /api/cron/referrers.
+await sql`CREATE TABLE IF NOT EXISTS referrer_daily (
+  day   date    NOT NULL,
+  host  text    NOT NULL,
+  hits  integer NOT NULL DEFAULT 0,
+  PRIMARY KEY (day, host)
+)`;
+await sql`CREATE TABLE IF NOT EXISTS referrer_alerts (
+  key         text PRIMARY KEY,
+  alerted_at  timestamptz NOT NULL DEFAULT now()
+)`;
+
 const [{ count }] = await sql`SELECT count(*)::int AS count FROM leads`;
 console.log("OK: таблица leads готова, строк:", count);

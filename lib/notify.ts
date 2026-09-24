@@ -4,6 +4,7 @@ import { filledFields, type LeadNotification } from "@/lib/lead-fields";
  * Серверные уведомления о новой заявке. Секреты только в env:
  *   TELEGRAM_BOT_TOKEN - токен бота от @BotFather
  *   TELEGRAM_CHAT_ID   - id группы/чата (для групп отрицательный)
+ *   TELEGRAM_ALERTS_CHAT_ID - чат служебных оповещений; не задан - чат заявок
  *   RESEND_API_KEY     - ключ Resend (https://resend.com/api-keys)
  *   LEAD_EMAIL_FROM    - отправитель, домен должен быть подтверждён в Resend
  *   LEAD_EMAIL_TO      - получатели через запятую
@@ -45,6 +46,32 @@ export async function notifyTelegram(lead: LeadNotification): Promise<void> {
     body: JSON.stringify({
       chat_id: chatId,
       text,
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
+    }),
+    signal: AbortSignal.timeout(TIMEOUT_MS),
+  });
+  if (!res.ok) {
+    throw new Error(`Telegram ${res.status}: ${await readDetail(res)}`);
+  }
+}
+
+/**
+ * Служебное оповещение (готовый HTML) в TELEGRAM_ALERTS_CHAT_ID, а если он
+ * не задан - в чат заявок. Бросает при любой ошибке.
+ */
+export async function notifyTelegramText(html: string): Promise<void> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_ALERTS_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) {
+    throw new Error("TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID not set");
+  }
+  const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: html,
       parse_mode: "HTML",
       disable_web_page_preview: true,
     }),

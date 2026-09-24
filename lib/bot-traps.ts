@@ -23,13 +23,18 @@ export async function recordTrap(ip: string, userAgent: string, source = "trap-l
   }
 }
 
+/**
+ * Форму блокирует только переход по ссылке-ловушке. Хиты по рефереру
+ * бот-редиректора - статистика IP/UA: редиректор может прислать живого
+ * человека, а общий IP мобильной сети делят тысячи абонентов.
+ */
 export async function isTrapped(ip: string): Promise<boolean> {
   if (!ip || ip === "local") return false;
   try {
     const sql = getSql();
     const rows = await sql`
       SELECT 1 FROM bot_traps
-      WHERE ip = ${ip} AND seen_at > now() - ${TRAP_TTL}::interval
+      WHERE ip = ${ip} AND source = 'trap-link' AND seen_at > now() - ${TRAP_TTL}::interval
       LIMIT 1
     `;
     return rows.length > 0;
