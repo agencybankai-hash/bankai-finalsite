@@ -57,10 +57,13 @@ function ValidMark() {
 export function ContactForm({
   locale = "ru",
   defaultCountry = "KZ",
+  formToken,
 }: {
   locale?: Locale;
   /** Стартовая страна телефона, обычно по IP посетителя (lib/geo.ts). */
   defaultCountry?: CountryCode;
+  /** Подписанная метка выдачи формы (lib/form-token.ts): защита от мгновенной отправки. */
+  formToken?: string;
 }) {
   const t = ui(locale).form;
   const pathname = usePathname();
@@ -143,7 +146,7 @@ export function ContactForm({
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...lead, turnstileToken }),
+        body: JSON.stringify({ ...lead, turnstileToken, formToken }),
       });
       if (res.status === 403) {
         setCaptchaErr(true);

@@ -5,6 +5,8 @@ import type { LeadNotification } from "@/lib/lead-fields";
 import { normalizeContact } from "@/lib/contact";
 import { formatPhoneDisplay, normalizePhone } from "@/lib/phone";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { verifyFormToken } from "@/lib/form-token";
+import { clientIp, isTrapped } from "@/lib/bot-traps";
 
 const clip = (v: unknown, n: number) => String(v ?? "").trim().slice(0, n);
 
@@ -50,7 +52,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "origin" }, { status: 403 });
   }
 
-  const ip = (req.headers.get("x-forwarded-for") ?? "local").split(",")[0].trim();
+  const ip = clientIp(req);
   if (rateLimited(ip)) {
     return NextResponse.json({ ok: false, error: "rate" }, { status: 429 });
   }
@@ -66,6 +68,20 @@ export async function POST(req: Request) {
 
   // honeypot
   if (String(b.company ?? "")) return NextResponse.json({ ok: true });
+
+  // Время заполнения: метка выдачи формы подписана сервером, заявка раньше
+  // чем через MIN_FILL_MS после выдачи - бот. Без метки - тоже.
+  const timing = verifyFormToken(b.formToken);
+  if (!timing.ok) {
+    console.warn(`contact rejected: form token ${timing.reason}`, timing.ageMs ?? "");
+    return NextResponse.json({ ok: false, error: "bot" }, { status: 403 });
+  }
+
+  // IP, сходивший по невидимой ссылке-ловушке /trap за последние часы.
+  if (await isTrapped(ip)) {
+    console.warn("contact rejected: trapped ip");
+    return NextResponse.json({ ok: false, error: "bot" }, { status: 403 });
+  }
 
   // Turnstile: включён, когда задан секрет. Токен обязателен и должен пройти
   // проверку; если сам Cloudflare недоступен, заявку пропускаем, чтобы не

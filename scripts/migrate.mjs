@@ -32,5 +32,13 @@ await sql`CREATE TABLE IF NOT EXISTS checklist_approvals (
 )`;
 await sql`ALTER TABLE checklist_approvals ADD COLUMN IF NOT EXISTS note text`;
 
+await sql`CREATE TABLE IF NOT EXISTS bot_traps (
+  id          bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  ip          text NOT NULL,
+  user_agent  text,
+  seen_at     timestamptz NOT NULL DEFAULT now()
+)`;
+await sql`CREATE INDEX IF NOT EXISTS bot_traps_ip_seen_idx ON bot_traps (ip, seen_at DESC)`;
+
 const [{ count }] = await sql`SELECT count(*)::int AS count FROM leads`;
 console.log("OK: таблица leads готова, строк:", count);
