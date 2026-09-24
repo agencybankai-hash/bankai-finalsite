@@ -8,6 +8,11 @@ import { prefersReducedMotion } from "@/lib/motion";
  * растёт на интерактиве ([data-cursor], a, button) через CSS-класс.
  * Только pointer:fine; на тач и reduced-motion выключен - тогда ни
  * слушателей, ни цикла. Нативный курсор не прячем (доступность форм).
+ *
+ * Позиция и масштаб - на разных элементах: внешний двигается transform'ом,
+ * внутренняя точка растёт через scale. Отдельное свойство scale применяется
+ * поверх transform, и на одном элементе оно умножало бы и сдвиг - точка
+ * улетала бы от мыши в 2,6 раза дальше от угла экрана.
  */
 export function Cursor() {
   const ref = useRef<HTMLDivElement>(null);
@@ -26,7 +31,7 @@ export function Cursor() {
     const loop = () => {
       x += (tx - x) * 0.18;
       y += (ty - y) * 0.18;
-      dot.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+      dot.style.transform = `translate(${x}px, ${y}px)`;
       if (Math.abs(tx - x) > 0.1 || Math.abs(ty - y) > 0.1) raf = requestAnimationFrame(loop);
       else running = false;
     };
@@ -68,7 +73,9 @@ export function Cursor() {
     <div
       ref={ref}
       aria-hidden
-      className="cursor-dot pointer-events-none fixed left-0 top-0 z-[90] hidden h-2.5 w-2.5 rounded-full bg-accent md:block"
-    />
+      className="cursor-dot pointer-events-none fixed left-0 top-0 z-[90] hidden md:block"
+    >
+      <div className="cursor-dot-inner h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent" />
+    </div>
   );
 }
