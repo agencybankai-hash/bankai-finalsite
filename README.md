@@ -70,6 +70,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
   быстрее 3&nbsp;секунд после выдачи отклоняется как бот (403).
 - **Ссылка-ловушка.** Невидимая ссылка на&nbsp;`/trap` в&nbsp;футере, закрыта в&nbsp;robots.txt. Перешедший
   IP пишется в&nbsp;таблицу `bot_traps` и&nbsp;12&nbsp;часов не&nbsp;может отправить форму (`lib/bot-traps.ts`).
+- **Бот-редиректоры.** Домены из&nbsp;`content/blocked-referrers.ts` (сейчас `kzvoevoda.top`): любой запрос
+  с&nbsp;таким Referer получает 403 в&nbsp;`proxy.ts`, заход пишется в&nbsp;`bot_traps` с&nbsp;источником
+  `referer:<домен>`. Новый домен - строка в&nbsp;списке и&nbsp;деплой. Без деплоя то&nbsp;же правило можно
+  держать в&nbsp;Vercel Firewall: условие Header `referer` contains `<домен>`, действие Deny.
+  Список IP/UA ботов: `SELECT ip, user_agent, source, seen_at FROM bot_traps ORDER BY seen_at DESC`.
 - **Honeypot** `company` и&nbsp;лёгкий лимит 5&nbsp;заявок за&nbsp;10&nbsp;минут с&nbsp;IP в&nbsp;памяти
   инстанса (на&nbsp;serverless не&nbsp;строгий; строгий лимит - правило Vercel Firewall или Upstash).
 - Заголовки безопасности (`X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`,

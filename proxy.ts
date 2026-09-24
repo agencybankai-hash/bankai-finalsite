@@ -1,19 +1,38 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import type { NextFetchEvent, NextRequest } from "next/server";
+import { isBlockedReferrer } from "@/content/blocked-referrers";
+import { clientIp, recordTrap } from "@/lib/bot-traps";
 
-// Basic-Auth на внутренние разделы: админка и контент-чеклист.
-// Логин/пароль - из env (ADMIN_USER / ADMIN_PASSWORD).
-// Next 16: конвенция proxy.ts (бывш. middleware.ts).
+/**
+ * Next 16: конвенция proxy.ts (бывш. middleware.ts). Две задачи:
+ * 1) Referer из списка бот-редиректоров (content/blocked-referrers.ts) -
+ *    403 на любой путь, заход пишется в bot_traps (IP, UA, источник);
+ * 2) Basic-Auth на внутренние разделы: админка и контент-чеклист
+ *    (логин/пароль из env ADMIN_USER / ADMIN_PASSWORD).
+ * Статика и картинки исключены из matcher: там ни то, ни другое не нужно.
+ */
 export const config = {
   matcher: [
-    "/admin/:path*",
-    "/api/admin/:path*",
-    "/checklist/:path*",
-    "/api/checklist/:path*",
+    "/((?!_next/static|_next/image|favicon\\.ico|icon\\.svg|apple-icon\\.png|fonts/|flags/|logos/|og/|guides/.*\\.pdf).*)",
   ],
 };
 
-export function proxy(req: NextRequest) {
+const PRIVATE_PATH = /^\/(admin|checklist|api\/(admin|checklist))(\/|$)/;
+
+export function proxy(req: NextRequest, event: NextFetchEvent) {
+  const blocked = isBlockedReferrer(req.headers.get("referer"));
+  if (blocked) {
+    event.waitUntil(
+      recordTrap(clientIp(req), req.headers.get("user-agent") ?? "", `referer:${blocked}`),
+    );
+    return new NextResponse("Forbidden", {
+      status: 403,
+      headers: { "Cache-Control": "no-store", "X-Robots-Tag": "noindex" },
+    });
+  }
+
+  if (!PRIVATE_PATH.test(req.nextUrl.pathname)) return NextResponse.next();
+
   const user = process.env.ADMIN_USER;
   const pass = process.env.ADMIN_PASSWORD;
 

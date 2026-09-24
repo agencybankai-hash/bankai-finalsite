@@ -13,10 +13,11 @@ export function clientIp(req: Request): string {
   return (fwd ?? req.headers.get("x-real-ip") ?? "local").split(",")[0].trim();
 }
 
-export async function recordTrap(ip: string, userAgent: string): Promise<void> {
+/** source: "trap-link" (невидимая ссылка) или "referer:<домен>" (бот-редиректор, см. proxy.ts). */
+export async function recordTrap(ip: string, userAgent: string, source = "trap-link"): Promise<void> {
   try {
     const sql = getSql();
-    await sql`INSERT INTO bot_traps (ip, user_agent) VALUES (${ip}, ${userAgent.slice(0, 300)})`;
+    await sql`INSERT INTO bot_traps (ip, user_agent, source) VALUES (${ip}, ${userAgent.slice(0, 300)}, ${source})`;
   } catch (e) {
     console.error("bot trap insert failed:", e);
   }
