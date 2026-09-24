@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { DeleteLeadButton } from "@/components/admin/DeleteLeadButton";
 import { Container } from "@/components/ui/Container";
 import type { Attribution } from "@/lib/attribution";
@@ -145,6 +146,7 @@ function ContactCell({ r }: { r: Lead }) {
 
 export default async function LeadsPage() {
   let rows: Lead[] = [];
+  let rejected = 0;
   let error = "";
   try {
     const sql = getSql();
@@ -154,6 +156,10 @@ export default async function LeadsPage() {
       ORDER BY created_at DESC
       LIMIT 500
     `) as Lead[];
+    try {
+      const [{ n }] = (await sql`SELECT count(*)::int AS n FROM rejected_submissions`) as { n: number }[];
+      rejected = n;
+    } catch {}
   } catch (e) {
     console.error("leads page query failed:", e);
     error = "Не удалось загрузить лиды. Проверьте подключение к БД.";
@@ -172,11 +178,16 @@ export default async function LeadsPage() {
               {rows.length === 500 && " (показаны последние 500)"}
             </p>
           </div>
-          {rows.length > 0 && (
-            <a href="/api/admin/export" className={btnLink}>
-              Скачать CSV
-            </a>
-          )}
+          <div className="flex flex-wrap gap-3">
+            <Link href="/admin/rejected" className={btnLink}>
+              Отклонённые: {rejected}
+            </Link>
+            {rows.length > 0 && (
+              <a href="/api/admin/export" className={btnLink}>
+                Скачать CSV
+              </a>
+            )}
+          </div>
         </div>
 
         {error ? (

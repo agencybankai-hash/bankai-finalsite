@@ -41,5 +41,17 @@ await sql`CREATE TABLE IF NOT EXISTS bot_traps (
 await sql`CREATE INDEX IF NOT EXISTS bot_traps_ip_seen_idx ON bot_traps (ip, seen_at DESC)`;
 await sql`ALTER TABLE bot_traps ADD COLUMN IF NOT EXISTS source text NOT NULL DEFAULT 'trap-link'`;
 
+await sql`CREATE TABLE IF NOT EXISTS rejected_submissions (
+  id          bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  reason      text NOT NULL,
+  detail      text,
+  ip          text,
+  user_agent  text,
+  referer     text,
+  payload     jsonb,
+  created_at  timestamptz NOT NULL DEFAULT now()
+)`;
+await sql`CREATE INDEX IF NOT EXISTS rejected_submissions_created_idx ON rejected_submissions (created_at DESC)`;
+
 const [{ count }] = await sql`SELECT count(*)::int AS count FROM leads`;
 console.log("OK: таблица leads готова, строк:", count);
