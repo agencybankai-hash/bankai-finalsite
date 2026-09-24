@@ -1,6 +1,7 @@
 import { Section } from "@/components/ui/Section";
 import { Hero } from "@/components/sections/Hero";
 import { ContactForm } from "@/components/sections/ContactForm";
+import { ContactsHero } from "@/components/illustrations/pages/ContactsHero";
 import { contacts } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
 import { visitorCountry } from "@/lib/geo";
@@ -21,6 +22,7 @@ export default async function ContactsPage() {
       <Hero
         title="Обсудим ваш поток заявок"
         subtitle="Расскажите о бизнесе и задаче. Проведём бесплатный аудит и предложим план под вашу нишу и бюджет - без обязательств."
+        visual={<ContactsHero />}
       />
 
       <Section>

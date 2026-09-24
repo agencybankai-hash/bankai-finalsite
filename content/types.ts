@@ -149,6 +149,51 @@ export type ServiceLanding = {
   parent?: string;
 };
 
+/**
+ * Тематический визуал hero (components/illustrations): сцена по теме страницы.
+ * Городские виды - та же тема с городом в запросе и шапке.
+ */
+export type HeroVisualKind =
+  | "seo"
+  | "seo-store"
+  | "seo-regions"
+  | "seo-city"
+  | "context"
+  | "google-ads"
+  | "yandex-direct"
+  | "context-city"
+  | "web"
+  | "landing"
+  | "corporate"
+  | "ecommerce"
+  | "web-city"
+  | "leadgen";
+
+/** Метрика плавающей карточки: одна реальная цифра кейса, показанного на странице. */
+export type VisualFloat = {
+  /** Имя кейса, как у клиента: «SOS Moving». Идёт в подпись и в дисклеймер. */
+  case: string;
+  value: string;
+  note: string;
+};
+
+/** Копирайт рамки визуала: шапка, KPI, карточка, подпись. */
+export type VisualCopy = {
+  /** Метка шапки панели. */
+  title: string;
+  /** Контекст справа в шапке; у городских видов - город. */
+  meta?: string;
+  /** aria-label всей сцены: суть одной фразой. */
+  label: string;
+  /** Два факта с этой же страницы, не повтор бейджей. */
+  kpis?: [StatItem, StatItem];
+  float?: VisualFloat | null;
+  /** Подпись под панелью: что это за схема. Источник цифры дописывается сам. */
+  disclaimer: string;
+  /** Запрос в строке поиска сцены (пример-бизнес). */
+  query?: string;
+};
+
 /** Бесплатный бонус внутри гайда (скачиваемый чек-лист). */
 export type GuideBonus = {
   title: string;

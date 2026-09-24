@@ -1,0 +1,238 @@
+/* ═══════════════════════════════════════════════════════════════
+   Иллюстрации (components/illustrations). Контракт:
+   - базовый стиль элемента = финальный кадр: без JS и при reduced-motion
+     видна готовая картинка;
+   - анимации включаются только внутри [data-live] (ставит InView),
+     пауза - [data-play="wait"|"off"];
+   - анимируем только transform / opacity / visibility / stroke-dashoffset;
+   - один примитив .a-* на элемент, движения комбинируем вложенными обёртками;
+   - SVG-узел с атрибутом transform не анимируем - оборачиваем в <g>;
+   - петли не больше 3 повторов, всё движение стихает примерно за 20 с.
+   Время - переменные --a-delay, --i, --a-step, --a-dur, --a-iter
+   (хелпер anim() в vars.ts). Цвет - только токен-утилиты.
+   ═══════════════════════════════════════════════════════════════ */
+@import "./hero/seo/seo.css";
+@import "./hero/context/context.css";
+@import "./hero/web/web.css";
+@import "./hero/system/system.css";
+@import "./pages/pages.css";
+@import "./infographics/infographics.css";
+@import "./emblems/emblems.css";
+
+/* Сцена 480×300: 1em = 1/48 ширины (10 единиц SVG viewBox 0 0 480 300). */
+.ill-stage {
+  container: ill / inline-size;
+}
+.ill-scene {
+  position: absolute;
+  inset: 0;
+  font-size: calc(100cqw / 48);
+  line-height: 1.25;
+}
+
+/* Кегли текста сцены: растут со сценой, но не мельче порога. */
+.ill-t-sm {
+  font-size: max(10px, 1.15em);
+}
+.ill-t-md {
+  font-size: max(11px, 1.35em);
+}
+.ill-t-lg {
+  font-size: max(12px, 1.7em);
+}
+.ill-t-xl {
+  font-size: max(14px, 2.4em);
+}
+
+/* Компактная сцена (телефон): второстепенные слои скрыты. */
+@container ill (max-width: 22rem) {
+  .ill-detail {
+    display: none !important;
+  }
+}
+
+/* Пауза: до входа в экран и вне экрана. */
+[data-play="wait"] *,
+[data-play="off"] * {
+  animation-play-state: paused !important;
+}
+
+/* ── Примитивы ── */
+[data-live]
+  :is(
+    .a-fade,
+    .a-rise,
+    .a-pop,
+    .a-draw,
+    .a-grow-x,
+    .a-grow-y,
+    .a-type,
+    .a-slide,
+    .a-pulse,
+    .a-flow,
+    .a-float
+  ) {
+  animation-duration: var(--a-dur, var(--dur-base));
+  animation-timing-function: var(--a-ease, var(--ease-osmo));
+  animation-delay: calc(var(--a-delay, 0s) + var(--i, 0) * var(--a-step, 0.08s));
+  animation-iteration-count: var(--a-iter, 1);
+  animation-fill-mode: both;
+}
+[data-live] .a-fade {
+  animation-name: ill-fade;
+}
+[data-live] .a-rise {
+  animation-name: ill-rise;
+}
+[data-live] .a-pop {
+  animation-name: ill-pop;
+  animation-timing-function: var(--a-ease, var(--ease-out));
+}
+[data-live] .a-draw {
+  animation-name: ill-draw;
+}
+[data-live] .a-grow-x {
+  animation-name: ill-grow-x;
+}
+[data-live] .a-grow-y {
+  animation-name: ill-grow-y;
+}
+[data-live] .a-type {
+  animation-name: ill-type;
+  animation-duration: 0.01s;
+}
+[data-live] .a-slide {
+  animation-name: ill-slide;
+}
+[data-live] .a-pulse {
+  animation-name: ill-pulse;
+  animation-duration: var(--a-dur, 1.6s);
+  animation-timing-function: var(--ease-out);
+  animation-iteration-count: var(--a-iter, 3);
+}
+[data-live] .a-flow {
+  animation-name: ill-flow;
+  animation-duration: var(--a-dur, 2.4s);
+  animation-timing-function: linear;
+  animation-iteration-count: var(--a-iter, 3);
+}
+[data-live] .a-float {
+  animation-name: ill-float;
+  animation-duration: var(--a-dur, 6s);
+  animation-iteration-count: var(--a-iter, 3);
+}
+
+/* Геометрия трансформаций (без глобального transform-origin на svg *:
+   он ломает узлы с атрибутом transform). */
+.a-pop,
+.a-grow-x,
+.a-grow-y,
+.a-pulse {
+  transform-box: fill-box;
+}
+.a-pop,
+.a-pulse {
+  transform-origin: center;
+}
+.a-grow-x {
+  transform-origin: left center;
+}
+.a-grow-y {
+  transform-origin: center bottom;
+}
+
+/* Финальные состояния особых примитивов. */
+.a-draw {
+  stroke-dasharray: 1; /* path с pathLength="1" */
+}
+.a-pulse {
+  opacity: 0; /* кольцо-пульс в финальном кадре не видно */
+}
+.a-flow {
+  stroke-dasharray: 0 2; /* точка на path с pathLength="1" и round-caps */
+  stroke-linecap: round;
+  opacity: 0;
+}
+
+@keyframes ill-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ill-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--a-y, 0.8em));
+  }
+}
+@keyframes ill-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+@keyframes ill-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+@keyframes ill-grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes ill-grow-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes ill-type {
+  from {
+    visibility: hidden;
+  }
+}
+@keyframes ill-slide {
+  from {
+    transform: translate(var(--a-x, 0), var(--a-y, 0));
+  }
+}
+@keyframes ill-pulse {
+  from {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+@keyframes ill-flow {
+  0% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+  10%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -1;
+    opacity: 0;
+  }
+}
+@keyframes ill-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-anim],
+  [data-anim] * {
+    animation: none !important;
+  }
+}

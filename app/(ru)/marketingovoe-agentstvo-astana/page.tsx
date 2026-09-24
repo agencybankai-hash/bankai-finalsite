@@ -9,6 +9,8 @@ import { ServicesGrid } from "@/components/sections/ServicesGrid";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
 import { FAQ } from "@/components/sections/FAQ";
 import { CTASection } from "@/components/sections/CTASection";
+import { HeroIllustration } from "@/components/illustrations/HeroIllustration";
+import { resolvePageVisual } from "@/components/illustrations/resolve";
 import { agencyAstana as page } from "@/content/agency-astana";
 import { finalCta } from "@/content/site";
 import {
@@ -65,6 +67,7 @@ export default function AgencyAstanaPage() {
         primary={{ label: "Получить бесплатный аудит", href: "/contacts" }}
         secondary={{ label: "Смотреть кейсы", href: "/cases" }}
         badges={page.badges}
+        visual={<HeroIllustration visual={resolvePageVisual(page.path)} />}
       />
 
       <div className="border-b border-border bg-surface">

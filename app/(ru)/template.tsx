@@ -22,8 +22,13 @@ export default function Template({ children }: { children: React.ReactNode }) {
     const el = ref.current;
     if (!el) return;
     el.classList.add("page-enter");
-    const done = () => el.classList.remove("page-enter");
-    el.addEventListener("animationend", done, { once: true });
+    // animationend всплывает от анимаций детей (иллюстрации) - ждём свою
+    const done = (e: AnimationEvent) => {
+      if (e.target !== el) return;
+      el.classList.remove("page-enter");
+      el.removeEventListener("animationend", done);
+    };
+    el.addEventListener("animationend", done);
     return () => el.removeEventListener("animationend", done);
   }, []);
 
