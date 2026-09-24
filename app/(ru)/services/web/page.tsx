@@ -3,6 +3,7 @@ import { ChannelPage } from "@/components/sections/ChannelPage";
 import { getChannel } from "@/content/services";
 import { faqLd, geoNeutralAreas, ldJson, serviceLd } from "@/lib/jsonld";
 import { pageMetadata } from "@/lib/metadata";
+import { readLongread } from "@/lib/longread";
 
 const channel = getChannel("web");
 const path = "/services/web";
@@ -13,8 +14,9 @@ export const generateMetadata = pageMetadata({
   path,
 });
 
-export default function WebPage() {
+export default async function WebPage() {
   if (!channel) notFound();
+  const longread = await readLongread(channel.longread);
   return (
     <>
       <script
@@ -31,7 +33,7 @@ export default function WebPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={ldJson(faqLd(channel.faq))}
       />
-      <ChannelPage channel={channel} />
+      <ChannelPage channel={channel} longread={longread} />
     </>
   );
 }

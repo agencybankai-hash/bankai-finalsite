@@ -82,6 +82,8 @@ export type ServiceChannel = {
   faq: FaqItem[];
   /** Карточка «Часть системы»; не задано - карточки нет (у самой лидогенерации). */
   partOfSystem?: string;
+  /** Лонгрид над футером: имя markdown-файла в content/longreads. */
+  longread?: string;
 };
 
 /**

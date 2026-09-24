@@ -38,6 +38,7 @@ export const channels: ServiceChannel[] = [
   {
     slug: "seo",
     navLabel: "SEO-продвижение",
+    longread: "seo.md",
     title: "SEO-продвижение сайтов - что входит, сроки и цены",
     description:
       "SEO-продвижение сайтов: аудит, семантика, контент, ссылки, локальная выдача. Рост органики с 3-4 месяца, отвечаем за заявки. Цены и сроки.",
@@ -230,6 +231,7 @@ export const channels: ServiceChannel[] = [
   {
     slug: "context",
     navLabel: "Контекстная реклама",
+    longread: "context.md",
     title: "Контекстная реклама Google Ads - настройка и ведение",
     description:
       "Настройка и ведение Google Ads: запуск за 3-5 дней, первые обращения в первую неделю. Управляем ценой заявки. Ведение от 350 000 ₸/мес.",
@@ -392,6 +394,7 @@ export const channels: ServiceChannel[] = [
   {
     slug: "web",
     navLabel: "Разработка сайтов",
+    longread: "web.md",
     title: "Создание и разработка сайтов под заявки - цены и сроки",
     description:
       "Лендинги, корпоративные сайты и интернет-магазины под заявки: от прототипа до запуска с аналитикой. Лендинг от 2 недель, цена от 1,6 млн ₸.",
@@ -589,6 +592,7 @@ export const channels: ServiceChannel[] = [
   {
     slug: "leadgen",
     navLabel: "Лидогенерация под ключ",
+    longread: "leadgen.md",
     title: "Лидогенерация под ключ - сайт, SEO и Google Ads",
     description:
       "Лидогенерация под ключ: сайт, SEO и Google Ads одной системой. Заявки из рекламы - с первой недели, цена каждой заявки в отчёте. От 350 000 ₸/мес.",

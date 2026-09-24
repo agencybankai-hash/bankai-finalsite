@@ -4,6 +4,7 @@ import { cases } from "@/content/cases";
 import { casesEn } from "@/content/en/cases";
 import { guides } from "@/content/guides";
 import { landings } from "@/content/landings";
+import { getChannel } from "@/content/services";
 import { agencyAstana } from "@/content/agency-astana";
 import { enPairOf, ruPairOf } from "@/lib/i18n";
 import { modifiedAt } from "@/lib/lastmod";
@@ -34,10 +35,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     if (!l) return undefined;
     return l.longread ? ["content/landings.ts", `content/city-longreads/${l.longread}`] : ["content/landings.ts"];
   };
+  // Хаб: объект в services.ts и его лонгрид (content/longreads).
+  const channelSources = (p: string): string[] => {
+    const c = getChannel(p.replace("/services/", ""));
+    return c?.longread ? ["content/services.ts", `content/longreads/${c.longread}`] : ["content/services.ts"];
+  };
   const lastModifiedOf = (p: string): Date | undefined => {
     const files =
       sources[p] ??
-      (p.startsWith("/services/") ? (landingSources(p) ?? ["content/services.ts"])
+      (p.startsWith("/services/") ? (landingSources(p) ?? channelSources(p))
       : p.startsWith("/guides/") ? [`content/guides/${guides.find((g) => `/guides/${g.slug}` === p)?.file ?? ""}`, "content/guides.ts"]
       : p.startsWith("/en/cases/") ? ["content/en/cases.ts"]
       : p.startsWith("/cases/") ? ["content/cases.ts"]

@@ -146,14 +146,14 @@ export function ChannelPage({
   const pricingTitle = `Стоимость ${forms.gen}`;
 
   /* Перелинковка внизу:
-     - гео-нейтральные страницы (хаб, подуслуга) - два блока: «Подуслуги»
-       (только у хаба) и городовые страницы этой услуги;
+     - хаб - блок «Подуслуги»; на его городовые страницы ведут ссылки из
+       текста лонгрида хаба;
+     - подуслуга - её городовые страницы («Опыт по городам и регионам»);
      - городовая - гео-нейтральная страница её услуги, та же услуга в других
        городах, затем смежные страницы из `related`. */
   const subserviceLinks = landing ? [] : subservicesOf(channel.slug).map(landingLink);
-  const cityLinks = isCity
-    ? []
-    : cityLandingsOf(channel.slug, landing?.slug).map(landingLink);
+  const cityLinks =
+    landing && !isCity ? cityLandingsOf(channel.slug, landing.slug).map(landingLink) : [];
   const serviceOfCity = landing?.parent
     ? landings.find((l) => l.slug === landing.parent)
     : undefined;
