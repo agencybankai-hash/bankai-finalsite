@@ -32,7 +32,7 @@
     "created": "2026-05-31"
   },
   "content/services.ts": {
-    "modified": "2026-09-17",
+    "modified": "2026-09-24",
     "created": "2026-05-31"
   },
   "content/site.ts": {
@@ -44,7 +44,7 @@
     "created": "2026-05-31"
   },
   "content/types.ts": {
-    "modified": "2026-09-23",
+    "modified": "2026-09-24",
     "created": "2026-05-31"
   },
   "content/ui.ts": {
@@ -107,9 +107,25 @@
     "modified": "2026-09-23",
     "created": "2026-09-23"
   },
+  "content/longreads/context.md": {
+    "modified": "2026-09-24",
+    "created": "2026-09-24"
+  },
   "content/longreads/home.md": {
     "modified": "2026-09-23",
     "created": "2026-09-23"
+  },
+  "content/longreads/leadgen.md": {
+    "modified": "2026-09-24",
+    "created": "2026-09-24"
+  },
+  "content/longreads/seo.md": {
+    "modified": "2026-09-24",
+    "created": "2026-09-24"
+  },
+  "content/longreads/web.md": {
+    "modified": "2026-09-24",
+    "created": "2026-09-24"
   },
   "app/(ru)/page.tsx": {
     "modified": "2026-09-23",
