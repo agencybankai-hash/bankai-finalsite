@@ -2,12 +2,15 @@ import { NextResponse } from "next/server";
 import type { NextFetchEvent, NextRequest } from "next/server";
 import { isBlockedReferrer } from "@/content/blocked-referrers";
 import { clientIp, recordTrap } from "@/lib/bot-traps";
+import { navigationSource, recordReferrer } from "@/lib/referrers";
 
 /**
- * Next 16: конвенция proxy.ts (бывш. middleware.ts). Две задачи:
+ * Next 16: конвенция proxy.ts (бывш. middleware.ts). Три задачи:
  * 1) Referer из списка бот-редиректоров (content/blocked-referrers.ts) -
  *    403 на любой путь, заход пишется в bot_traps (IP, UA, источник);
- * 2) Basic-Auth на внутренние разделы: админка и контент-чеклист
+ * 2) источник каждой загрузки страницы - в referrer_daily для ежедневного
+ *    отчёта о новых доменах и всплесках (lib/referrers.ts);
+ * 3) Basic-Auth на внутренние разделы: админка и контент-чеклист
  *    (логин/пароль из env ADMIN_USER / ADMIN_PASSWORD).
  * Статика и картинки исключены из matcher: там ни то, ни другое не нужно.
  */
@@ -30,6 +33,9 @@ export function proxy(req: NextRequest, event: NextFetchEvent) {
       headers: { "Cache-Control": "no-store", "X-Robots-Tag": "noindex" },
     });
   }
+
+  const source = navigationSource(req);
+  if (source) event.waitUntil(recordReferrer(source));
 
   if (!PRIVATE_PATH.test(req.nextUrl.pathname)) return NextResponse.next();
 
