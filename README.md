@@ -75,6 +75,17 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
   `referer:<домен>`. Новый домен - строка в&nbsp;списке и&nbsp;деплой. Без деплоя то&nbsp;же правило можно
   держать в&nbsp;Vercel Firewall: условие Header `referer` contains `<домен>`, действие Deny.
   Список IP/UA ботов: `SELECT ip, user_agent, source, seen_at FROM bot_traps ORDER BY seen_at DESC`.
+  Эти хиты - статистика: отправку формы блокирует только ссылка-ловушка.
+- **Подозрительные зоны.** `SUSPICIOUS_TLDS` в&nbsp;том&nbsp;же файле (.top, .xyz, .icu и&nbsp;т.&nbsp;п.).
+  Режим `SUSPICIOUS_TLD_MODE`: `"log"` - переходы пропускаются и&nbsp;попадают в&nbsp;оповещение,
+  `"block"` - 403, как для списка. Исключения - `ALLOWED_REFERRERS`.
+- **Оповещение о&nbsp;новых источниках.** `proxy.ts` считает источник каждой загрузки страницы
+  на&nbsp;боевом домене в&nbsp;`referrer_daily`: домен реферера, `(direct)` или `(hidden)` (чужой сайт
+  скрыл реферер). Cron `/api/cron/referrers` (`vercel.json`, 09:00 Алматы) присылает в&nbsp;Telegram
+  новые домены-источники и&nbsp;всплески прямых и&nbsp;скрытых заходов (`lib/referrers.ts`).
+  Нужен `CRON_SECRET` (в&nbsp;Vercel хранится как sensitive и&nbsp;не&nbsp;читается); чат - `TELEGRAM_ALERTS_CHAT_ID`,
+  без него чат заявок. Ручной запуск: `npx -y vercel@latest crons run /api/cron/referrers`.
+  Просмотр без отправки (`?dry=1`, `&force=1`, `&day=YYYY-MM-DD`) - на&nbsp;dev-сервере со&nbsp;своим `CRON_SECRET`.
 - **Honeypot** `company` и&nbsp;лёгкий лимит 5&nbsp;заявок за&nbsp;10&nbsp;минут с&nbsp;IP в&nbsp;памяти
   инстанса (на&nbsp;serverless не&nbsp;строгий; строгий лимит - правило Vercel Firewall или Upstash).
 - Заголовки безопасности (`X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`,

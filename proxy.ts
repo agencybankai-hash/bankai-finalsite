@@ -1,12 +1,17 @@
 import { NextResponse } from "next/server";
 import type { NextFetchEvent, NextRequest } from "next/server";
-import { isBlockedReferrer } from "@/content/blocked-referrers";
+import {
+  isBlockedReferrer,
+  SUSPICIOUS_TLD_MODE,
+  suspiciousReferrer,
+} from "@/content/blocked-referrers";
 import { clientIp, recordTrap } from "@/lib/bot-traps";
 import { navigationSource, recordReferrer } from "@/lib/referrers";
 
 /**
  * Next 16: конвенция proxy.ts (бывш. middleware.ts). Три задачи:
- * 1) Referer из списка бот-редиректоров (content/blocked-referrers.ts) -
+ * 1) Referer из списка бот-редиректоров (content/blocked-referrers.ts),
+ *    а в режиме "block" - и из подозрительных доменных зон оттуда же -
  *    403 на любой путь, заход пишется в bot_traps (IP, UA, источник);
  * 2) источник каждой загрузки страницы - в referrer_daily для ежедневного
  *    отчёта о новых доменах и всплесках (lib/referrers.ts);
@@ -23,7 +28,10 @@ export const config = {
 const PRIVATE_PATH = /^\/(admin|checklist|api\/(admin|checklist))(\/|$)/;
 
 export function proxy(req: NextRequest, event: NextFetchEvent) {
-  const blocked = isBlockedReferrer(req.headers.get("referer"));
+  const referer = req.headers.get("referer");
+  const blocked =
+    isBlockedReferrer(referer) ??
+    (SUSPICIOUS_TLD_MODE === "block" ? suspiciousReferrer(referer) : null);
   if (blocked) {
     event.waitUntil(
       recordTrap(clientIp(req), req.headers.get("user-agent") ?? "", `referer:${blocked}`),

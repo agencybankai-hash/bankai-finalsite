@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { isSuspiciousHost } from "@/content/blocked-referrers";
 import { getSql } from "@/lib/db";
 
 /**
@@ -115,7 +116,8 @@ export async function recordReferrer(source: string): Promise<void> {
   }
 }
 
-type HostRow = { host: string; hits: number; firstDay: string };
+/** suspicious - домен в дешёвой зоне из content/blocked-referrers.ts, кандидат в блок. */
+type HostRow = { host: string; hits: number; firstDay: string; suspicious: boolean };
 type Spike = { bucket: string; hits: number; median: number };
 
 export type ReferrerReport = {
@@ -176,17 +178,21 @@ export async function buildReferrerReport({
       AND NOT EXISTS (SELECT 1 FROM referrer_alerts a WHERE a.key = 'host:' || d.host)
     ORDER BY d.hits DESC
   `;
-  const newHosts: HostRow[] =
-    force || historyDays >= MIN_HISTORY_NEW_HOSTS
-      ? hostRows
-          .map((r) => ({ host: r.host as string, hits: r.hits as number, firstDay: r.first_day as string }))
-          .filter(
-            (r) =>
-              r.hits >= NEW_HOST_MIN_HITS &&
-              !RESERVED_TLD.test(r.host) &&
-              !KNOWN_SOURCES.some((re) => re.test(r.host)),
-          )
-      : [];
+  // Домен в подозрительной зоне сообщаем с первого захода и без защиты
+  // от шума на старте; остальные - с NEW_HOST_MIN_HITS и после MIN_HISTORY_NEW_HOSTS.
+  const enoughHistory = force || historyDays >= MIN_HISTORY_NEW_HOSTS;
+  const newHosts: HostRow[] = hostRows
+    .map((r) => {
+      const host = r.host as string;
+      return { host, hits: r.hits as number, firstDay: r.first_day as string, suspicious: isSuspiciousHost(host) };
+    })
+    .filter(
+      (r) =>
+        !RESERVED_TLD.test(r.host) &&
+        !KNOWN_SOURCES.some((re) => re.test(r.host)) &&
+        (r.suspicious || (enoughHistory && r.hits >= NEW_HOST_MIN_HITS)),
+    )
+    .sort((a, b) => Number(b.suspicious) - Number(a.suspicious) || b.hits - a.hits);
 
   const bucketRows = await sql`
     SELECT host, day::text AS day, hits FROM referrer_daily
@@ -226,7 +232,8 @@ export async function buildReferrerReport({
     if (newHosts.length) {
       lines.push("Новые домены-источники:");
       for (const r of newHosts.slice(0, MAX_LISTED)) {
-        lines.push(`- <code>${esc(r.host)}</code> - ${visits(r.hits)}, впервые ${ddmm(r.firstDay)}`);
+        const zone = r.suspicious ? `, зона .${esc(r.host.slice(r.host.lastIndexOf(".") + 1))} - кандидат в блок` : "";
+        lines.push(`- <code>${esc(r.host)}</code> - ${visits(r.hits)}, впервые ${ddmm(r.firstDay)}${zone}`);
       }
       if (newHosts.length > MAX_LISTED) lines.push(`- и ещё ${newHosts.length - MAX_LISTED}`);
       lines.push("");
