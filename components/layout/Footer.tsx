@@ -78,6 +78,19 @@ export function Footer({ locale = "ru" }: { locale?: Locale }) {
           </div>
         </div>
 
+        {/* Ловушка для ботов: людям и скринридерам не видна, в robots закрыта;
+            кто перешёл - бот, его IP временно не может отправить форму (lib/bot-traps.ts).
+            Обычный <a>, не <Link>: Next не должен префетчить эту страницу. */}
+        <a
+          href="/trap"
+          rel="nofollow"
+          tabIndex={-1}
+          aria-hidden
+          className="pointer-events-none fixed left-0 top-0 h-px w-px overflow-hidden opacity-0"
+        >
+          Не переходить
+        </a>
+
         <div className="flex flex-col gap-4 border-t border-border py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
           <div>© 2026 {siteMeta.fullName}</div>
           <div className="flex flex-wrap gap-x-6 gap-y-2">

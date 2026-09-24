@@ -65,6 +65,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
   Тестовые ключи для локалки: site `1x00000000000000000000AA`, secret `1x0000000000000000000000000000000AA`.
 - **Origin.** Роут принимает POST только с&nbsp;`bankai.agency`, `*.bankai.agency`, `*.vercel.app`
   и&nbsp;`localhost`; иначе 403. Отсекает примитивные скрипты, настоящая защита - Turnstile.
+- **Время заполнения.** Страница контактов выдаёт подписанную метку времени (`lib/form-token.ts`,
+  HMAC на&nbsp;`FORM_TOKEN_SECRET`, без него на&nbsp;`TURNSTILE_SECRET_KEY`). Заявка без метки или
+  быстрее 3&nbsp;секунд после выдачи отклоняется как бот (403).
+- **Ссылка-ловушка.** Невидимая ссылка на&nbsp;`/trap` в&nbsp;футере, закрыта в&nbsp;robots.txt. Перешедший
+  IP пишется в&nbsp;таблицу `bot_traps` и&nbsp;12&nbsp;часов не&nbsp;может отправить форму (`lib/bot-traps.ts`).
 - **Honeypot** `company` и&nbsp;лёгкий лимит 5&nbsp;заявок за&nbsp;10&nbsp;минут с&nbsp;IP в&nbsp;памяти
   инстанса (на&nbsp;serverless не&nbsp;строгий; строгий лимит - правило Vercel Firewall или Upstash).
 - Заголовки безопасности (`X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`,

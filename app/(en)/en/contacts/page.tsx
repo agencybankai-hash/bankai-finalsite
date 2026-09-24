@@ -5,6 +5,7 @@ import { contacts } from "@/content/site";
 import { ui } from "@/content/ui";
 import { pageMetadata } from "@/lib/metadata";
 import { visitorCountry } from "@/lib/geo";
+import { issueFormToken } from "@/lib/form-token";
 
 const t = ui("en");
 
@@ -18,6 +19,7 @@ export const generateMetadata = pageMetadata({
 
 export default async function EnContactsPage() {
   const country = await visitorCountry();
+  const formToken = issueFormToken();
   return (
     <>
       {/* visual={false}: HeroVisual - иллюстрация с русскими подписями и без
@@ -32,7 +34,7 @@ export default async function EnContactsPage() {
       <Section>
         <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr]">
           <div>
-            <ContactForm locale="en" defaultCountry={country} />
+            <ContactForm locale="en" defaultCountry={country} formToken={formToken} />
           </div>
 
           <aside className="space-y-8">

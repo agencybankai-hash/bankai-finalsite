@@ -4,6 +4,7 @@ import { ContactForm } from "@/components/sections/ContactForm";
 import { contacts } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
 import { visitorCountry } from "@/lib/geo";
+import { issueFormToken } from "@/lib/form-token";
 
 export const generateMetadata = pageMetadata({
   title: "Контакты",
@@ -14,6 +15,7 @@ export const generateMetadata = pageMetadata({
 
 export default async function ContactsPage() {
   const country = await visitorCountry();
+  const formToken = issueFormToken();
   return (
     <>
       <Hero
@@ -24,7 +26,7 @@ export default async function ContactsPage() {
       <Section>
         <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr]">
           <div>
-            <ContactForm defaultCountry={country} />
+            <ContactForm defaultCountry={country} formToken={formToken} />
           </div>
 
           <aside className="space-y-8">
