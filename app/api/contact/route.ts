@@ -7,6 +7,7 @@ import { formatPhoneDisplay, normalizePhone } from "@/lib/phone";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { verifyFormToken } from "@/lib/form-token";
 import { clientIp, isTrapped } from "@/lib/bot-traps";
+import { recordRejection, rejectionPayload, type RejectReason } from "@/lib/rejections";
 
 const clip = (v: unknown, n: number) => String(v ?? "").trim().slice(0, n);
 
@@ -48,40 +49,50 @@ function rateLimited(ip: string, max = 5, windowMs = 600_000) {
  * Сбои пишутся в лог Vercel как `contact <канал> failed`.
  */
 export async function POST(req: Request) {
-  if (!originAllowed(req.headers.get("origin"))) {
-    return NextResponse.json({ ok: false, error: "origin" }, { status: 403 });
-  }
-
-  const ip = clientIp(req);
-  if (rateLimited(ip)) {
-    return NextResponse.json({ ok: false, error: "rate" }, { status: 429 });
-  }
-
-  let body: unknown;
+  // Тело читаем первым: даже отклонённая попытка попадает в журнал вместе
+  // с содержимым полей (lib/rejections.ts).
+  let body: unknown = null;
+  let badJson = false;
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ ok: false, error: "bad_json" }, { status: 400 });
+    badJson = true;
+  }
+  const b = (body && typeof body === "object" ? body : {}) as Record<string, unknown>;
+  const snapshot = rejectionPayload(badJson ? null : b);
+
+  /** Отказ: пишем в журнал отклонённых и отвечаем клиенту. */
+  const reject = async (reason: RejectReason, status: number, error: string, detail?: string) => {
+    console.warn(`contact rejected: ${reason}`, detail ?? "");
+    await recordRejection(req, reason, snapshot, detail);
+    return NextResponse.json({ ok: false, error }, { status });
+  };
+
+  if (!originAllowed(req.headers.get("origin"))) {
+    return reject("origin", 403, "origin", req.headers.get("origin") ?? "no origin");
   }
 
-  const b = (body ?? {}) as Record<string, unknown>;
+  const ip = clientIp(req);
+  if (rateLimited(ip)) return reject("rate", 429, "rate");
+  if (badJson) return reject("bad_json", 400, "bad_json");
 
-  // honeypot
-  if (String(b.company ?? "")) return NextResponse.json({ ok: true });
+  // honeypot: боту отвечаем «ок», чтобы он не искал обход, но попытку записываем
+  if (String(b.company ?? "")) {
+    console.warn("contact rejected: honeypot");
+    await recordRejection(req, "honeypot", snapshot);
+    return NextResponse.json({ ok: true });
+  }
 
   // Время заполнения: метка выдачи формы подписана сервером, заявка раньше
   // чем через MIN_FILL_MS после выдачи - бот. Без метки - тоже.
   const timing = verifyFormToken(b.formToken);
   if (!timing.ok) {
-    console.warn(`contact rejected: form token ${timing.reason}`, timing.ageMs ?? "");
-    return NextResponse.json({ ok: false, error: "bot" }, { status: 403 });
+    const secs = timing.ageMs !== undefined ? `${(timing.ageMs / 1000).toFixed(1)} с` : undefined;
+    return reject(`token_${timing.reason}`, 403, "bot", secs);
   }
 
   // IP, сходивший по невидимой ссылке-ловушке /trap за последние часы.
-  if (await isTrapped(ip)) {
-    console.warn("contact rejected: trapped ip");
-    return NextResponse.json({ ok: false, error: "bot" }, { status: 403 });
-  }
+  if (await isTrapped(ip)) return reject("trapped", 403, "bot");
 
   // Turnstile: включён, когда задан секрет. Токен обязателен и должен пройти
   // проверку; если сам Cloudflare недоступен, заявку пропускаем, чтобы не
@@ -89,9 +100,7 @@ export async function POST(req: Request) {
   const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
   if (turnstileSecret) {
     const verdict = await verifyTurnstile(turnstileSecret, clip(b.turnstileToken, 2048), ip);
-    if (verdict === "rejected") {
-      return NextResponse.json({ ok: false, error: "bot" }, { status: 403 });
-    }
+    if (verdict === "rejected") return reject("turnstile", 403, "bot");
     if (verdict === "unavailable") console.error("turnstile unavailable, lead accepted");
   }
 
@@ -99,7 +108,8 @@ export async function POST(req: Request) {
   const phone = normalizePhone(clip(b.phone, 40));
   const contact = normalizeContact(clip(b.contact, 200));
   if (!name || !phone || !contact) {
-    return NextResponse.json({ ok: false, error: "required" }, { status: 422 });
+    const missing = [!name && "name", !phone && "phone", !contact && "contact"].filter(Boolean).join(",");
+    return reject("invalid_fields", 422, "required", missing);
   }
 
   // Атрибуция источника из lib/attribution: собрана браузером, поэтому
