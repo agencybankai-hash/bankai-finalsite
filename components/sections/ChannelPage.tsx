@@ -231,7 +231,11 @@ export function ChannelPage({
             lead={channel.funnel.lead}
           />
           <div className="mt-10">
-            <FunnelChain chain={channel.funnel.chain} note={channel.funnel.note} />
+            <FunnelChain
+              chain={channel.funnel.chain}
+              note={channel.funnel.note}
+              channel={channel.slug}
+            />
           </div>
         </Section>
       )}

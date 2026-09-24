@@ -183,7 +183,7 @@ export default async function IllustrationsGallery({
               <Label>FunnelChain · {c.slug}</Label>
               <h2 className="text-h3 text-ink">{c.funnel.title}</h2>
               <div className="mt-10">
-                <FunnelChain chain={c.funnel.chain} note={c.funnel.note} />
+                <FunnelChain chain={c.funnel.chain} note={c.funnel.note} channel={c.slug} />
               </div>
             </Section>
           ))}

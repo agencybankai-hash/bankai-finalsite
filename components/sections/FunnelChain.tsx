@@ -5,10 +5,14 @@ import type { StatItem } from "@/content/types";
 export function FunnelChain({
   chain,
   note,
+  channel,
 }: {
   chain: StatItem[];
   note?: string;
+  /** Слаг канала: форма ленты-потока (сужение, «×2», три дорожки). */
+  channel?: string;
 }) {
+  void channel;
   return (
     <div>
       <Reveal stagger className="grid grid-cols-2 gap-3 sm:grid-cols-4">
