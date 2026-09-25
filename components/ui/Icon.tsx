@@ -17,6 +17,7 @@ export type IconName =
   | "doc"
   | "rocket"
   | "check"
+  | "x"
   | "arrow";
 
 const paths: Record<IconName, React.ReactNode> = {
@@ -91,6 +92,7 @@ const paths: Record<IconName, React.ReactNode> = {
     </>
   ),
   check: <path d="m5 12 4 4 10-10" />,
+  x: <path d="M7 7l10 10M17 7 7 17" />,
   arrow: <path d="M7 17 17 7M9 7h8v8" />,
 };
 
