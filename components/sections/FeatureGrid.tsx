@@ -62,7 +62,7 @@ export function FeatureGrid({
             />
             <h3
               className={cn(
-                "text-lg font-semibold tracking-tight text-ink sm:pt-2.5",
+                "text-balance text-lg font-semibold tracking-tight text-ink sm:pt-2.5",
                 stacked && "lg:pt-0",
               )}
             >
@@ -70,7 +70,7 @@ export function FeatureGrid({
             </h3>
             <p
               className={cn(
-                "col-span-2 max-w-prose text-sm leading-relaxed text-ink-2 sm:col-span-1 sm:col-start-2",
+                "col-span-2 max-w-prose text-pretty text-sm leading-relaxed text-ink-2 sm:col-span-1 sm:col-start-2",
                 stacked && "lg:col-start-1",
               )}
             >

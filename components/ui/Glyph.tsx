@@ -431,8 +431,6 @@ const GLYPHS = {
 
 export type GlyphName = keyof typeof GLYPHS;
 
-export const GLYPH_NAMES = Object.keys(GLYPHS) as GlyphName[];
-
 /** Голый глиф без плитки. */
 export function GlyphSvg({ name, className }: { name: GlyphName; className?: string }) {
   const G = GLYPHS[name];
