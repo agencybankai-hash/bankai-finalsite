@@ -1,26 +1,15 @@
-import type { ReactElement } from "react";
 import type { HeroVisualKind } from "@/content/types";
-import type { SceneProps } from "./types";
-import { SeoScene } from "./hero/seo/SeoScene";
-import { ContextScene } from "./hero/context/ContextScene";
-import { WebScene } from "./hero/web/WebScene";
-import { LeadgenScene } from "./hero/system/LeadgenScene";
+import type { Scene } from "./types";
+import { SEO_SCENES } from "./hero/seo/scenes";
+import { CONTEXT_SCENES } from "./hero/context/scenes";
+import { WEB_SCENES } from "./hero/web/scenes";
+import { SYSTEM_SCENES } from "./hero/system/scenes";
 
-/** Сцена по виду. Тематические варианты посадочных пока рисует базовая сцена
- *  канала: вид, город и запрос она получает в пропсах. */
-export const HERO_SCENES: Record<HeroVisualKind, (p: SceneProps) => ReactElement> = {
-  seo: SeoScene,
-  "seo-store": SeoScene,
-  "seo-regions": SeoScene,
-  "seo-city": SeoScene,
-  context: ContextScene,
-  "google-ads": ContextScene,
-  "yandex-direct": ContextScene,
-  "context-city": ContextScene,
-  web: WebScene,
-  landing: WebScene,
-  corporate: WebScene,
-  ecommerce: WebScene,
-  "web-city": WebScene,
-  leadgen: LeadgenScene,
+/** Сцена по виду. Каждый канал ведёт свой реестр (hero/<канал>/scenes.ts),
+ *  здесь они только сводятся; пропущенный вид - ошибка типов. */
+export const HERO_SCENES: Record<HeroVisualKind, Scene> = {
+  ...SEO_SCENES,
+  ...CONTEXT_SCENES,
+  ...WEB_SCENES,
+  ...SYSTEM_SCENES,
 };
