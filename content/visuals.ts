@@ -152,23 +152,26 @@ export const visualCopy: Record<HeroVisualKind, Omit<VisualCopy, "float">> = {
     disclaimer: WEB_DISCLAIMER,
   },
   landing: {
-    title: "Лендинг под заявки",
+    title: "Лендинг под кампанию",
     meta: "одно действие",
-    label: "Схема: лендинг на телефоне ведёт посетителя к одному действию - заявке",
+    label:
+      "Схема: первый экран лендинга повторяет объявление, страница отвечает на сомнения и ведёт к одному действию - заявке",
     kpis: [{ value: "2-3 дня", label: "прототип" }, webKpi.goals],
     disclaimer: WEB_DISCLAIMER,
   },
   corporate: {
     title: "Корпоративный сайт",
-    meta: "страницы направлений",
-    label: "Схема: корпоративный сайт ведёт к заявке со страницы каждого направления",
+    meta: "страница под направление",
+    label:
+      "Схема: у каждого направления своя страница с формой, заявка приходит в CRM с пометкой страницы и канала",
     kpis: [{ value: "4-6 нед.", label: "сайт под ключ" }, webKpi.goals],
     disclaimer: WEB_DISCLAIMER,
   },
   ecommerce: {
     title: "Интернет-магазин",
     meta: "каталог → заказ",
-    label: "Схема: магазин на телефоне ведёт от каталога к оформленному заказу",
+    label:
+      "Схема: магазин на телефоне ведёт от карточки товара через корзину, доставку и оплату к оформленному заказу, цены и остатки - из учёта",
     kpis: [{ value: "прототип", label: "в первые недели" }, webKpi.goals],
     disclaimer: WEB_DISCLAIMER,
   },
@@ -224,6 +227,19 @@ export const visualKpis: Record<string, VisualCopy["kpis"]> = {
   "/marketingovoe-agentstvo-astana": [
     { value: "еженедельно", label: "разбор по заявкам" },
     { value: "1 отчёт", label: "цена заявки по каналам" },
+  ],
+  /* Городские сайты: «3 способа» вида дословно на этих страницах нет - срок из их текста. */
+  "/services/web/sozdanie-saitov-almaty": [
+    { value: "4-6 нед.", label: "сайт на несколько услуг" },
+    webKpi.goals,
+  ],
+  "/services/web/sozdanie-saitov-astana": [
+    { value: "4-6 нед.", label: "корпоративный сайт" },
+    webKpi.goals,
+  ],
+  "/services/web/sozdanie-saitov-shymkent": [
+    { value: "4-6 нед.", label: "сайт компании" },
+    webKpi.goals,
   ],
 };
 

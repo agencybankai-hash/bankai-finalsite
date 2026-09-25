@@ -26,3 +26,196 @@
     display: flex;
   }
 }
+
+/* ── Лендинг ──
+   Раскладка по вертикали (em сцены): верх переключателя источника
+   (--land-src), объявления (--land-ad) и телефона с правой карточкой
+   (--land-top); --land-row - строка схемы. Связь идёт из-под объявления до
+   верхней грани рамки заголовка: телефон + 5.5em (корпус 0.4, вырез 1.5,
+   отступ 0.9, шапка 1.8, зазор 0.9). Подпись - посередине зазора между
+   объявлением и телефоном. Компактная сцена: кегли упираются в порог 10px,
+   ряды выше в em - раскладка ниже, у Алматы подпись скрыта. */
+.web-land {
+  --land-src: 0.6em;
+  --land-ad: 0.9em;
+  --land-ad-py: 0.5em;
+  --land-top: 6.6em;
+  --land-note: 1.8em;
+  --land-row: 3.3em;
+  --land-seg: 0.45em;
+}
+.web-land-almaty {
+  --land-ad: 3.9em;
+  --land-ad-py: 0.35em;
+  --land-top: 9.1em;
+  --land-row: 2.9em;
+}
+@container ill (max-width: 22rem) {
+  .web-land {
+    --land-top: 7.8em;
+    --land-note: 2.13em;
+    --land-row: 3em;
+    --land-seg: 0.3em;
+  }
+  .web-land-almaty {
+    --land-src: 0.5em;
+    --land-ad: 4.5em;
+    --land-ad-py: 0.3em;
+    --land-top: 9.4em;
+    --land-row: 2.8em;
+  }
+  .web-land-almaty .web-land-note {
+    display: none;
+  }
+}
+/* Алматы: телефон ниже - доводы под заголовком не помещаются до кнопки WhatsApp. */
+.web-land-almaty .web-land-points {
+  display: none;
+}
+.web-land-source {
+  top: var(--land-src);
+}
+.web-land-seg {
+  padding-block: var(--land-seg);
+}
+.web-land-ad {
+  top: var(--land-ad);
+  padding-block: var(--land-ad-py);
+}
+.web-land-phone,
+.web-land-panel {
+  top: var(--land-top);
+  bottom: 0.5em;
+}
+.web-land-link {
+  top: calc(var(--land-ad) + 1.2em);
+  height: calc(var(--land-top) + 5.5em - var(--land-ad) - 1.2em);
+}
+.web-land-port {
+  top: calc(var(--land-top) + 5.2em);
+}
+.web-land-note {
+  top: calc(var(--land-top) - var(--land-note));
+}
+
+/* Схема страницы: пять строк одной высоты по краям и между ними поровну.
+   Подсветка текущего экрана с ползунком висит под обёрткой высотой «столбец
+   минус строка»: обёртка на месте - подсветка на последней строке (форма),
+   сдвиг на -100% - на первой. */
+.web-land-row {
+  height: var(--land-row);
+}
+.web-land-scroll {
+  bottom: var(--land-row);
+  --a-y: -100%;
+}
+.web-land-scroll > * {
+  top: 100%;
+  height: var(--land-row);
+}
+
+/* ── Корпоративный ──
+   Браузер (адрес, шапка сайта, карта сайта) и под ним CRM. Высоты в em
+   сцены; узлы дерева - по кеглю (порог 10px делает их выше в компактной
+   сцене, там уровни дерева и колонки плотнее). --corp-drop - от низа глифа
+   формы «Направления 2» до верха CRM: браузер 0.6 + 2 строки + отступ +
+   узел + связь + узел + связь + карточка - поле карточки (узел 2.41em,
+   в компактной 2.93em). Правый край CRM стоит под глифом - точка приходит
+   к заявке. */
+.web-corp {
+  --corp-bar: 2.6em;
+  --corp-browser: 21.4em;
+  --corp-pad: 1em;
+  --corp-node: 0.45em;
+  --corp-gap: 1.8em;
+  --corp-card: 5.6em;
+  --corp-card-p: 0.7em;
+  --corp-col: 1em;
+  --corp-crm: 23.3em;
+  --corp-crm-py: 0.8em;
+  --corp-drop: 3.18em;
+}
+@container ill (max-width: 22rem) {
+  .web-corp {
+    --corp-bar: 2.8em;
+    --corp-browser: 19.8em;
+    --corp-pad: 0.6em;
+    --corp-node: 0.3em;
+    --corp-gap: 0.8em;
+    --corp-card: 5.4em;
+    --corp-card-p: 0.45em;
+    --corp-col: 0.6em;
+    --corp-crm: 21.2em;
+    --corp-crm-py: 0.5em;
+    --corp-drop: 1.99em;
+  }
+}
+.web-corp-browser {
+  height: var(--corp-browser);
+}
+.web-corp-bar {
+  height: var(--corp-bar);
+}
+.web-corp-tree {
+  padding-top: var(--corp-pad);
+}
+.web-corp-node {
+  padding-block: var(--corp-node);
+}
+.web-corp-gap {
+  height: var(--corp-gap);
+}
+.web-corp-card {
+  height: var(--corp-card);
+  padding: var(--corp-card-p);
+}
+.web-corp-cols {
+  gap: var(--corp-col);
+}
+/* Перекладина - между центрами крайних колонок. */
+.web-corp-fork {
+  left: calc((100% - 2 * var(--corp-col)) / 6);
+  right: calc((100% - 2 * var(--corp-col)) / 6);
+}
+.web-corp-crm {
+  top: var(--corp-crm);
+  padding-block: var(--corp-crm-py);
+}
+.web-corp-drop {
+  height: var(--corp-drop);
+}
+.web-corp-dot {
+  top: calc(100% + var(--corp-drop) - 0.35em);
+  --a-y: calc(-1 * (var(--corp-drop) + 0.95em));
+}
+/* Дерево растёт сверху вниз, перекладина - от ствола к краям. */
+.web-corp .a-grow-y {
+  transform-origin: center top;
+}
+.web-corp .web-corp-fork.a-grow-x {
+  transform-origin: center;
+}
+
+/* ── Магазин ──
+   Телефон как у базовой сцены; фото товара ниже в компактной сцене (фильтры
+   и цена упираются в порог 10px). Правая колонка - оформление и учёт под
+   ним, в компактной сцене ряды плотнее. */
+.web-store {
+  --store-photo: 7em;
+  --store-gap: 1em;
+}
+@container ill (max-width: 22rem) {
+  .web-store {
+    --store-photo: 5.2em;
+    --store-gap: 0.8em;
+  }
+}
+.web-store-photo {
+  height: var(--store-photo);
+}
+.web-store-card {
+  gap: var(--store-gap);
+}
+.web-store-col {
+  gap: calc(var(--store-gap) - 0.2em);
+}
