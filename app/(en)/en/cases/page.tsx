@@ -8,7 +8,6 @@ import {
   regionalCasesEn,
   casesIntroEn,
   casesStatsEn,
-  casesCtaEn,
 } from "@/content/en/cases";
 import { breadcrumbLd, ldJson } from "@/lib/jsonld";
 import { pageMetadata } from "@/lib/metadata";
@@ -69,11 +68,7 @@ export default function EnCasesPage() {
         </Section>
       )}
 
-      <CTASection
-        title={casesCtaEn.title}
-        lead={casesCtaEn.lead}
-        cta={casesCtaEn.cta}
-      />
+      <CTASection locale="en" />
     </>
   );
 }

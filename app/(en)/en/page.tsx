@@ -20,7 +20,6 @@ import {
   servicesEn,
   whyKzEn,
   casesPreviewEn,
-  finalCtaEn,
 } from "@/content/en/site";
 import { pairAlternates } from "@/lib/i18n";
 
@@ -138,11 +137,7 @@ export default function EnHomePage() {
         </div>
       </Section>
 
-      <CTASection
-        title={finalCtaEn.title}
-        lead={finalCtaEn.lead}
-        cta={finalCtaEn.cta}
-      />
+      <CTASection locale="en" />
     </>
   );
 }

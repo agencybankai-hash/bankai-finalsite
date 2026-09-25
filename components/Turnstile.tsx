@@ -21,8 +21,27 @@ declare global {
 
 const SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 
-export function Turnstile({ siteKey, locale = "ru" }: { siteKey: string; locale?: string }) {
+export function Turnstile({
+  siteKey,
+  locale = "ru",
+  theme = "auto",
+  className,
+  onInteractive,
+}: {
+  siteKey: string;
+  locale?: string;
+  /** auto - по теме системы; dark - для формы на тёмном блоке. */
+  theme?: "auto" | "light" | "dark";
+  className?: string;
+  /** Cloudflare решил показать проверку: виджет стал видимым. */
+  onInteractive?: () => void;
+}) {
   const ref = useRef<HTMLDivElement>(null);
+  // Свежий колбэк без перерисовки виджета: render зависит только от ключа, языка и темы.
+  const interactive = useRef(onInteractive);
+  useEffect(() => {
+    interactive.current = onInteractive;
+  });
 
   useEffect(() => {
     const el = ref.current;
@@ -36,7 +55,9 @@ export function Turnstile({ siteKey, locale = "ru" }: { siteKey: string; locale?
         sitekey: siteKey,
         appearance: "interaction-only",
         language: locale,
+        theme,
         "refresh-expired": "auto",
+        "before-interactive-callback": () => interactive.current?.(),
       });
     };
 
@@ -53,12 +74,12 @@ export function Turnstile({ siteKey, locale = "ru" }: { siteKey: string; locale?
         } catch {}
       }
     };
-  }, [siteKey, locale]);
+  }, [siteKey, locale, theme]);
 
   return (
     <>
       <Script src={SCRIPT_SRC} strategy="afterInteractive" />
-      <div ref={ref} />
+      <div ref={ref} className={className} />
     </>
   );
 }

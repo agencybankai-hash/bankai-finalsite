@@ -32,7 +32,6 @@ import {
   process,
   companyBlock,
   guarantee,
-  finalCta,
   clients,
   homeLongread,
 } from "@/content/site";
@@ -246,7 +245,7 @@ export default async function Home() {
       {/* FAQ */}
       <FaqSection title="Частые вопросы" items={homeFaq} />
 
-      <CTASection title={finalCta.title} lead={finalCta.lead} cta={finalCta.cta} />
+      <CTASection />
 
       {/* Лонгрид над футером: ссылки на хабы и городские страницы - в тексте */}
       {longread && <Longread markdown={longread} />}

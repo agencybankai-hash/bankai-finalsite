@@ -536,14 +536,6 @@ export const casesStatsEn: StatItem[] = [
   { value: "4", label: "markets: KZ, US, RU, MN" },
 ];
 
-/** Финальный CTA EN-страниц кейсов (CTASection локали не имеет - строки пропсами). */
-export const casesCtaEn = {
-  title: "Want to choose your clients instead of chasing them?",
-  lead:
-    "When leads come in steadily, you plan growth and work with the people you want, instead of taking whatever comes. The first step is seeing where you lose clients today: we show it on your own numbers and lay out a plan for a steady flow of leads. The audit is free, with no obligation.",
-  cta: { label: "Get a free audit", href: "/en/contacts" },
-};
-
 /** Подписи секций страницы кейса на EN (RU-страница держит свои строки инлайном). */
 export const caseUiEn = {
   back: "← All cases",

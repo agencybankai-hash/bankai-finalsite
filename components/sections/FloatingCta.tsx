@@ -22,7 +22,20 @@ export function FloatingCta({ locale = "ru" }: { locale?: Locale }) {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+  // Прячемся, пока на экране финальный CTA с формой (CTASection, id="cta"):
+  // бар закрыл бы кнопку отправки, а карточка дублировала бы действие.
+  // Храним путь, на котором блок виден, - после перехода флаг не залипает.
+  const [ctaOn, setCtaOn] = useState<string | null>(null);
+  useEffect(() => {
+    const cta = document.getElementById("cta");
+    if (!cta) return;
+    const io = new IntersectionObserver(([e]) => setCtaOn(e.isIntersecting ? pathname : null));
+    io.observe(cta);
+    return () => io.disconnect();
+  }, [pathname]);
   if (floatingCta.hiddenOn.some((p) => pathname.startsWith(p))) return null;
+  // Спейсер не трогаем (иначе футер прыгает) - скрываем только сами виджеты.
+  const visible = scrolled && ctaOn !== pathname;
 
   return (
     <>
@@ -30,7 +43,7 @@ export function FloatingCta({ locale = "ru" }: { locale?: Locale }) {
       <div className="h-20 lg:hidden" aria-hidden />
 
       {/* Десктоп: баннер-композиция (инвертированная карточка) — после hero */}
-      {scrolled && !closed && (
+      {visible && !closed && (
         <div className="fixed bottom-6 right-6 z-40 hidden w-80 rounded-2xl bg-ink p-5 text-bg shadow-xl shadow-ink/25 lg:block">
           <div className="flex items-start justify-between gap-3">
             <span className="inline-flex items-center rounded-full border border-bg/25 px-2.5 py-1 text-xs font-medium uppercase tracking-wide text-bg/80">
@@ -83,7 +96,7 @@ export function FloatingCta({ locale = "ru" }: { locale?: Locale }) {
       )}
 
       {/* Мобилка: фиксированный нижний бар - тоже после hero */}
-      {scrolled && (
+      {visible && (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-bg/95 backdrop-blur lg:hidden">
           <div
             className="flex gap-3 px-4 py-3"

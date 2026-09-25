@@ -12,7 +12,6 @@ import { CTASection } from "@/components/sections/CTASection";
 import { HeroIllustration } from "@/components/illustrations/HeroIllustration";
 import { resolvePageVisual } from "@/components/illustrations/resolve";
 import { agencyAstana as page } from "@/content/agency-astana";
-import { finalCta } from "@/content/site";
 import {
   breadcrumbLd,
   faqLd,
@@ -119,7 +118,7 @@ export default function AgencyAstanaPage() {
 
       <FaqSection title={page.faqTitle} items={page.faq} tone="surface" />
 
-      <CTASection title={finalCta.title} lead={finalCta.lead} cta={finalCta.cta} />
+      <CTASection />
     </>
   );
 }
