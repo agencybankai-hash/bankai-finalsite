@@ -1,4 +1,4 @@
-import { cn, nbsp } from "@/lib/utils";
+import { cn, keepHyphens, nbsp } from "@/lib/utils";
 import { Container } from "./Container";
 import { Pill } from "./Pill";
 
@@ -64,7 +64,7 @@ export function SectionHeader({
           </Pill>
         </div>
       )}
-      <h2 className="text-h2 text-ink">{nbsp(title)}</h2>
+      <h2 className="text-h2 text-ink">{keepHyphens(nbsp(title))}</h2>
       {lead && <p className="mt-4 text-lead text-ink-2">{nbsp(lead)}</p>}
     </div>
   );

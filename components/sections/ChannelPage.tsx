@@ -13,7 +13,7 @@ import { FeatureGrid } from "@/components/sections/FeatureGrid";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
 import { FunnelChain } from "@/components/sections/FunnelChain";
 import { CaseGrid } from "@/components/sections/CaseGrid";
-import { FAQ } from "@/components/sections/FAQ";
+import { FaqSection } from "@/components/sections/FAQ";
 import { CTASection } from "@/components/sections/CTASection";
 import { Longread } from "@/components/sections/Longread";
 import { LinkGrid } from "@/components/sections/LinkGrid";
@@ -430,16 +430,7 @@ export function ChannelPage({
       )}
 
       {/* FAQ */}
-      <Section>
-        <SectionHeader
-          eyebrow="FAQ"
-          title={`Частые вопросы о ${forms.prep}`}
-          align="center"
-        />
-        <div className="mt-8">
-          <FAQ items={faq} />
-        </div>
-      </Section>
+      <FaqSection title={`Частые вопросы о ${forms.prep}`} items={faq} />
 
       {(subserviceLinks.length > 0 || cityLinks.length > 0) && (
         <Section tone="surface">

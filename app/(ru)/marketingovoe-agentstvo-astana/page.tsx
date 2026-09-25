@@ -7,7 +7,7 @@ import { Hero } from "@/components/sections/Hero";
 import { Breadcrumbs, type Crumb } from "@/components/sections/Breadcrumbs";
 import { ServicesGrid } from "@/components/sections/ServicesGrid";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
-import { FAQ } from "@/components/sections/FAQ";
+import { FaqSection } from "@/components/sections/FAQ";
 import { CTASection } from "@/components/sections/CTASection";
 import { HeroIllustration } from "@/components/illustrations/HeroIllustration";
 import { resolvePageVisual } from "@/components/illustrations/resolve";
@@ -135,12 +135,7 @@ export default function AgencyAstanaPage() {
         </Reveal>
       </Section>
 
-      <Section tone="surface">
-        <SectionHeader eyebrow="FAQ" title={page.faqTitle} align="center" />
-        <div className="mt-8">
-          <FAQ items={page.faq} />
-        </div>
-      </Section>
+      <FaqSection title={page.faqTitle} items={page.faq} tone="surface" />
 
       <CTASection title={finalCta.title} lead={finalCta.lead} cta={finalCta.cta} />
     </>
