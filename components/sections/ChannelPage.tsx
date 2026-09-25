@@ -8,7 +8,7 @@ import { Icon } from "@/components/ui/Icon";
 import { Hero } from "@/components/sections/Hero";
 import { Breadcrumbs, serviceCrumbs } from "@/components/sections/Breadcrumbs";
 import { AnswerBlock } from "@/components/sections/AnswerBlock";
-import { BulletList } from "@/components/sections/BulletList";
+import { FitSection } from "@/components/sections/FitSection";
 import { FeatureGrid } from "@/components/sections/FeatureGrid";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
 import { FunnelChain } from "@/components/sections/FunnelChain";
@@ -183,21 +183,8 @@ export function ChannelPage({
         <MetaphorCallout channel={channel.slug} text={channel.metaphor} />
       )}
 
-      {/* Для кого */}
-      <Section>
-        <SectionHeader title="Кому подходит" />
-        <div className="mt-8">
-          <BulletList items={audience} variant="check" />
-        </div>
-      </Section>
-
-      {/* Проблема */}
-      <Section tone="surface">
-        <SectionHeader title={problem.title} />
-        <div className="mt-8">
-          <BulletList items={problem.items} />
-        </div>
-      </Section>
+      {/* Кому подходит и кому не подойдёт */}
+      <FitSection audience={audience} problem={problem} />
 
       {/* Что входит */}
       <Section>

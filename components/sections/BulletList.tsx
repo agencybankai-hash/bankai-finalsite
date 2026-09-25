@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, nbsp } from "@/lib/utils";
 import { Icon } from "@/components/ui/Icon";
 import { gridTail } from "./gridTail";
 
@@ -37,7 +37,7 @@ export function BulletList({
           ) : (
             <span aria-hidden className="mt-2.5 h-px w-4 shrink-0 bg-muted" />
           )}
-          <span>{item}</span>
+          <span>{nbsp(item)}</span>
         </li>
       ))}
     </ul>
