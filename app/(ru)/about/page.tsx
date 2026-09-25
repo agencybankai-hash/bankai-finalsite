@@ -6,7 +6,7 @@ import { ProcessSteps } from "@/components/sections/ProcessSteps";
 import { CTASection } from "@/components/sections/CTASection";
 import { Reveal } from "@/components/motion/Reveal";
 import { about } from "@/content/about";
-import { process, finalCta } from "@/content/site";
+import { process } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
 
 export const generateMetadata = pageMetadata({
@@ -123,7 +123,7 @@ export default function AboutPage() {
         </div>
       </Section>
 
-      <CTASection title={finalCta.title} lead={finalCta.lead} cta={finalCta.cta} />
+      <CTASection />
     </>
   );
 }
