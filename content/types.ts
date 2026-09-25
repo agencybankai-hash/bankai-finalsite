@@ -23,7 +23,7 @@ export type Feature = {
   title: string;
   text: string;
   details?: string;
-  /** ключ иконки (см. components/ui/Icon) для icon-бейджа карточки */
+  /** старый ключ иконки: запасной выбор глифа, если названия нет в components/sections/featureGlyph.ts */
   icon?: string;
 };
 

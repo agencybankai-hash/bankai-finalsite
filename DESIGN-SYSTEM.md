@@ -62,7 +62,7 @@
 - Моторика не должна тормозить первый экран и мешать конверсии.
 
 ## Инвентарь компонентов
-**UI-kit (`components/ui/`)** — на токенах: `Button` (варианты primary/accent/secondary/ghost, `data-cursor`), `Section` (tone default/surface/ink) + `SectionHeader` (eyebrow/title/lead), `Card`, `Badge`, `Stat`, `Container`, `MediaPlaceholder`, `InfoTooltip`.
+**UI-kit (`components/ui/`)** — на токенах: `Button` (варианты primary/accent/secondary/ghost, `data-cursor`), `Section` (tone default/surface/ink) + `SectionHeader` (eyebrow/title/lead), `Card`, `Badge`, `Stat`, `Container`, `MediaPlaceholder`, `Glyph` (тематические line-глифы пунктов «Что входит», выбор - `components/sections/featureGlyph.ts`).
 **Секции (`components/sections/`)** — 22 шт., композятся на страницах из `content/*.ts`.
 **Motion (`components/motion/`)** — `MotionProvider`, `Reveal`, `Preloader`, `Cursor`.
 
