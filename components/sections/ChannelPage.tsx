@@ -3,8 +3,6 @@ import { cn } from "@/lib/utils";
 import { Container } from "@/components/ui/Container";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
-import { Pill } from "@/components/ui/Pill";
-import { Icon } from "@/components/ui/Icon";
 import { Hero } from "@/components/sections/Hero";
 import { Breadcrumbs, serviceCrumbs } from "@/components/sections/Breadcrumbs";
 import { AnswerBlock } from "@/components/sections/AnswerBlock";
@@ -19,6 +17,7 @@ import { CTASection } from "@/components/sections/CTASection";
 import { Longread } from "@/components/sections/Longread";
 import { LinkGrid } from "@/components/sections/LinkGrid";
 import { MetaphorCallout } from "@/components/sections/MetaphorCallout";
+import { ServicePricing } from "@/components/sections/ServicePricing";
 import { Reveal } from "@/components/motion/Reveal";
 import { HeroIllustration } from "@/components/illustrations/HeroIllustration";
 import { resolveHeroVisual } from "@/components/illustrations/resolve";
@@ -247,79 +246,12 @@ export function ChannelPage({
       )}
 
       {/* Тарифы */}
-      <Section>
-        <SectionHeader
-          eyebrow="Тарифы"
-          title={pricingTitle}
-          align="center"
-        />
-        {plans ? (
-          <Reveal stagger className="mt-10 grid gap-5 lg:grid-cols-3">
-            {plans.map((p) => (
-              <div
-                key={p.name}
-                data-reveal
-                className={cn(
-                  "flex flex-col rounded-xl border bg-bg p-7 shadow-card transition duration-300 ease-osmo hover:-translate-y-1 hover:shadow-card-hover",
-                  p.featured ? "border-accent" : "border-border hover:border-ink",
-                )}
-              >
-                {p.featured && (
-                  <Pill variant="soft" size="sm" className="mb-3 self-start">
-                    Популярно
-                  </Pill>
-                )}
-                <h3 className="text-lg font-semibold tracking-tight text-ink">
-                  {p.name}
-                </h3>
-                <div className="mt-4 flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold tracking-tight text-ink">
-                    {p.price}
-                  </span>
-                  {p.sub && <span className="text-sm text-muted">{p.sub}</span>}
-                </div>
-                <ul className="mt-6 space-y-2.5">
-                  {p.includes.map((i) => (
-                    <li key={i} className="flex gap-2.5 text-sm text-ink-2">
-                      <Icon
-                        name="check"
-                        className="mt-0.5 h-4 w-4 shrink-0 text-accent"
-                      />
-                      <span>{i}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </Reveal>
-        ) : (
-          <Reveal className="mt-10 flex flex-col gap-4 rounded-xl border border-border bg-bg p-7 shadow-card transition duration-300 ease-osmo hover:border-ink hover:shadow-card-hover sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-semibold tracking-tight text-ink">
-                  {pricing.value}
-                </span>
-                <span className="text-sm text-muted">{pricing.sub}</span>
-              </div>
-              {pricing.note && (
-                <p className="mt-2 max-w-md text-sm text-ink-2">
-                  {pricing.note}
-                </p>
-              )}
-            </div>
-            <Button href="/contacts" size="lg">
-              Узнать точную смету
-            </Button>
-          </Reveal>
-        )}
-        {source.pricingNote && (
-          <Reveal className="mt-8">
-            <p className="mx-auto max-w-2xl text-center text-sm leading-relaxed text-ink-2">
-              {source.pricingNote}
-            </p>
-          </Reveal>
-        )}
-      </Section>
+      <ServicePricing
+        title={pricingTitle}
+        plans={plans}
+        price={pricing}
+        note={source.pricingNote}
+      />
 
       {/* Место канала в системе + открытый гайд - только у канала */}
       {!landing && (channel.partOfSystem || guideSlug) && (
