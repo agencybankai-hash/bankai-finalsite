@@ -15,10 +15,11 @@ import { uiEn } from "./en/ui";
 export const uiRu: UiDict = {
   locale: "ru",
   home: "/",
-  tagline: siteMeta.tagline,
   nav,
   headerCta,
   menuLabel: "Меню",
+  closeLabel: "Закрыть",
+  telegramLabel: "Написать в Telegram",
   footer: {
     slogan,
     description: siteMeta.description,

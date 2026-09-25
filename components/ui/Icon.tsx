@@ -18,7 +18,9 @@ export type IconName =
   | "rocket"
   | "check"
   | "x"
-  | "arrow";
+  | "arrow"
+  | "chevron"
+  | "send";
 
 const paths: Record<IconName, React.ReactNode> = {
   search: (
@@ -94,6 +96,13 @@ const paths: Record<IconName, React.ReactNode> = {
   check: <path d="m5 12 4 4 10-10" />,
   x: <path d="M7 7l10 10M17 7 7 17" />,
   arrow: <path d="M7 17 17 7M9 7h8v8" />,
+  chevron: <path d="m6 9 6 6 6-6" />,
+  send: (
+    <>
+      <path d="M21.5 2.5 2.5 9.8l7.3 3 3 7.7z" />
+      <path d="m21.5 2.5-11.7 10.3" />
+    </>
+  ),
 };
 
 export function Icon({
