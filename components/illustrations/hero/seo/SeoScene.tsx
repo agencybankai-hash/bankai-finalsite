@@ -1,6 +1,8 @@
+import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import { Bar, Chip, LeadDot, SearchBar } from "../../parts";
 import type { SceneProps } from "../../types";
+import { anim } from "../../vars";
 
 type Result = { title: string; url: string; price?: boolean };
 
@@ -21,10 +23,23 @@ const TOP_10: Result[] = [
 ];
 const PAGE_2: Result = { title: "46%", url: "24%", price: true };
 
+/** Выдача проявляется сверху вниз: строка i - в 0.6 + i·0.04 с. */
+const ROWS_IN = { delay: 0.6, step: 0.04, dur: 0.5 };
+
 /** Строка выдачи: фавикон (у магазина - превью товара), заголовок, адрес, цена. */
-function Row({ r, store, className }: { r: Result; store: boolean; className?: string }) {
+function Row({
+  r,
+  store,
+  className,
+  style,
+}: {
+  r: Result;
+  store: boolean;
+  className?: string;
+  style?: CSSProperties;
+}) {
   return (
-    <div className={cn("seo-row flex items-center gap-[0.8em]", className)}>
+    <div className={cn("seo-row flex items-center gap-[0.8em]", className)} style={style}>
       <span
         className={cn(
           "shrink-0 bg-ink/15",
@@ -48,7 +63,7 @@ function Row({ r, store, className }: { r: Result; store: boolean; className?: s
 /** Очередь регионов на одном домене: первый в работе, следующий, в очереди. */
 function RegionQueue() {
   return (
-    <div className="flex shrink-0 items-center gap-[0.4em]">
+    <div className="a-fade flex shrink-0 items-center gap-[0.4em]" style={anim({ delay: 0.7 })}>
       <Chip tone="solid">Алматы</Chip>
       <span className="ill-t-sm leading-none text-muted">›</span>
       <Chip tone="outline">Астана</Chip>
@@ -67,7 +82,10 @@ const PINS = [
 /** Мини-блок карт в рельсе городской выдачи: две улицы и три нейтральные метки. */
 function MapPack() {
   return (
-    <div className="seo-map ill-detail absolute right-0 top-0 w-(--seo-rail) overflow-hidden rounded-[0.6em] border border-border bg-surface">
+    <div
+      className="seo-map a-fade ill-detail absolute right-0 top-0 w-(--seo-rail) overflow-hidden rounded-[0.6em] border border-border bg-surface"
+      style={anim({ delay: 1 })}
+    >
       <span className="absolute -left-[10%] top-[64%] h-px w-[120%] -rotate-[8deg] bg-ink/15" />
       <span className="absolute -top-[10%] left-[64%] h-[120%] w-px rotate-[14deg] bg-ink/15" />
       <span className="ill-t-sm absolute left-[0.5em] top-[0.45em] leading-none text-muted">
@@ -85,13 +103,18 @@ function MapPack() {
 }
 
 /** Слот сайта: строка 4 и маркер в рельсе - один блок. Строки одной высоты,
- *  поэтому будущий подъём из-под линии ТОП-10 - один translateY. */
+ *  поэтому подъём со второй страницы из-под линии ТОП-10 - один translateY
+ *  (a-slide, путь - в seo.css). Внутренняя обёртка - проявление на старте. */
 function SiteSlot({ store }: { store: boolean }) {
   return (
-    <div className="seo-slot absolute inset-x-0">
-      <div className="flex h-full items-center">
+    <div className="seo-slot a-slide absolute inset-x-0" style={anim({ delay: 1.2, dur: 1.3 })}>
+      <div className="a-fade flex h-full items-center" style={anim({ delay: 1.1, dur: 0.5 })}>
         <div className="relative ml-[0.3em] flex h-full min-w-0 flex-1 items-center gap-[0.8em] rounded-[0.7em] bg-surface pl-[0.8em]">
-          <span className="absolute inset-0 rounded-[0.7em] border border-ink/30" />
+          {/* Магазин: подсветка строки - проявление обводки */}
+          <span
+            className={cn("absolute inset-0 rounded-[0.7em] border border-ink/30", store && "a-fade")}
+            style={store ? anim({ delay: 2.2, dur: 0.5 }) : undefined}
+          />
           {store ? (
             <span className="relative grid h-[max(10px,1.4em)] w-[max(10px,1.4em)] shrink-0 grid-cols-2 gap-[max(1px,0.14em)]">
               {[0, 1, 2, 3].map((k) => (
@@ -108,7 +131,12 @@ function SiteSlot({ store }: { store: boolean }) {
               /* Обычный заголовок под заливкой: подсветка строки - протяжка заливки поверх. */
               <span className="relative block h-[0.55em] w-[60%]">
                 <Bar w="100%" className="absolute inset-0" />
-                <Bar w="100%" tone="strong" className="absolute inset-0" />
+                <Bar
+                  w="100%"
+                  tone="strong"
+                  className="a-grow-x absolute inset-0"
+                  style={anim({ delay: 2.2, dur: 0.5 })}
+                />
               </span>
             )}
             <Bar w="28%" tone="faint" className="h-[0.45em]" />
@@ -120,9 +148,11 @@ function SiteSlot({ store }: { store: boolean }) {
             <span className="absolute left-0 top-1/2 h-[0.55em] w-[0.55em] -translate-x-1/2 -translate-y-1/2 rotate-45 border-b border-l border-ink/40 bg-bg" />
             ваш сайт
           </span>
-          <span className="absolute left-[0.7em] top-full flex items-center gap-[0.4em]">
-            <LeadDot className="h-[max(7px,1.1em)] w-[max(7px,1.1em)]" />
-            <span className="ill-t-sm leading-none text-muted">{store ? "заказы" : "заявки"}</span>
+          <span className="seo-lead absolute left-[0.7em] top-full flex items-center gap-[0.4em]">
+            <LeadDot delay={2.45} className="h-[max(7px,1.1em)] w-[max(7px,1.1em)]" />
+            <span className="a-fade ill-t-sm leading-none text-muted" style={anim({ delay: 2.5 })}>
+              {store ? "заказы" : "заявки"}
+            </span>
           </span>
         </div>
       </div>
@@ -151,19 +181,30 @@ export function SeoScene({ v }: SceneProps) {
       <div className="relative mt-[0.9em]">
         <div className="seo-col pl-[1.1em]">
           {TOP_10.map((r, i) => (
-            <Row key={i} r={r} store={store} className={i >= 6 ? "ill-detail" : undefined} />
+            <Row
+              key={i}
+              r={r}
+              store={store}
+              className={cn("a-fade", i >= 6 && "ill-detail")}
+              style={anim({ ...ROWS_IN, i })}
+            />
           ))}
         </div>
 
         {/* Граница первой страницы */}
         <div className="seo-line flex items-center gap-[0.6em] pl-[1.1em]">
-          <span className="flex-1 border-t border-dashed border-ink/25" />
-          <span className="ill-t-sm leading-none text-muted">ТОП-10</span>
+          <span
+            className="a-grow-x flex-1 border-t border-dashed border-ink/25"
+            style={anim({ delay: 0.9, dur: 0.7 })}
+          />
+          <span className="a-fade ill-t-sm leading-none text-muted" style={anim({ delay: 1.3 })}>
+            ТОП-10
+          </span>
         </div>
 
-        {/* Вторая страница */}
+        {/* Вторая страница: шаг каскада (--i) - в seo.css, на телефоне строк меньше */}
         <div className="seo-col pl-[1.1em] opacity-40">
-          <Row r={PAGE_2} store={store} />
+          <Row r={PAGE_2} store={store} className="seo-p2 a-fade" style={anim(ROWS_IN)} />
         </div>
 
         {v.kind === "seo-city" && <MapPack />}

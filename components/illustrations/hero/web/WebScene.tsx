@@ -3,11 +3,28 @@ import { cn } from "@/lib/utils";
 import type { HeroVisualKind } from "@/content/types";
 import type { SceneProps } from "../../types";
 import { Bar, Chip, LeadDot } from "../../parts";
+import { anim } from "../../vars";
 
 /* Сцена «Сайт под заявки»: слева телефон с мини-сайтом, справа лента событий
-   аналитики. Базовый стиль - финальный кадр. Обёртки под движение (этап 2):
-   телефон, заливка каждого блока (контур-вайрфрейм - ::before слота .web-wire),
-   нижняя панель, касание, карточка ленты и её строки - по одному примитиву. */
+   аналитики. Базовый стиль - финальный кадр. Движение - по одному примитиву:
+   телефон, заливка каждого блока (под ней контур-вайрфрейм .web-wire),
+   нижняя панель, касание, карточка ленты и её строки. */
+
+/** Таймлайн, с - общий для всех видов: телефон → блоки сверху вниз → панель
+ *  связи → касание → события в ленте → заявка. Задержки вложенных узлов
+ *  задаются явно: переменные таймлайна (--i, --a-dur) наследуются. */
+const T = {
+  phone: 0.6,
+  block: 0.75,
+  blockStep: 0.1,
+  bar: 1.4,
+  tap: 1.75,
+  feed: 0.9,
+  row: 1.85,
+  rowStep: 0.11,
+  lead: 2.45,
+};
+const at = (s: number) => Math.round(s * 100) / 100;
 
 /* ── Иконки: один path на 24×24, штрих currentColor ── */
 
@@ -112,10 +129,13 @@ const VARIANTS: Partial<Record<HeroVisualKind, Variant>> = {
 
 /* ── Телефон ── */
 
-/** Корпус и экран. Обёртка - вход телефона (этап 2: a-rise); экран обрезает нижнюю панель. */
+/** Корпус и экран. Обёртка - вход телефона; экран обрезает нижнюю панель (она въезжает снизу). */
 function Phone({ children, bottom }: { children: ReactNode; bottom: ReactNode }) {
   return (
-    <div className="absolute left-[1.5em] top-[1em] h-[28em] w-[14.5em]">
+    <div
+      className="a-rise absolute left-[1.5em] top-[1em] h-[28em] w-[14.5em]"
+      style={anim({ delay: T.phone }, { "--a-y": "1.2em" })}
+    >
       <span className="ill-detail absolute -left-[0.2em] top-[5.5em] h-[2.2em] w-[0.3em] rounded-l-[0.2em] bg-surface-2" />
       <span className="ill-detail absolute -left-[0.2em] top-[8.4em] h-[2.2em] w-[0.3em] rounded-l-[0.2em] bg-surface-2" />
       <span className="ill-detail absolute -right-[0.2em] top-[7em] h-[3.4em] w-[0.3em] rounded-r-[0.2em] bg-surface-2" />
@@ -132,12 +152,14 @@ function Phone({ children, bottom }: { children: ReactNode; bottom: ReactNode })
 
 /** Блок мини-сайта: пунктирный контур-вайрфрейм под заливкой. Заливка закрывает
  *  контур кольцом цвета экрана (.web-fill), поэтому в финальном кадре его не видно.
- *  Этап 2: одна анимация на блок - заливка a-fade сверху вниз по i, контур гаснет под ней. */
+ *  Одна анимация на блок: заливка проявляется (i - шаг сверху вниз), контур гаснет под ней. */
 function Block({
+  i,
   className,
   fill,
   children,
 }: {
+  i: number;
   className?: string;
   fill?: string;
   children: ReactNode;
@@ -145,7 +167,12 @@ function Block({
   return (
     <div className={cn("relative shrink-0", className)}>
       <span aria-hidden className="web-wire" />
-      <div className={cn("web-fill h-full", fill)}>{children}</div>
+      <div
+        className={cn("web-fill a-fade h-full", fill)}
+        style={anim({ delay: at(T.block + i * T.blockStep), dur: 0.5 })}
+      >
+        {children}
+      </div>
     </div>
   );
 }
@@ -161,7 +188,7 @@ function Logo() {
 
 function Nav({ icon }: { icon: IconName }) {
   return (
-    <Block className="h-[1.8em]" fill="flex items-center justify-between">
+    <Block i={0} className="h-[1.8em]" fill="flex items-center justify-between">
       <Logo />
       <Icon name={icon} className="text-ink-2" />
     </Block>
@@ -171,7 +198,7 @@ function Nav({ icon }: { icon: IconName }) {
 /** Заголовок мини-сайта; в компактной сцене - скелетон (текст не влезает в узкий экран). */
 function Headline({ lines = 1 }: { lines?: number }) {
   return (
-    <Block fill="flex flex-col gap-[0.55em]">
+    <Block i={1} fill="flex flex-col gap-[0.55em]">
       <span className="ill-t-sm ill-detail font-semibold leading-[1.2] text-ink">
         {"Ремонт квартир под\u00a0ключ"}
       </span>
@@ -187,9 +214,19 @@ function Headline({ lines = 1 }: { lines?: number }) {
 }
 
 /** Главная кнопка: светлая (единственная инверсия экрана). */
-function Cta({ label = "Оставить заявку", short, tap }: { label?: string; short?: string; tap?: boolean }) {
+function Cta({
+  i,
+  label = "Оставить заявку",
+  short,
+  tap,
+}: {
+  i: number;
+  label?: string;
+  short?: string;
+  tap?: boolean;
+}) {
   return (
-    <Block className="rounded-[0.7em]">
+    <Block i={i} className="rounded-[0.7em]">
       <span
         className={cn(
           "relative grid h-[2.6em] place-items-center rounded-[0.7em] bg-ink text-bg",
@@ -214,16 +251,17 @@ function Field() {
   );
 }
 
-function Form() {
+function Form({ i }: { i: number }) {
   return (
-    <Block fill="flex flex-col gap-[0.45em]">
+    <Block i={i} fill="flex flex-col gap-[0.45em]">
       <Field />
       <Field />
     </Block>
   );
 }
 
-/** Касание пальцем: пятно (этап 2: a-pop) и кольцо-волна (этап 2: a-pulse, в финальном
+/** Касание пальцем: пятно проявляется (a-fade: полупрозрачный круг без transform
+ *  растрируется в финале как в статике) и кольцо-волна (a-pulse, один раз; в финальном
  *  кадре не видно). spot={false} - только волна; on="light" - поверх светлой кнопки. */
 function Tap({
   className,
@@ -236,13 +274,19 @@ function Tap({
 }) {
   return (
     <>
-      {spot && <span className={cn("absolute rounded-full bg-ink/15", className)} />}
+      {spot && (
+        <span
+          className={cn("a-fade absolute rounded-full bg-ink/15", className)}
+          style={anim({ delay: T.tap, dur: 0.4 })}
+        />
+      )}
       <span
         className={cn(
-          "absolute rounded-full border opacity-0",
+          "a-pulse absolute rounded-full border opacity-0",
           on === "light" ? "border-bg/40" : "border-ink/50",
           className,
         )}
+        style={anim({ delay: T.tap, dur: 0.9, iter: 1 })}
       />
     </>
   );
@@ -262,10 +306,16 @@ function RoundButton({ icon, tap }: { icon: IconName; tap?: boolean }) {
   );
 }
 
-/** Нижняя панель связи: форма, WhatsApp, звонок (этап 2: a-slide снизу). */
+/** Нижняя панель выезжает снизу на всю высоту - до старта её прячет край экрана. */
+const BAR_IN = anim({ delay: T.bar }, { "--a-y": "100%" });
+
+/** Нижняя панель связи: форма, WhatsApp, звонок. */
 function ContactBar() {
   return (
-    <div className="flex h-[3.7em] shrink-0 items-center justify-around border-t border-border bg-surface px-[0.8em]">
+    <div
+      className="a-slide flex h-[3.7em] shrink-0 items-center justify-around border-t border-border bg-surface px-[0.8em]"
+      style={BAR_IN}
+    >
       <RoundButton icon="form" />
       <RoundButton icon="chat" tap />
       <RoundButton icon="phone" />
@@ -273,15 +323,21 @@ function ContactBar() {
   );
 }
 
-/** Таб-бар магазина с корзиной «1» (этап 2: a-slide снизу). */
+/** Таб-бар магазина; «1» в корзине появляется после касания «В корзину». */
 function StoreBar() {
   return (
-    <div className="flex h-[3.7em] shrink-0 items-center justify-around border-t border-border bg-surface px-[0.8em] text-ink-2">
+    <div
+      className="a-slide flex h-[3.7em] shrink-0 items-center justify-around border-t border-border bg-surface px-[0.8em] text-ink-2"
+      style={BAR_IN}
+    >
       <Icon name="home" className="h-[1.4em] w-[1.4em]" />
       <Icon name="grid" className="h-[1.4em] w-[1.4em]" />
       <span className="relative text-ink">
         <Icon name="cart" className="h-[1.4em] w-[1.4em]" />
-        <span className="ill-t-sm absolute bottom-[55%] left-[65%] grid h-[1.4em] min-w-[1.4em] place-items-center rounded-full bg-ink px-[0.3em] font-semibold leading-none text-bg ring-2 ring-surface">
+        <span
+          className="a-rise ill-t-sm absolute bottom-[55%] left-[65%] grid h-[1.4em] min-w-[1.4em] place-items-center rounded-full bg-ink px-[0.3em] font-semibold leading-none text-bg ring-2 ring-surface"
+          style={anim({ delay: at(T.tap + 0.2), dur: 0.5 }, { "--a-y": "0.5em" })}
+        >
           1
         </span>
       </span>
@@ -290,10 +346,13 @@ function StoreBar() {
   );
 }
 
-/** Плавающая кнопка WhatsApp лендинга (этап 2: a-pop). */
+/** Плавающая кнопка WhatsApp лендинга: появляется вместо панели связи. */
 function ChatFab() {
   return (
-    <span className="absolute bottom-[1em] right-[0.9em] grid h-[2.8em] w-[2.8em] place-items-center rounded-full border border-ink/30 bg-surface-2 text-ink">
+    <span
+      className="a-rise absolute bottom-[1em] right-[0.9em] grid h-[2.8em] w-[2.8em] place-items-center rounded-full border border-ink/30 bg-surface-2 text-ink"
+      style={anim({ delay: T.bar }, { "--a-y": "1.5em" })}
+    >
       <Tap className="-inset-[0.5em]" />
       <Icon name="chat" className="relative h-[1.35em] w-[1.35em]" />
     </span>
@@ -301,9 +360,9 @@ function ChatFab() {
 }
 
 /** Фото в блоке: комната (сайт) или банка краски (магазин), line-art. */
-function Photo({ art, className }: { art: "room" | "paint"; className: string }) {
+function Photo({ i, art, className }: { i: number; art: "room" | "paint"; className: string }) {
   return (
-    <Block className={cn("rounded-[0.8em]", className)} fill="rounded-[0.8em] bg-surface-2">
+    <Block i={i} className={cn("rounded-[0.8em]", className)} fill="rounded-[0.8em] bg-surface-2">
       <svg
         viewBox="0 0 120 64"
         aria-hidden
@@ -331,12 +390,12 @@ function SiteScreen() {
     <>
       <Nav icon="menu" />
       <Headline />
-      <Block fill="flex gap-[0.4em]">
+      <Block i={2} fill="flex gap-[0.4em]">
         <Chip>цена</Chip>
         <Chip className="ill-detail">сроки</Chip>
       </Block>
-      <Photo art="room" className="h-[6.4em]" />
-      <Cta short="Заявка" />
+      <Photo i={3} art="room" className="h-[6.4em]" />
+      <Cta i={4} short="Заявка" />
     </>
   );
 }
@@ -347,7 +406,7 @@ function LandingScreen() {
     <>
       <Nav icon="phone" />
       <Headline lines={0} />
-      <Block fill="flex flex-col gap-[0.55em]">
+      <Block i={2} fill="flex flex-col gap-[0.55em]">
         {["75%", "60%"].map((w) => (
           <span key={w} className="flex items-center gap-[0.45em]">
             <Icon name="tick" className="h-[1em] w-[1em] text-ink-2" />
@@ -355,13 +414,17 @@ function LandingScreen() {
           </span>
         ))}
       </Block>
-      <Form />
-      <Cta short="Заявка" />
-      <Block fill="flex justify-center text-muted">
+      <Form i={3} />
+      <Cta i={4} short="Заявка" />
+      <Block i={5} fill="flex justify-center text-muted">
         <Icon name="down" className="h-[1.5em] w-[1.5em]" />
       </Block>
       {/* следующая секция выглядывает из-под сгиба */}
-      <Block className="mt-auto" fill="flex h-[3em] flex-col gap-[0.5em] rounded-t-[0.9em] bg-surface px-[0.8em] pt-[0.9em]">
+      <Block
+        i={6}
+        className="mt-auto"
+        fill="flex h-[3em] flex-col gap-[0.5em] rounded-t-[0.9em] bg-surface px-[0.8em] pt-[0.9em]"
+      >
         <Bar w="55%" tone="soft" />
         <Bar w="80%" tone="faint" />
       </Block>
@@ -374,19 +437,19 @@ function CorporateScreen() {
   return (
     <>
       <Nav icon="menu" />
-      <Block fill="flex gap-[0.9em] overflow-hidden whitespace-nowrap border-b border-border">
+      <Block i={1} fill="flex gap-[0.9em] overflow-hidden whitespace-nowrap border-b border-border">
         <span className="ill-t-sm border-b border-ink pb-[0.4em] text-ink">Услуги</span>
         <span className="ill-t-sm pb-[0.4em] text-muted">Кейсы</span>
         <span className="ill-t-sm pb-[0.4em] text-muted">О компании</span>
       </Block>
-      <Block fill="flex flex-col gap-[0.55em]">
+      <Block i={2} fill="flex flex-col gap-[0.55em]">
         <span className="ill-t-sm ill-detail truncate font-semibold text-ink">Направление 2</span>
         <Bar w="75%" tone="strong" className="web-compact" />
         <Bar w="100%" tone="faint" />
         <Bar w="70%" tone="faint" />
       </Block>
-      <Form />
-      <Cta short="Заявка" />
+      <Form i={3} />
+      <Cta i={4} short="Заявка" />
     </>
   );
 }
@@ -396,13 +459,13 @@ function StoreScreen() {
   return (
     <>
       <Nav icon="search" />
-      <Photo art="paint" className="h-[8.4em]" />
-      <Block fill="flex flex-col gap-[0.5em]">
+      <Photo i={1} art="paint" className="h-[8.4em]" />
+      <Block i={2} fill="flex flex-col gap-[0.5em]">
         <Bar w="90%" />
         <Bar w="55%" />
         <Bar w="4.5em" tone="strong" className="mt-[0.3em] h-[0.8em]" />
       </Block>
-      <Cta label="В корзину" tap />
+      <Cta i={3} label="В корзину" tap />
     </>
   );
 }
@@ -429,17 +492,25 @@ function IconBox({ name, className }: { name: IconName; className?: string }) {
   );
 }
 
-/** Карточка событий (этап 2: a-fade); строки - a-rise каскадом, точка заявки - последней. */
+/** Карточка событий проявляется вместе с телефоном и ждёт; строки приходят каскадом
+ *  после касания, точка заявки - последней. */
 function Feed({ title, variant }: { title: string; variant: Variant }) {
   const { rows, lead } = variant;
   return (
-    <div className="absolute left-[18.5em] right-[1.2em] top-[4.4em] rounded-[1.4em] border border-border bg-surface p-[1.1em]">
+    <div
+      className="a-fade absolute left-[18.5em] right-[1.2em] top-[4.4em] rounded-[1.4em] border border-border bg-surface p-[1.1em]"
+      style={anim({ delay: T.feed })}
+    >
       <div className="ill-t-sm flex h-[1.9em] items-center truncate font-medium uppercase tracking-[0.08em] text-muted">
         {title}
       </div>
       <div className="mt-[0.5em]">
-        {rows.map((r) => (
-          <div key={r.label} className="flex h-[3.5em] items-center gap-[0.8em] border-t border-border">
+        {rows.map((r, i) => (
+          <div
+            key={r.label}
+            className="a-rise flex h-[3.5em] items-center gap-[0.8em] border-t border-border"
+            style={anim({ delay: at(T.row + i * T.rowStep) })}
+          >
             <IconBox name={r.icon} />
             <span className="ill-t-sm min-w-0 flex-1 truncate text-ink">{r.label}</span>
             <Chip tone={r.tone} className="ill-detail">
@@ -447,7 +518,10 @@ function Feed({ title, variant }: { title: string; variant: Variant }) {
             </Chip>
           </div>
         ))}
-        <div className="mt-[0.3em] flex min-h-[4em] items-center gap-[0.8em] rounded-[0.9em] border border-border bg-surface-2 px-[0.7em] py-[0.5em]">
+        <div
+          className="a-rise mt-[0.3em] flex min-h-[4em] items-center gap-[0.8em] rounded-[0.9em] border border-border bg-surface-2 px-[0.7em] py-[0.5em]"
+          style={anim({ delay: at(T.row + rows.length * T.rowStep) })}
+        >
           <IconBox name={lead.icon} className="bg-ink/10 text-ink" />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-[0.6em]">
@@ -455,7 +529,7 @@ function Feed({ title, variant }: { title: string; variant: Variant }) {
               <Chip tone="solid" className="ill-detail">
                 {lead.tag}
               </Chip>
-              <LeadDot delay={2.45} />
+              <LeadDot delay={T.lead} />
             </div>
             {lead.sub && <div className="ill-t-sm ill-detail truncate text-muted">{lead.sub}</div>}
           </div>

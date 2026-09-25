@@ -2,7 +2,13 @@
   Мини-иллюстрации молочной метафоры для карточек SystemSection.
   Line-art на токенах (ink / muted / border / surface-2), как CaseVisual:
   цвет не несёт смысла, единственное accent-пятно - капля сливок у сепаратора.
+  Живая версия (animated, MetaphorCallout): классы движения только в ней,
+  статика главной - прежняя разметка. Сценарии - infographics.css.
 */
+
+import type { CSSProperties } from "react";
+import { anim } from "@/components/illustrations/vars";
+import { cn } from "@/lib/utils";
 
 export type SystemVisual = "market" | "cow" | "separator";
 
@@ -57,15 +63,71 @@ function Can({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
 type VisualProps = { animated: boolean };
 
 /** Движущаяся часть живой версии (обёртка без transform). В статике - без обёртки. */
-function Part({ on, children }: { on: boolean; children: React.ReactNode }) {
-  return on ? <g>{children}</g> : <>{children}</>;
+function Part({
+  on,
+  className,
+  style,
+  children,
+}: {
+  on: boolean;
+  className?: string;
+  style?: CSSProperties;
+  children: React.ReactNode;
+}) {
+  return on ? (
+    <g className={className} style={style}>
+      {children}
+    </g>
+  ) : (
+    <>{children}</>
+  );
 }
 
 const AWNING_ROOF = "M52 14 L52 8 H228 V14";
 const AWNING_FESTOONS =
   "M52 14 Q63 22 74 14 Q85 22 96 14 Q107 22 118 14 Q129 22 140 14 Q151 22 162 14 Q173 22 184 14 Q195 22 206 14 Q217 22 228 14";
 
-/** Рынок: навес-прилавок, бидон, ценник - платишь за каждый литр. */
+/** Монета ₸ у прилавка (центр 92,56). */
+function Coin() {
+  return (
+    <>
+      <circle
+        cx="92"
+        cy="56"
+        r="9"
+        className="text-surface-2"
+        fill="currentColor"
+      />
+      <circle
+        cx="92"
+        cy="56"
+        r="9"
+        className="text-ink"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <text
+        x="92"
+        y="60"
+        textAnchor="middle"
+        className="text-ink"
+        fill="currentColor"
+        fontSize="10"
+        fontWeight="600"
+      >
+        ₸
+      </text>
+    </>
+  );
+}
+
+/**
+ * Рынок: навес-прилавок, бидон, ценник - платишь за каждый литр.
+ * Живая версия: навес прорисовывается, монета, стрелка, бидон (от дна) и ценник
+ * (качнувшись) собираются слева направо к 1.6 с; затем копия монеты трижды уходит
+ * по стрелке за бидон и гаснет (до 7.8 с).
+ */
 function Market({ animated }: VisualProps) {
   const awning = {
     className: "text-ink",
@@ -87,8 +149,20 @@ function Market({ animated }: VisualProps) {
       {animated ? (
         /* живая версия: крыша и фестоны - отдельные контуры, прорисовываются по очереди */
         <>
-          <path d={AWNING_ROOF} pathLength={1} {...awning} />
-          <path d={AWNING_FESTOONS} pathLength={1} {...awning} />
+          <path
+            d={AWNING_ROOF}
+            pathLength={1}
+            {...awning}
+            className="a-draw text-ink"
+            style={anim({ delay: 0.05, dur: 0.45 })}
+          />
+          <path
+            d={AWNING_FESTOONS}
+            pathLength={1}
+            {...awning}
+            className="a-draw text-ink"
+            style={anim({ delay: 0.3, dur: 0.6 })}
+          />
         </>
       ) : (
         <path d={`${AWNING_ROOF} ${AWNING_FESTOONS}`} {...awning} />
@@ -111,34 +185,8 @@ function Market({ animated }: VisualProps) {
         strokeWidth="1.5"
       />
       {/* монета ₸ → бидон: платишь за каждый литр */}
-      <Part on={animated}>
-        <circle
-          cx="92"
-          cy="56"
-          r="9"
-          className="text-surface-2"
-          fill="currentColor"
-        />
-        <circle
-          cx="92"
-          cy="56"
-          r="9"
-          className="text-ink"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-        />
-        <text
-          x="92"
-          y="60"
-          textAnchor="middle"
-          className="text-ink"
-          fill="currentColor"
-          fontSize="10"
-          fontWeight="600"
-        >
-          ₸
-        </text>
+      <Part on={animated} className="a-pop" style={anim({ delay: 0.3, dur: 0.5 })}>
+        <Coin />
       </Part>
       {animated ? (
         /* живая версия: древко прорисовывается, наконечник - отдельным контуром */
@@ -150,8 +198,17 @@ function Market({ animated }: VisualProps) {
           strokeLinecap="round"
           strokeLinejoin="round"
         >
-          <path d="M106 56 H122" pathLength={1} />
-          <path d="M117 52 L122 56 L117 60" />
+          <path
+            d="M106 56 H122"
+            pathLength={1}
+            className="a-draw"
+            style={anim({ delay: 0.5, dur: 0.3 })}
+          />
+          <path
+            d="M117 52 L122 56 L117 60"
+            className="a-fade"
+            style={anim({ delay: 0.72, dur: 0.2 })}
+          />
         </g>
       ) : (
         <path
@@ -164,12 +221,22 @@ function Market({ animated }: VisualProps) {
           strokeLinejoin="round"
         />
       )}
+      {/* живая версия: копия монеты уходит по стрелке за бидон (над стрелкой, под бидоном) */}
+      {animated && (
+        <g className="ig-coin" style={anim({ delay: 1.5, dur: 2.1, iter: 3 })}>
+          <Coin />
+        </g>
+      )}
       {/* бидон на прилавке */}
-      <Part on={animated}>
+      <Part
+        on={animated}
+        className="a-pop ig-pop-base"
+        style={anim({ delay: 0.6, dur: 0.5 })}
+      >
         <Can x={130} y={42} s={1.15} />
       </Part>
       {/* ценник */}
-      <Part on={animated}>
+      <Part on={animated} className="ig-swing" style={anim({ delay: 0.85, dur: 0.75 })}>
         <rect
           x="172"
           y="46"
@@ -220,7 +287,16 @@ const TREND: [number, number, number, number][] = (() => {
   return out;
 })();
 
-/** Своя корова → стадо: восходящая пунктирная линия, бидоны растут. */
+/** Каскад штрихов: последний начинает прорисовку через 1.1 с после первого. */
+const TREND_STEP = 0.046;
+
+/**
+ * Своя корова → стадо: восходящая пунктирная линия, бидоны растут.
+ * Живая версия: пунктир прорисовывается по штрихам (0.1-1.3 с), бидоны вырастают
+ * от дна на 0.4 / 0.8 / 1.2 с, наконечник стрелки дорисовывается последним (1.25 с).
+ * Штрихи и наконечник - прорисовкой, не opacity/transform: слой под анимацию
+ * сдвигает сглаживание мелких скруглённых концов.
+ */
 function Cow({ animated }: VisualProps) {
   return (
     <>
@@ -242,8 +318,17 @@ function Cow({ animated }: VisualProps) {
           strokeWidth="1.5"
           strokeLinecap="round"
         >
-          {TREND.map(([xa, ya, xb, yb]) => (
-            <line key={`${xa}-${ya}`} x1={xa} y1={ya} x2={xb} y2={yb} />
+          {TREND.map(([xa, ya, xb, yb], i) => (
+            <line
+              key={`${xa}-${ya}`}
+              x1={xa}
+              y1={ya}
+              x2={xb}
+              y2={yb}
+              pathLength={1}
+              className="a-draw"
+              style={anim({ delay: 0.1, i, step: TREND_STEP, dur: 0.12 })}
+            />
           ))}
         </g>
       ) : (
@@ -260,28 +345,33 @@ function Cow({ animated }: VisualProps) {
       {/* стрелка на конце */}
       <path
         d="M250 30 L242.5 30.5 M250 30 L246 36.5"
-        className="text-muted"
+        pathLength={animated ? 1 : undefined}
+        className={cn("text-muted", animated && "a-draw")}
+        style={animated ? anim({ delay: 1.25, dur: 0.3 }) : undefined}
         fill="none"
         stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"
       />
       {/* бидоны: 1 → 2 → 3, каждый литр дешевле */}
-      <Part on={animated}>
+      <Part on={animated} className="a-pop ig-pop-base" style={anim({ delay: 0.4, dur: 0.5 })}>
         <Can x={44} y={67} s={0.7} />
       </Part>
-      <Part on={animated}>
+      <Part on={animated} className="a-pop ig-pop-base" style={anim({ delay: 0.8, dur: 0.5 })}>
         <Can x={118} y={56} s={1} />
       </Part>
-      <Part on={animated}>
+      <Part on={animated} className="a-pop ig-pop-base" style={anim({ delay: 1.2, dur: 0.5 })}>
         <Can x={186} y={45} s={1.3} />
       </Part>
     </>
   );
 }
 
-/** Сепаратор: молоко из рекламы и SEO → конус → сливки (заявки). */
-function Separator() {
+/**
+ * Сепаратор: молоко из рекламы и SEO → конус → сливки (заявки).
+ * Живая версия: струи текут (3 × 0.8 с), капля сливок один раз падает из носика (1.0 с).
+ */
+function Separator({ animated }: VisualProps) {
   return (
     <>
       {/* подписи источников */}
@@ -308,7 +398,8 @@ function Separator() {
       {/* струи молока в конус */}
       <path
         d="M92 20 V34 M188 20 V34"
-        className="text-muted"
+        className={cn("text-muted", animated && "ig-stream")}
+        style={animated ? anim({ delay: 0.1, dur: 0.8, iter: 3 }) : undefined}
         fill="none"
         stroke="currentColor"
         strokeWidth="1.5"
@@ -332,7 +423,8 @@ function Separator() {
       {/* капля сливок - единственный accent в секции */}
       <path
         d="M140 68 Q144 74 144 77 A4 4 0 1 1 136 77 Q136 74 140 68 Z"
-        className="text-accent"
+        className={cn("text-accent", animated && "a-rise")}
+        style={animated ? anim({ delay: 1, dur: 0.6 }, { "--a-y": "-8px" }) : undefined}
         fill="currentColor"
       />
       <text

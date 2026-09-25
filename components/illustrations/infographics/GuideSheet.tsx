@@ -1,4 +1,6 @@
 import { cn } from "@/lib/utils";
+import { InView } from "@/components/motion/InView";
+import { anim } from "../vars";
 
 /* Длины строк-скелетонов чек-листа (доля свободной ширины строки). */
 const ROWS = ["86%", "62%", "74%", "48%"];
@@ -27,8 +29,9 @@ function Fold({ s }: { s: number }) {
   );
 }
 
-/** Отмеченный пункт: рамка + галочка (pathLength="1" - под будущую прорисовку). */
-function Checkbox({ compact }: { compact: boolean }) {
+/** Отмеченный пункт: рамка + галочка. Галочки прорисовываются по очереди
+    (после проявления карточки Reveal): с 0.5 с, шаг 120 мс. */
+function Checkbox({ compact, i }: { compact: boolean; i: number }) {
   return (
     <span
       className={cn(
@@ -40,7 +43,8 @@ function Checkbox({ compact }: { compact: boolean }) {
         <path
           d="M2 5.3 4.2 7.4 8.4 2.6"
           pathLength={1}
-          className="text-ink"
+          className="a-draw text-ink"
+          style={anim({ delay: 0.5, i, step: 0.12, dur: 0.3 })}
           fill="none"
           stroke="currentColor"
           strokeWidth={compact ? 1.8 : 1.6}
@@ -69,9 +73,9 @@ function Sheet({ compact }: { compact: boolean }) {
         {!compact && <span className="h-1.5 w-20 rounded-full bg-ink/60" />}
       </div>
       <ul className={cn("flex flex-col", compact ? "mt-3 gap-[5px]" : "mt-2 gap-1")}>
-        {ROWS.map((w) => (
+        {ROWS.map((w, i) => (
           <li key={w} className={cn("flex items-center", compact ? "gap-1.5" : "gap-2")}>
-            <Checkbox compact={compact} />
+            <Checkbox compact={compact} i={i} />
             <span className="h-1.5 rounded-full bg-ink/10" style={{ width: w }} />
           </li>
         ))}
@@ -88,16 +92,16 @@ function Sheet({ compact }: { compact: boolean }) {
 export function GuideSheet({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
-      <div aria-hidden className="shrink-0">
+      <InView aria-hidden className="ig-scope shrink-0">
         <Sheet compact />
-      </div>
+      </InView>
     );
   }
   return (
-    <div aria-hidden className="mb-6 h-24">
+    <InView aria-hidden className="ig-scope mb-6 h-24">
       <div className="h-full max-w-72">
         <Sheet compact={false} />
       </div>
-    </div>
+    </InView>
   );
 }

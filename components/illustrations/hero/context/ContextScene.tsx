@@ -1,12 +1,17 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import type { SceneProps } from "../../types";
 import { Bar, Chip, Cursor, LeadDot, SearchBar } from "../../parts";
+import { anim } from "../../vars";
 
 /* Сцена контекста: широкое объявление над выдачей + мини-таблица кампаний.
-   Финальный кадр (Hi-Fi). Всё, что потом поедет, уже в своей обёртке:
-   карточка объявления, курсор, «₸ за клик», строки и бары таблицы,
-   пилюля строки 2 (две стопкой: «выше цели» скрыта, «в цели» видна). */
+   Базовый стиль - финальный кадр. Движение: запрос набирается, объявление
+   падает сверху, курсор кликает по заголовку - «₸ за клик», таблица
+   заполняется строками и барами, цена строки 2 из «выше цели» уходит
+   «в цели» (две пилюли стопкой), последней - точка заявки. */
+
+/** Каскад строк таблицы: строка i стартует на i·0.07 с позже. */
+const ROW_STEP = 0.07;
 
 type Row = { name: string; clicks: string; leads: string };
 
@@ -35,13 +40,22 @@ const COL = {
 
 /** Статус цены в строке таблицы. Не Chip: его ill-t-sm внутри строки с ill-t-sm
  *  дал бы кегль ×1.15 (em от родителя). */
-function Pill({ children, className }: { children: ReactNode; className?: string }) {
+function Pill({
+  children,
+  className,
+  style,
+}: {
+  children: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+}) {
   return (
     <span
       className={cn(
         "col-start-1 row-start-1 inline-flex items-center justify-center whitespace-nowrap rounded-full bg-surface-2 px-[0.7em] py-[0.15em] leading-none text-ink-2",
         className,
       )}
+      style={style}
     >
       {children}
     </span>
@@ -50,21 +64,29 @@ function Pill({ children, className }: { children: ReactNode; className?: string
 
 function AdCard() {
   return (
-    <div className="relative z-10 rounded-[1.1em] border border-ink/15 bg-surface-2 px-[1.3em] py-[0.95em]">
+    <div
+      className="a-rise relative z-10 rounded-[1.1em] border border-ink/15 bg-surface-2 px-[1.3em] py-[0.95em]"
+      style={anim({ delay: 1.25 }, { "--a-y": "-1.2em" })}
+    >
       <div className="flex items-center gap-[0.6em]">
         <Chip tone="outline" className="border-ink/40 font-semibold text-ink">
           Реклама
         </Chip>
         <span className="ill-t-sm min-w-0 truncate text-ink-2">ваш-сайт.kz › цены</span>
-        <Chip className="ml-auto bg-ink/10 text-ink">₸ за клик</Chip>
+        <Chip className="a-pop ml-auto bg-ink/10 text-ink" style={anim({ delay: 2.05 })}>
+          ₸ за клик
+        </Chip>
       </div>
 
       <div className="relative mt-[0.5em] w-fit max-w-full">
         <p className="ill-t-lg truncate font-semibold tracking-tight text-ink">
           Ремонт квартир под ключ - цена за м²
         </p>
-        <span className="absolute -right-[1.4em] top-[calc(100%-0.7em)] block h-[max(14px,2em)] w-[max(14px,2em)]">
-          <Cursor className="inset-0 h-full w-full" />
+        <span
+          className="a-slide absolute -right-[1.4em] top-[calc(100%-0.7em)] block h-[max(14px,2em)] w-[max(14px,2em)]"
+          style={anim({ delay: 1.55, dur: 0.45 }, { "--a-x": "5em", "--a-y": "3em" })}
+        >
+          <Cursor clickDelay={2} className="inset-0 h-full w-full" />
         </span>
       </div>
 
@@ -87,7 +109,8 @@ function OrganicRow() {
   return (
     <div
       aria-hidden
-      className="ill-detail absolute inset-x-[1em] top-[calc(100%-1.2em)] flex items-center gap-[0.8em] rounded-b-[1em] border border-t-0 border-border bg-surface px-[1.2em] pb-[0.65em] pt-[1.85em]"
+      className="a-fade ill-detail absolute inset-x-[1em] top-[calc(100%-1.2em)] flex items-center gap-[0.8em] rounded-b-[1em] border border-t-0 border-border bg-surface px-[1.2em] pb-[0.65em] pt-[1.85em]"
+      style={anim({ delay: 1.45 })}
     >
       <span className="h-[1.2em] w-[1.2em] shrink-0 rounded-full bg-ink/10" />
       <Bar w="58%" tone="faint" className="h-[0.7em]" />
@@ -97,11 +120,15 @@ function OrganicRow() {
 
 function Ledger({ rows, conversions }: { rows: Row[]; conversions: boolean }) {
   return (
-    <div className="relative mt-auto rounded-[1.1em] border border-border bg-surface px-[1.3em] py-[0.55em]">
+    <div
+      className="a-fade relative mt-auto rounded-[1.1em] border border-border bg-surface px-[1.3em] py-[0.55em]"
+      style={anim({ delay: 1.5 })}
+    >
       {conversions && (
         <>
+          {/* Сдвиг бейджа - у обёртки, pop - у самой пилюли */}
           <span className="ill-detail absolute right-[1.3em] top-0 flex -translate-y-1/2">
-            <Chip tone="outline" className="bg-surface">
+            <Chip tone="outline" className="a-pop bg-surface" style={anim({ delay: 1.9 })}>
               Конверсии ✓
             </Chip>
           </span>
@@ -121,21 +148,32 @@ function Ledger({ rows, conversions }: { rows: Row[]; conversions: boolean }) {
         <div
           key={r.name}
           className={cn(
-            "ill-t-sm flex items-center gap-[1em] border-t border-border py-[0.25em]",
+            "a-rise ill-t-sm flex items-center gap-[1em] border-t border-border py-[0.25em]",
             i === 2 && "ill-detail",
           )}
+          style={anim({ delay: 1.6, i, step: ROW_STEP }, { "--a-y": "0.4em" })}
         >
           <span className={cn(COL.name, "text-ink-2")}>{r.name}</span>
           <span className={cn(COL.bar, "ill-detail")}>
-            <Bar w={r.clicks} />
+            <Bar w={r.clicks} className="a-grow-x" style={anim({ delay: 1.7, i, step: ROW_STEP })} />
           </span>
           <span className={cn(COL.bar, "flex items-center gap-[0.4em]")}>
-            <Bar w={r.leads} />
+            <Bar w={r.leads} className="a-grow-x" style={anim({ delay: 1.85, i, step: ROW_STEP })} />
             {i === 0 && <LeadDot delay={2.5} />}
           </span>
+          {/* Смена статуса цены: --i строки наследуется, пилюлям - свой 0 */}
           <span className={cn(COL.price, "grid")}>
-            {i === 1 && <Pill className="opacity-0">выше цели</Pill>}
-            <Pill>в цели</Pill>
+            {i === 1 && (
+              <Pill className="a-fade-out" style={anim({ delay: 2.2, dur: 0.3, i: 0 })}>
+                выше цели
+              </Pill>
+            )}
+            <Pill
+              className={i === 1 ? "a-fade" : undefined}
+              style={i === 1 ? anim({ delay: 2.25, dur: 0.3, i: 0 }) : undefined}
+            >
+              в цели
+            </Pill>
           </span>
         </div>
       ))}
@@ -147,7 +185,7 @@ function Ledger({ rows, conversions }: { rows: Row[]; conversions: boolean }) {
 export function ContextScene({ v }: SceneProps) {
   return (
     <div className="absolute inset-0 flex flex-col">
-      <SearchBar query={v.copy.query ?? "ремонт квартир цена"} />
+      <SearchBar query={v.copy.query ?? "ремонт квартир цена"} typing delay={0.7} step={0.025} />
       <div className="relative mb-[0.9em] mt-[1.1em]">
         <AdCard />
         <OrganicRow />
