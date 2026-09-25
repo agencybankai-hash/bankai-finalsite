@@ -1,4 +1,5 @@
 import { Container } from "@/components/ui/Container";
+import { InView } from "@/components/motion/InView";
 import { SystemIllustration, type SystemVisual } from "@/components/sections/SystemIllustration";
 
 /* Канал → сцена молочной метафоры (те же, что в SystemSection главной). */
@@ -30,9 +31,10 @@ export function MetaphorCallout({
           <div className="grid overflow-hidden rounded-xl border border-border bg-bg lg:grid-cols-[22rem_minmax(0,1fr)]">
             {visual && (
               <div className="flex items-center justify-center border-b border-border py-5 lg:border-b-0 lg:border-r lg:px-4 lg:py-6">
-                <div className="w-full max-w-sm lg:max-w-none">
+                {/* сцена играет по входу в экран (карточка без Reveal - с первых долей секунды) */}
+                <InView className="ig-scope w-full max-w-sm lg:max-w-none">
                   <SystemIllustration variant={visual} animated />
-                </div>
+                </InView>
               </div>
             )}
             <div className="flex flex-col justify-center p-5 sm:px-7 lg:px-9 lg:py-7">

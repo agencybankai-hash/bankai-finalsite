@@ -18,6 +18,16 @@ export type ServicePlan = {
   includes: string[];
   featured?: boolean;
 };
+/** Цена одной карточкой (без сетки тарифов). */
+export type ServicePrice = {
+  /** Сумма «от»: «от 350 000 ₸/мес». */
+  value: string;
+  sub: string;
+  /** 2-3 факта списком: что входит в стоимость. */
+  facts?: string[];
+  /** Что оплачивается отдельно, мимо нас, - строкой под фактами. */
+  separate?: string;
+};
 export type FaqItem = { q: string; a: string };
 export type Feature = {
   title: string;
@@ -76,7 +86,7 @@ export type ServiceChannel = {
     note: string;
   };
   proof?: ProofBlock;
-  pricing: { value: string; sub: string; note?: string };
+  pricing: ServicePrice;
   plans?: ServicePlan[];
   pricingNote?: string;
   faq: FaqItem[];
@@ -129,7 +139,7 @@ export type ServiceLanding = {
   /** Свои тарифы под интент; не заданы - тарифы канала. */
   plans?: ServicePlan[];
   /** Своя цена «от»; задана без plans - тарифы канала не наследуются. */
-  pricing?: { value: string; sub: string; note?: string };
+  pricing?: ServicePrice;
   /** Приписка к блоку тарифов. */
   pricingNote?: string;
   /** Гео обслуживания для Service.areaServed городовой; не задано - Алматы и Казахстан. */
@@ -345,6 +355,8 @@ export type UiDict = {
     moreCases: string;
     empty: string;
     inProgress: string;
+    /** Пометка кейса-образца (template) у его цифр. */
+    template: string;
     viewCase: string;
   };
 };

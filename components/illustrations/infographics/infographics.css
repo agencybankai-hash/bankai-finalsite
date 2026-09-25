@@ -1,1 +1,110 @@
-/* Инфографика секций: стили и сценарии движения трека (контракт - illustrations.css). */
+/* Инфографика секций: стили и сценарии движения трека (контракт - illustrations.css).
+   Файл подключается до примитивов: модификаторы .a-* берут специфичность
+   составным селектором, а не порядком. */
+
+/* ── Метафора «По-простому» (SystemIllustration animated) ── */
+
+/* Бидон вырастает от дна: a-pop с опорой на основание, от половины размера. */
+.a-pop.ig-pop-base {
+  transform-origin: center bottom;
+}
+[data-live] .a-pop.ig-pop-base {
+  animation-name: ig-pop-base;
+}
+@keyframes ig-pop-base {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+/* Ценник подвешен за верхний край: влетает с поворота -10° и качнувшись замирает. */
+.ig-swing {
+  transform-box: fill-box;
+  transform-origin: center top;
+}
+[data-live] .ig-swing {
+  animation: ig-swing var(--a-dur, 0.8s) var(--ease-out) var(--a-delay, 0s) backwards;
+}
+@keyframes ig-swing {
+  0% {
+    opacity: 0;
+    transform: rotate(-10deg);
+  }
+  45% {
+    opacity: 1;
+    transform: rotate(3deg);
+  }
+  75% {
+    transform: rotate(-1deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* Монета-копия: проступает поверх монеты, уходит по стрелке за бидон и гаснет,
+   затем пауза (до 3 раз). В финальном кадре её нет. Сдвиг 49 - от центра
+   монеты (92) к центру бидона (141.5), в единицах SVG. */
+.ig-coin {
+  opacity: 0;
+}
+[data-live] .ig-coin {
+  animation: ig-coin var(--a-dur, 2.1s) linear var(--a-delay, 0s) var(--a-iter, 3) backwards;
+}
+@keyframes ig-coin {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  5% {
+    opacity: 1;
+    transform: translateX(0);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  30% {
+    opacity: 1;
+  }
+  45%,
+  100% {
+    opacity: 0;
+    transform: translateX(49px);
+  }
+}
+
+/* Струи молока текут в конус: пунктир «3 4» сдвигается на два периода (14)
+   за проход, до 3 проходов. */
+[data-live] .ig-stream {
+  animation: ig-stream var(--a-dur, 0.8s) linear var(--a-delay, 0s) var(--a-iter, 3) backwards;
+}
+@keyframes ig-stream {
+  from {
+    stroke-dashoffset: 14;
+  }
+}
+
+/* ── Лента FunnelBand: раскрытие по ходу потока ──
+   Линейно, чтобы фронт проходил станции в расчётное время. Заливка только
+   назад (backwards): после проигрыша clip-path снят, финальный кадр - без обрезки. */
+[data-live] .ig-wipe-x {
+  animation: ig-wipe-x var(--a-dur, 1.2s) linear var(--a-delay, 0s) backwards;
+}
+[data-live] .ig-wipe-y {
+  animation: ig-wipe-y var(--a-dur, 1.2s) linear var(--a-delay, 0s) backwards;
+}
+@keyframes ig-wipe-x {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+@keyframes ig-wipe-y {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}

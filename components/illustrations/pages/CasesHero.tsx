@@ -1,7 +1,9 @@
 import { cases } from "@/content/cases";
 import { pageCopy } from "@/content/visuals";
+import { cn } from "@/lib/utils";
 import { HeroFrame } from "../frame/HeroFrame";
 import { Chip, LeadDot } from "../parts";
+import { anim } from "../vars";
 
 /* Сцена /cases: три результата из реальных кейсов. Цифра и подпись -
    дословно из cardMetrics (подпись без скобок-уточнений), мини-графики
@@ -31,6 +33,14 @@ const ROWS = PICKS.flatMap(({ slug, metric, chart }) => {
   ];
 });
 
+/** Таймлайн, с: строки каскадом → мини-графики (столбики, кривая, неделя) →
+ *  точка заявки (1.6). Задержки строк явные: --i наследуется в графики. */
+const ROW_IN = { delay: 0.6, step: 0.12 };
+const at = (s: number) => Math.round(s * 100) / 100;
+/** Кривая стартует, пока её строка ещё почти прозрачна: до старта кончик пути
+ *  (dashoffset 1) рисовал бы точку. */
+const CURVE_IN = { delay: 0.85, dur: 0.65 };
+
 /** Рост с нуля: столбики. */
 const BARS = [4, 9, 15, 23, 33, 45];
 /** Неделя: точек в день (схема). */
@@ -53,8 +63,9 @@ function MiniChart({ kind }: { kind: Chart }) {
             width="12"
             height={h}
             rx="1.6"
-            className={i === BARS.length - 1 ? "text-ink" : "text-muted"}
+            className={cn("a-grow-y", i === BARS.length - 1 ? "text-ink" : "text-muted")}
             fill="currentColor"
+            style={anim({ delay: 0.9, i, step: 0.06, dur: 0.5 })}
           />
         ))}
       {kind === "curve" && (
@@ -62,14 +73,16 @@ function MiniChart({ kind }: { kind: Chart }) {
           <path
             d="M2 45 C22 44 34 39 50 30 S78 11 95 7"
             pathLength={1}
-            className="text-ink-2"
+            className="a-draw text-ink-2"
+            style={anim(CURVE_IN, { "--a-ease": "ease-in-out" })}
             fill="none"
             stroke="currentColor"
             strokeWidth="2.2"
             strokeLinecap="round"
           />
-          {/* Заливка под линией (сдвиг на полштриха - не перекрывает её) и точка - одним слоем */}
-          <g>
+          {/* Заливка под линией (сдвиг на полштриха - не перекрывает её) и точка - одним
+              слоем, проявляются к концу прорисовки */}
+          <g className="a-fade" style={anim({ delay: 1.3, dur: 0.4 })}>
             <path
               d="M2 46.2 C22 45.2 34 40.2 50 31.2 S78 12.2 95 8.2 V48 H2 Z"
               className="text-surface-2"
@@ -81,7 +94,7 @@ function MiniChart({ kind }: { kind: Chart }) {
       )}
       {kind === "week" &&
         WEEK.map((n, d) => (
-          <g key={d}>
+          <g key={d} className="a-pop" style={anim({ delay: 1, i: d, step: 0.07 })}>
             {Array.from({ length: n }, (_, k) => (
               <circle
                 key={k}
@@ -105,7 +118,8 @@ function CasesScene() {
       {ROWS.map((r, i) => (
         <div
           key={r.slug}
-          className="flex min-h-0 flex-1 items-center gap-[1.4em] rounded-[1em] border border-border bg-surface px-[1.3em]"
+          className="a-rise flex min-h-0 flex-1 items-center gap-[1.4em] rounded-[1em] border border-border bg-surface px-[1.3em]"
+          style={anim({ delay: at(ROW_IN.delay + i * ROW_IN.step) })}
         >
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-[0.6em]">

@@ -1,3 +1,4 @@
+import { createElement, type ReactNode } from "react";
 import { extendTailwindMerge } from "tailwind-merge";
 
 /* Токены типо-шкалы DS - иначе twMerge принимает text-h2/text-label за цвет
@@ -22,8 +23,10 @@ const NB = String.fromCharCode(160);
 const WJ = String.fromCharCode(0x2060);
 
 // Короткие служебные слова, которые не должны висеть в конце строки.
+// Хвостовой пробел - любой, кроме уже неразрывного: иначе второй проход
+// снова матчит первое слово пары и не доходит до второго («а не», «и в»).
 const SHORT_WORDS =
-  /(^|[\s (])([а-яёa-z]{1,2}|под|над|при|для|без|про|или|что|как|это)\s+/giu;
+  /(^|[\s (])([а-яёa-z]{1,2}|под|над|при|для|без|про|или|что|как|это)[^\S ]+/giu;
 
 /**
  * Типографика: ставит неразрывные пробелы после коротких предлогов/союзов
@@ -55,5 +58,24 @@ export function nbspValue(text: string): string {
       .replace(/(^|\s)([а-яёa-z]{1,2}) /giu, "$1$2" + NB)
       // «₸/мес» не рвётся по слэшу (браузер переносит по «/» даже без пробелов)
       .replace(/\//g, "/" + WJ)
+  );
+}
+
+// Слово через дефис: «SEO-продвижение», «интернет-магазина», «E-commerce».
+const HYPHENATED = /([a-zа-яё0-9]+(?:-[a-zа-яё0-9]+)+)/i;
+
+/**
+ * Слова через дефис не рвутся на строки: обёртка nowrap вместо U+2011.
+ * Символ остаётся обычным дефисом - поиск по странице, копирование и
+ * индексация видят исходный текст. На экранах меньше 360px перенос по
+ * дефису разрешён: связка «о SEO-продвижении» там шире строки.
+ */
+export function keepHyphens(text: string): ReactNode {
+  const parts = text.split(HYPHENATED);
+  if (parts.length === 1) return text;
+  return parts.map((part, i) =>
+    i % 2
+      ? createElement("span", { key: i, className: "min-[360px]:whitespace-nowrap" }, part)
+      : part,
   );
 }

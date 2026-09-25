@@ -6,7 +6,11 @@
   SVG растянут (preserveAspectRatio="none"): обводки non-scaling-stroke,
   точки станций и подписи - HTML, по сетке карточек.
   Десктоп (sm+) - лента над карточками, телефон - вертикальная колонка слева.
+  Движение (область InView - FunnelChain): лента раскрывается по ходу потока
+  линейно за WIPE, станции и подписи появляются, когда до них доходит фронт.
 */
+
+import { anim } from "../vars";
 
 type Pt = readonly [number, number];
 type Edge = readonly [number, number];
@@ -275,15 +279,40 @@ function BandSvg({ shape, vertical }: { shape: FunnelShape; vertical: boolean })
   );
 }
 
-/** Точка-станция (обёртка - позиция, внутренний span - будущий pop). */
-function Dot({ style, className }: { style: React.CSSProperties; className?: string }) {
+/* ── Движение ── */
+
+/** Раскрытие ленты (ig-wipe-x / ig-wipe-y), линейно, с. */
+const WIPE = 1.2;
+/** Момент, когда фронт раскрытия доходит до доли x длины ленты, с. */
+const front = (x: number) => Math.round(x * WIPE * 100) / 100;
+/** Станция карточки i - в центре четверти: 0.15 / 0.45 / 0.75 / 1.05 с. */
+const stationAt = (i: number) => front((i + 0.5) / 4);
+/** Появление подписей. */
+const NOTE = 0.4;
+
+/** Точка-станция (обёртка - позиция, внутренний span - pop, когда до станции доходит лента). */
+function Dot({
+  style,
+  className,
+  delay,
+  i,
+}: {
+  style: React.CSSProperties;
+  className?: string;
+  delay: number;
+  /** Каскад точек одной станции (дорожки лидгена). */
+  i?: number;
+}) {
   return (
     <span
       aria-hidden
       className={`absolute -translate-x-1/2 -translate-y-1/2 ${className ?? ""}`}
       style={style}
     >
-      <span className="block h-1.5 w-1.5 rounded-full bg-ink" />
+      <span
+        className="a-pop block h-1.5 w-1.5 rounded-full bg-ink"
+        style={anim({ delay, i, step: i === undefined ? undefined : 0.06, dur: 0.45 })}
+      />
     </span>
   );
 }
@@ -300,8 +329,8 @@ export function FunnelBand({ shape }: { shape: FunnelShape }) {
           {shape.notes.map((n) => (
             <span
               key={n.text}
-              className="absolute top-0 -translate-x-1/2 whitespace-nowrap text-xs leading-4 text-muted"
-              style={{ left: `${n.at * 25}%` }}
+              className="a-fade absolute top-0 -translate-x-1/2 whitespace-nowrap text-xs leading-4 text-muted"
+              style={{ left: `${n.at * 25}%`, ...anim({ delay: front(n.at / 4), dur: NOTE }) }}
             >
               {n.text}
             </span>
@@ -309,20 +338,23 @@ export function FunnelBand({ shape }: { shape: FunnelShape }) {
         </div>
       )}
       <div className="relative" style={{ height: shape.size }}>
-        {/* обёртка ленты - будущее раскрытие слева направо */}
-        <div className="absolute inset-0">
+        {/* обёртка ленты - раскрытие слева направо */}
+        <div className="ig-wipe-x absolute inset-0" style={anim({ dur: WIPE })}>
           <BandSvg shape={shape} vertical={false} />
         </div>
         <div className="absolute inset-0 grid grid-cols-4 gap-3">
           {shape.stations.map((c, i) => (
             <div key={i} className="relative">
-              {c !== null && <Dot style={{ left: "50%", top: c }} />}
+              {c !== null && <Dot style={{ left: "50%", top: c }} delay={stationAt(i)} />}
               {i === 1 &&
-                shape.lanes?.map((l) => (
+                shape.lanes?.map((l, k) => (
                   <span
                     key={l.text}
-                    className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-bg px-1.5 text-xs leading-4 text-ink-2"
-                    style={{ top: l.c }}
+                    className="a-fade absolute left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-bg px-1.5 text-xs leading-4 text-ink-2"
+                    style={{
+                      top: l.c,
+                      ...anim({ delay: stationAt(1), i: k, step: 0.06, dur: NOTE }),
+                    }}
                   >
                     {l.text}
                   </span>
@@ -333,10 +365,14 @@ export function FunnelBand({ shape }: { shape: FunnelShape }) {
         {shape.ends?.map((e) => (
           <span
             key={e.text}
-            className={`absolute -translate-y-1/2 whitespace-nowrap leading-none ${
+            className={`a-fade absolute -translate-y-1/2 whitespace-nowrap leading-none ${
               e.strong ? "text-sm font-semibold text-ink" : "text-xs text-muted"
             }`}
-            style={{ left: `calc(${ribbonEnd(shape) / 10}% + 0.5rem)`, top: e.c }}
+            style={{
+              left: `calc(${ribbonEnd(shape) / 10}% + 0.5rem)`,
+              top: e.c,
+              ...anim({ delay: front(ribbonEnd(shape) / 1000), dur: NOTE }),
+            }}
           >
             {e.text}
           </span>
@@ -360,8 +396,8 @@ export function FunnelColumn({ shape }: { shape: FunnelShape }) {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-y-0 left-0 sm:hidden"
-      style={{ width: shape.size }}
+      className="ig-wipe-y pointer-events-none absolute inset-y-0 left-0 sm:hidden"
+      style={{ width: shape.size, ...anim({ dur: WIPE }) }}
     >
       <BandSvg shape={shape} vertical />
     </div>
@@ -371,11 +407,18 @@ export function FunnelColumn({ shape }: { shape: FunnelShape }) {
 /**
  * Станция карточки i на телефоне: точка на колонке ленты напротив центра карточки.
  * Сдвиг от левого края карточки: позиция поперёк колонки минус (колонка + gap-3 + рамка).
+ * Карточки одной высоты (auto-rows-fr) - фронт колонки проходит их центры в те же моменты.
  */
 export function ColumnStation({ shape, i }: { shape: FunnelShape; i: number }) {
   const c = shape.stations[i];
   const at = c !== null ? [c] : i === 1 && shape.lanes ? shape.lanes.map((l) => l.c) : [];
-  return at.map((x) => (
-    <Dot key={x} className="top-1/2 sm:hidden" style={{ left: x - shape.size - 13 }} />
+  return at.map((x, k) => (
+    <Dot
+      key={x}
+      className="top-1/2 sm:hidden"
+      style={{ left: x - shape.size - 13 }}
+      delay={stationAt(i)}
+      i={k}
+    />
   ));
 }

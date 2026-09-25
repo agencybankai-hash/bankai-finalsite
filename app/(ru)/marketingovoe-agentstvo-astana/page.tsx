@@ -1,13 +1,13 @@
 import { Fragment } from "react";
 import Link from "next/link";
-import { Reveal } from "@/components/motion/Reveal";
 import { Container } from "@/components/ui/Container";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Hero } from "@/components/sections/Hero";
 import { Breadcrumbs, type Crumb } from "@/components/sections/Breadcrumbs";
 import { ServicesGrid } from "@/components/sections/ServicesGrid";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
-import { FAQ } from "@/components/sections/FAQ";
+import { ProofCards } from "@/components/sections/ProofCards";
+import { FaqSection } from "@/components/sections/FAQ";
 import { CTASection } from "@/components/sections/CTASection";
 import { HeroIllustration } from "@/components/illustrations/HeroIllustration";
 import { resolvePageVisual } from "@/components/illustrations/resolve";
@@ -115,32 +115,10 @@ export default function AgencyAstanaPage() {
       {/* Кейсы пересказаны под Астану, а не карточками с общими тизерами */}
       <Section>
         <SectionHeader eyebrow="Кейсы" title={page.proof.title} />
-        <Reveal stagger className="mt-10 grid gap-5 lg:grid-cols-2">
-          {page.proof.items.map((it) => (
-            <Link
-              key={it.slug}
-              href={`/cases/${it.slug}`}
-              data-reveal
-              className="group flex flex-col rounded-xl border border-border bg-bg p-7 shadow-card transition duration-300 ease-osmo hover:-translate-y-1 hover:border-ink hover:shadow-card-hover"
-            >
-              <h3 className="text-lg font-semibold tracking-tight text-ink">
-                {it.case}
-              </h3>
-              <p className="mt-3 text-sm leading-relaxed text-ink-2">{it.text}</p>
-              <span className="mt-5 text-sm font-medium text-ink group-hover:text-accent">
-                Смотреть кейс →
-              </span>
-            </Link>
-          ))}
-        </Reveal>
+        <ProofCards items={page.proof.items} className="mt-10" />
       </Section>
 
-      <Section tone="surface">
-        <SectionHeader eyebrow="FAQ" title={page.faqTitle} align="center" />
-        <div className="mt-8">
-          <FAQ items={page.faq} />
-        </div>
-      </Section>
+      <FaqSection title={page.faqTitle} items={page.faq} tone="surface" />
 
       <CTASection title={finalCta.title} lead={finalCta.lead} cta={finalCta.cta} />
     </>
