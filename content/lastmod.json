@@ -7,8 +7,12 @@
     "modified": "2026-09-22",
     "created": "2026-09-22"
   },
+  "content/blocked-referrers.ts": {
+    "modified": "2026-09-24",
+    "created": "2026-09-24"
+  },
   "content/cases.ts": {
-    "modified": "2026-08-07",
+    "modified": "2026-09-25",
     "created": "2026-05-31"
   },
   "content/checklist.ts": {
@@ -44,12 +48,16 @@
     "created": "2026-05-31"
   },
   "content/types.ts": {
-    "modified": "2026-09-24",
+    "modified": "2026-09-25",
     "created": "2026-05-31"
   },
   "content/ui.ts": {
-    "modified": "2026-09-15",
+    "modified": "2026-09-25",
     "created": "2026-08-07"
+  },
+  "content/visuals.ts": {
+    "modified": "2026-09-25",
+    "created": "2026-09-25"
   },
   "content/en/cases.ts": {
     "modified": "2026-08-07",
@@ -60,7 +68,7 @@
     "created": "2026-08-07"
   },
   "content/en/ui.ts": {
-    "modified": "2026-09-14",
+    "modified": "2026-09-25",
     "created": "2026-08-07"
   },
   "content/guides/ai-seo-guide.md": {
@@ -136,7 +144,7 @@
     "created": "2026-08-07"
   },
   "app/(ru)/contacts/page.tsx": {
-    "modified": "2026-09-14",
+    "modified": "2026-09-25",
     "created": "2026-08-07"
   },
   "app/(ru)/privacy/page.tsx": {
@@ -148,7 +156,7 @@
     "created": "2026-08-07"
   },
   "app/(ru)/marketingovoe-agentstvo-astana/page.tsx": {
-    "modified": "2026-09-22",
+    "modified": "2026-09-25",
     "created": "2026-09-22"
   },
   "app/(en)/en/page.tsx": {
@@ -156,7 +164,7 @@
     "created": "2026-08-07"
   },
   "app/(en)/en/contacts/page.tsx": {
-    "modified": "2026-09-14",
+    "modified": "2026-09-24",
     "created": "2026-08-07"
   },
   "app/(en)/en/privacy/page.tsx": {
