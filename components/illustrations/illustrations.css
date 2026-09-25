@@ -78,7 +78,9 @@
   animation-timing-function: var(--a-ease, var(--ease-osmo));
   animation-delay: calc(var(--a-delay, 0s) + var(--i, 0) * var(--a-step, 0.08s));
   animation-iteration-count: var(--a-iter, 1);
-  animation-fill-mode: both;
+  /* только назад: до старта - первый кадр, после - базовый стиль (он и есть
+     финал). При both отыгравший узел держит свой слой, края мылятся. */
+  animation-fill-mode: backwards;
 }
 [data-live] .a-fade {
   animation-name: ill-fade;
@@ -114,6 +116,8 @@
   animation-duration: var(--a-dur, 1.6s);
   animation-timing-function: var(--ease-out);
   animation-iteration-count: var(--a-iter, 3);
+  /* без заливки: до старта и после петель кольцо в базовом стиле - скрыто */
+  animation-fill-mode: none;
 }
 [data-live] .a-flow {
   animation-name: ill-flow;
@@ -147,9 +151,6 @@
 }
 
 /* Финальные состояния особых примитивов. */
-.a-draw {
-  stroke-dasharray: 1; /* path с pathLength="1" */
-}
 .a-pulse,
 .a-fade-out {
   opacity: 0; /* кольцо-пульс и уходящий слой в финальном кадре не видны */
@@ -182,9 +183,17 @@
     transform: scale(0.6);
   }
 }
+/* Прорисовка path с pathLength="1": пунктир только на время движения (в покое
+   линия сплошная, концы не сдвигаются); штрих 1 и зазор 2 от смещения 1.01 -
+   до старта штрих целиком за началом пути, круглый кончик не рисует точку. */
 @keyframes ill-draw {
   from {
-    stroke-dashoffset: 1;
+    stroke-dasharray: 1 2;
+    stroke-dashoffset: 1.01;
+  }
+  to {
+    stroke-dasharray: 1 2;
+    stroke-dashoffset: 0;
   }
 }
 @keyframes ill-grow-x {

@@ -1,4 +1,5 @@
 import { Reveal } from "@/components/motion/Reveal";
+import { InView } from "@/components/motion/InView";
 import { LeadDot } from "@/components/illustrations/parts";
 import {
   ColumnStation,
@@ -15,6 +16,8 @@ import type { StatItem } from "@/content/types";
  * лента-поток по форме канала (FunnelBand). С sm лента над карточками,
  * станции - по центрам карточек; на телефоне карточки стопкой, лента -
  * колонкой слева. Коралловая точка - перед итогом последнего шага.
+ * Движение - одна область InView: лента раскрывается за 1.2 с, станции
+ * вспыхивают по ходу фронта (0.15-1.05 с), коралловая точка - на 1.3 с.
  */
 export function FunnelChain({
   chain,
@@ -29,7 +32,7 @@ export function FunnelChain({
   const shape = channel ? funnelShape(channel) : undefined;
   const last = chain.length - 1;
   return (
-    <div>
+    <InView className="ig-scope">
       {shape && <FunnelBand shape={shape} />}
       <Reveal
         stagger
@@ -56,6 +59,6 @@ export function FunnelChain({
         ))}
       </Reveal>
       {note && <p className="mt-4 text-sm text-muted">{note}</p>}
-    </div>
+    </InView>
   );
 }

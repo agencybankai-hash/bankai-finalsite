@@ -108,8 +108,9 @@ export function Hero({
 
           {/* Правая колонка — визуал. Общий визуал главной на мобилке скрыт;
               тематический визуал страницы сам решает мобильную версию. */}
+          {/* min-w-0: колонка сетки не растягивается по min-content визуала */}
           {hasVisual && (
-            <div className={visual === true ? "hidden lg:block" : undefined}>
+            <div className={cn("min-w-0", visual === true && "hidden lg:block")}>
               {visualNode}
             </div>
           )}
