@@ -154,12 +154,15 @@ export function ChannelPage({
           landing.path,
         )
       : [];
+  /* Пилюля хаба - название услуги; у посадочной её место занимает пилюля-крошка.
+     navLabel лидгена повторяет его H1 - там остаётся общая пилюля Hero. */
+  const hubBadge = channel.navLabel === channel.hero.title ? undefined : channel.navLabel;
 
   return (
     <>
-      {landing && <Breadcrumbs items={serviceCrumbs(channel, landing)} />}
-
       <Hero
+        crumbs={landing && <Breadcrumbs items={serviceCrumbs(channel, landing)} />}
+        badge={landing ? null : hubBadge}
         title={hero.title}
         subtitle={hero.subtitle}
         primary={{ label: "Получить бесплатный аудит", href: "/contacts" }}

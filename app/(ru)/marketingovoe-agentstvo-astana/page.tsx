@@ -30,7 +30,7 @@ export const generateMetadata = pageMetadata({
 
 const crumbs: Crumb[] = [
   { label: "Главная", href: "/" },
-  { label: page.hero.title, href: page.path },
+  { label: page.hero.title, href: page.path, short: "Астана" },
 ];
 
 /** Один канал с учётом обращений - как в интро страницы. */
@@ -62,9 +62,9 @@ export default function AgencyAstanaPage() {
         )}
       />
 
-      <Breadcrumbs items={crumbs} />
-
       <Hero
+        crumbs={<Breadcrumbs items={crumbs} />}
+        badge={null}
         title={page.hero.title}
         subtitle={page.hero.subtitle}
         primary={{ label: "Получить бесплатный аудит", href: "/contacts" }}
