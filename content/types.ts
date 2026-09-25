@@ -1,12 +1,18 @@
 /** Локаль сайта. RU - основная версия, EN - выжимка на /en. */
 export type Locale = "ru" | "en";
 
-/** indent - визуально вложенный пункт (подуслуга под родительской услугой в дропдауне). */
+/**
+ * Пункт навигации шапки. С children - группа: в шапке открывает панель, а href
+ * группы - префикс раздела, по нему подсвечивается активный пункт (сам не ссылка).
+ * description - строка под названием в панели, featured - главный пункт группы
+ * (крупная карточка слева). children у пункта группы - его подуслуги.
+ */
 export type NavItem = {
   label: string;
   href: string;
+  description?: string;
+  featured?: boolean;
   children?: NavItem[];
-  indent?: boolean;
 };
 export type Cta = { label: string; href: string };
 export type StatItem = { value: string; label: string };
@@ -290,12 +296,14 @@ export type UiDict = {
   locale: Locale;
   /** Корень локали: "/" для ru, "/en" для en - ссылка логотипа и точка отсчёта активного пункта. */
   home: string;
-  /** Подпись рядом с логотипом. */
-  tagline: string;
   nav: NavItem[];
   headerCta: Cta;
-  /** aria-label бургера. */
+  /** Подпись бургера и имя навигации. */
   menuLabel: string;
+  /** Подпись бургера при открытом меню. */
+  closeLabel: string;
+  /** Быстрый контакт в шапке: aria-label иконки и подпись кнопки в мобильном меню. */
+  telegramLabel: string;
   footer: {
     slogan: string;
     description: string;
