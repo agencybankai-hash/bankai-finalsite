@@ -56,11 +56,12 @@ export function HeroFrame({
 
       <div className={cn("tone-ink rounded-2xl p-5 shadow-float sm:p-7", float && "lg:pb-9")}>
         <div className="flex h-5 items-center justify-between gap-4 text-label uppercase">
-          <span className="inline-flex min-w-0 items-center gap-2 text-ink-2">
+          {/* На узкой панели сокращается контекст, а не метка */}
+          <span className="inline-flex shrink-0 items-center gap-2 text-ink-2">
             <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-ink-2" />
-            <span className="truncate">{copy.title}</span>
+            {copy.title}
           </span>
-          {copy.meta && <span className="shrink-0 text-muted">{copy.meta}</span>}
+          {copy.meta && <span className="min-w-0 truncate text-muted">{copy.meta}</span>}
         </div>
 
         <div className="ill-stage relative mt-5 aspect-[8/5]">
