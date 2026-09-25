@@ -13,6 +13,7 @@ import { FeatureGrid } from "@/components/sections/FeatureGrid";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
 import { FunnelChain } from "@/components/sections/FunnelChain";
 import { CaseGrid } from "@/components/sections/CaseGrid";
+import { ProofCards } from "@/components/sections/ProofCards";
 import { FAQ } from "@/components/sections/FAQ";
 import { CTASection } from "@/components/sections/CTASection";
 import { Longread } from "@/components/sections/Longread";
@@ -244,24 +245,7 @@ export function ChannelPage({
       {source.proof && (
         <Section tone="surface">
           <SectionHeader title={source.proof.title} />
-          <Reveal stagger className="mt-10 grid gap-5 lg:grid-cols-2">
-            {source.proof.items.map((it) => (
-              <Link
-                key={it.slug}
-                href={`/cases/${it.slug}`}
-                data-reveal
-                className="group flex flex-col rounded-xl border border-border bg-bg p-7 shadow-card transition duration-300 ease-osmo hover:-translate-y-1 hover:border-ink hover:shadow-card-hover"
-              >
-                <h3 className="text-lg font-semibold tracking-tight text-ink">
-                  {it.case}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-ink-2">{it.text}</p>
-                <span className="mt-5 text-sm font-medium text-ink group-hover:text-accent">
-                  Смотреть кейс →
-                </span>
-              </Link>
-            ))}
-          </Reveal>
+          <ProofCards items={source.proof.items} className="mt-10" />
         </Section>
       )}
 

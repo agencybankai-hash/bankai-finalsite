@@ -345,6 +345,8 @@ export type UiDict = {
     moreCases: string;
     empty: string;
     inProgress: string;
+    /** Пометка кейса-образца (template) у его цифр. */
+    template: string;
     viewCase: string;
   };
 };
