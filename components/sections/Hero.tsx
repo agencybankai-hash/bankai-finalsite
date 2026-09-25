@@ -16,6 +16,7 @@ export function Hero({
   note,
   badges,
   badge = "SEO · Контекст · Сайты",
+  crumbs,
   visual = true,
 }: {
   title: string;
@@ -26,12 +27,15 @@ export function Hero({
   badges?: string[];
   /** Пилюля над заголовком; null — без пилюли. */
   badge?: string | null;
+  /** Хлебные крошки над заголовком - внутри hero, без своей полосы. */
+  crumbs?: React.ReactNode;
   /** Правая колонка: true - общий визуал главной (только десктоп); узел - свой
    *  визуал страницы (сам решает мобильную версию); false - без визуала. */
   visual?: React.ReactNode;
 }) {
   const visualNode = visual === true ? <HeroVisual /> : visual;
   const hasVisual = Boolean(visualNode);
+  const hasCrumbs = Boolean(crumbs);
   // Дефис-разделитель → em-dash, приклеенный к следующему слову (nbsp после
   // тире). Так тире не висит в конце строки, а ведёт value-prop на новой строке.
   const titleText = nbsp(title).replace(
@@ -45,11 +49,14 @@ export function Hero({
           className={cn(
             "grid items-center gap-10 py-14 sm:py-16 lg:gap-14 lg:py-24",
             hasVisual && "lg:grid-cols-[1.05fr_0.95fr]",
+            // с крошками одна колонка начинается ближе к шапке, десктоп - как был
+            hasCrumbs && "pt-6 sm:pt-8 lg:pt-24",
           )}
         >
           {/* Левая колонка — текст. Появление на CSS (.rise): контент виден
               с первой краски, LCP не ждёт JS; каскад задержками rise-N. */}
           <div>
+            {hasCrumbs && <div className="fade-rise rise-1 mb-5">{crumbs}</div>}
             {badge && (
               <div className="fade-rise rise-1 mb-5">
                 <Pill variant="soft" size="sm" className="uppercase tracking-wide">

@@ -214,9 +214,11 @@ export const casesPreviewEn: {
   ],
 };
 
+/* Финальный CTA EN-страниц: главная, кейсы и страница кейса. */
 export const finalCtaEn = {
   title: "Want to choose your clients instead of chasing them?",
-  lead:
-    "When leads come in steadily, you plan growth and work with the clients you want. The first step is seeing where you lose them today: we show it on your own numbers and lay out a plan for a steady flow of leads. The audit is free and comes with no obligations.",
-  cta: { label: "Get a free audit", href: "/en/contacts" } as Cta,
+  lead: "We show where you lose clients on your own numbers and lay out a plan for a steady flow of leads.",
+  note: "The audit is free and comes with no obligations.",
+  submit: "Get a free audit",
+  messenger: { text: "Prefer a messenger?", link: "Message us on Telegram" },
 };

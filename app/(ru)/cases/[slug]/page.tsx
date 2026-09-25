@@ -9,7 +9,6 @@ import { CaseVisual } from "@/components/sections/CaseVisual";
 import { CaseGrid } from "@/components/sections/CaseGrid";
 import { CTASection } from "@/components/sections/CTASection";
 import { cases, getCase } from "@/content/cases";
-import { finalCta } from "@/content/site";
 import { ui } from "@/content/ui";
 import { pageMetadata } from "@/lib/metadata";
 import type { CaseChannel, CaseStudy, Cta, StatItem } from "@/content/types";
@@ -416,7 +415,7 @@ export default async function CaseDetailPage({ params }: Params) {
         </div>
       </Section>
 
-      <CTASection title={finalCta.title} lead={finalCta.lead} cta={finalCta.cta} />
+      <CTASection />
     </>
   );
 }

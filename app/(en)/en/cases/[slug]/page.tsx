@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Stat } from "@/components/ui/Stat";
 import { CaseGrid } from "@/components/sections/CaseGrid";
 import { CTASection } from "@/components/sections/CTASection";
-import { casesEn, getCaseEn, caseUiEn, casesCtaEn } from "@/content/en/cases";
+import { casesEn, getCaseEn, caseUiEn } from "@/content/en/cases";
 import { ui } from "@/content/ui";
 import { pageMetadata } from "@/lib/metadata";
 import type { CaseChannel, CaseStudy, StatItem } from "@/content/types";
@@ -358,11 +358,7 @@ export default async function EnCaseDetailPage({ params }: Params) {
         </div>
       </Section>
 
-      <CTASection
-        title={casesCtaEn.title}
-        lead={casesCtaEn.lead}
-        cta={casesCtaEn.cta}
-      />
+      <CTASection locale="en" />
     </>
   );
 }
