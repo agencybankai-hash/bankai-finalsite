@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Container } from "@/components/ui/Container";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
 import { Hero } from "@/components/sections/Hero";
 import { Breadcrumbs, serviceCrumbs } from "@/components/sections/Breadcrumbs";
+import { IntroStrip } from "@/components/sections/IntroStrip";
 import { AnswerBlock } from "@/components/sections/AnswerBlock";
 import { FitSection } from "@/components/sections/FitSection";
 import { FeatureGrid } from "@/components/sections/FeatureGrid";
@@ -28,6 +28,7 @@ import { channelForms, getChannel } from "@/content/services";
 import { cityLandingsOf, landings, subservicesOf } from "@/content/landings";
 import { finalCta } from "@/content/site";
 import { agencyAstana } from "@/content/agency-astana";
+import { introFacts } from "@/content/intro-facts";
 import type {
   CaseChannel,
   Cta,
@@ -169,11 +170,7 @@ export function ChannelPage({
 
       {/* Прямой ответ на запрос */}
       {source.intro && (
-        <div className="border-b border-border bg-surface">
-          <Container>
-            <p className="max-w-3xl py-8 text-lead text-ink-2">{source.intro}</p>
-          </Container>
-        </div>
+        <IntroStrip text={source.intro} {...introFacts(channel, landing)} />
       )}
 
       {source.answer && <AnswerBlock answer={source.answer} />}
