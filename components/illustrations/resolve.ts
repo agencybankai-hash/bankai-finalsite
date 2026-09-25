@@ -55,9 +55,12 @@ function copyFor(kind: HeroVisualKind, path: string, city?: string): VisualCopy 
     base.query && city && !base.query.includes(city.toLowerCase())
       ? `${base.query} ${city.toLowerCase()}`
       : base.query;
+  // «{city}» в заголовке вида - город встаёт в заголовок, справа остаётся meta вида
+  const cityTitle = base.title.includes("{city}");
   return {
     ...base,
-    meta: city ?? base.meta,
+    title: cityTitle ? base.title.replace("{city}", city ?? "") : base.title,
+    meta: cityTitle ? base.meta : (city ?? base.meta),
     query,
     kpis: visualKpis[path] ?? base.kpis,
     float: visualFloats[path] ?? null,
