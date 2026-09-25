@@ -16,7 +16,7 @@ import { CaseExplorer } from "@/components/sections/CaseExplorer";
 import { ServicesGrid } from "@/components/sections/ServicesGrid";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { Pricing } from "@/components/sections/Pricing";
-import { FAQ } from "@/components/sections/FAQ";
+import { FaqSection } from "@/components/sections/FAQ";
 import { CTASection } from "@/components/sections/CTASection";
 import { LeadMagnet } from "@/components/sections/LeadMagnet";
 import { Longread } from "@/components/sections/Longread";
@@ -244,12 +244,7 @@ export default async function Home() {
       <LeadMagnet />
 
       {/* FAQ */}
-      <Section>
-        <SectionHeader eyebrow="FAQ" title="Частые вопросы" align="center" />
-        <div className="mt-8">
-          <FAQ items={homeFaq} />
-        </div>
-      </Section>
+      <FaqSection title="Частые вопросы" items={homeFaq} />
 
       <CTASection title={finalCta.title} lead={finalCta.lead} cta={finalCta.cta} />
 
