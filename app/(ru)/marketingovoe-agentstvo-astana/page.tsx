@@ -1,8 +1,8 @@
 import { Fragment } from "react";
 import Link from "next/link";
-import { Container } from "@/components/ui/Container";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Hero } from "@/components/sections/Hero";
+import { IntroStrip } from "@/components/sections/IntroStrip";
 import { Breadcrumbs, type Crumb } from "@/components/sections/Breadcrumbs";
 import { ServicesGrid } from "@/components/sections/ServicesGrid";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
@@ -33,6 +33,9 @@ const crumbs: Crumb[] = [
   { label: page.hero.title, href: page.path },
 ];
 
+/** Один канал с учётом обращений - как в интро страницы. */
+const priceFrom = "350 000 ₸/мес";
+
 export default function AgencyAstanaPage() {
   const neutral = page.services.neutral;
 
@@ -44,7 +47,7 @@ export default function AgencyAstanaPage() {
           serviceLd(page.hero.title, page.description, page.path, {
             serviceType: "Маркетинговое агентство",
             areaServed: ["Астана", "Казахстан", ...geoNeutralAreas],
-            priceFrom: "350 000 ₸/мес",
+            priceFrom,
           }),
         )}
       />
@@ -70,11 +73,7 @@ export default function AgencyAstanaPage() {
         visual={<HeroIllustration visual={resolvePageVisual(page.path)} />}
       />
 
-      <div className="border-b border-border bg-surface">
-        <Container>
-          <p className="max-w-3xl py-8 text-lead text-ink-2">{page.intro}</p>
-        </Container>
-      </div>
+      <IntroStrip text={page.intro} priceFrom={priceFrom} geo="Астана" />
 
       <Section>
         <SectionHeader
