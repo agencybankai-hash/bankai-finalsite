@@ -1,13 +1,10 @@
 import { Fragment } from "react";
-import { nbsp } from "@/lib/utils";
+import { keepHyphens, nbsp } from "@/lib/utils";
 import { Section } from "@/components/ui/Section";
 import { Icon } from "@/components/ui/Icon";
 import { Reveal } from "@/components/motion/Reveal";
 
 const NB = String.fromCharCode(160);
-
-// Слово через дефис («B2B-услуги», «январь-август») не рвётся на дефисе.
-const HYPHENATED = /(\S+-\S+)/;
 
 /** Числа не рвутся: разряды «300 000», число с единицей «1,6 млн ₸», «100-200 тыс. ₸». */
 function bindNumbers(text: string): string {
@@ -19,9 +16,7 @@ function bindNumbers(text: string): string {
 /** Пункт с разметкой «**ключ** пояснение»: ключ полужирным, пояснение обычным. */
 function Item({ text }: { text: string }) {
   return text.split("**").map((part, i) => {
-    const words = bindNumbers(nbsp(part))
-      .split(HYPHENATED)
-      .map((w, j) => (j % 2 ? <span key={j} className="whitespace-nowrap">{w}</span> : w));
+    const words = keepHyphens(bindNumbers(nbsp(part)));
     return i % 2 ? (
       <strong key={i} className="font-semibold text-ink">
         {words}
