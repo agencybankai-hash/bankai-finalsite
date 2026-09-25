@@ -1,0 +1,28 @@
+/* Сайты: стили и сценарии движения трека (контракт - illustrations.css). */
+
+/* Вайрфрейм блока мини-сайта: пунктирный контур слота. Лежит под заливкой,
+   её кольцо цвета экрана закрывает контур - в финальном кадре его не видно,
+   а пока заливка проявляется (a-fade), контур гаснет под ней сам: одна
+   анимация на блок. Кольцо 0.45em покрывает контур и при скруглении
+   заливки до 0.9em. */
+.web-wire {
+  position: absolute;
+  inset: -0.2em;
+  border: 1px dashed var(--color-muted);
+  border-radius: 0.5em;
+  pointer-events: none;
+}
+.web-fill {
+  position: relative;
+  box-shadow: 0 0 0 0.45em var(--color-bg);
+}
+
+/* Короткий вариант подписи - только в компактной сцене (пара к .ill-detail). */
+.web-compact {
+  display: none;
+}
+@container ill (max-width: 22rem) {
+  .web-compact {
+    display: flex;
+  }
+}

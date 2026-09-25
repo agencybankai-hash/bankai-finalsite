@@ -54,8 +54,26 @@ function Can({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
   );
 }
 
+type VisualProps = { animated: boolean };
+
+/** Движущаяся часть живой версии (обёртка без transform). В статике - без обёртки. */
+function Part({ on, children }: { on: boolean; children: React.ReactNode }) {
+  return on ? <g>{children}</g> : <>{children}</>;
+}
+
+const AWNING_ROOF = "M52 14 L52 8 H228 V14";
+const AWNING_FESTOONS =
+  "M52 14 Q63 22 74 14 Q85 22 96 14 Q107 22 118 14 Q129 22 140 14 Q151 22 162 14 Q173 22 184 14 Q195 22 206 14 Q217 22 228 14";
+
 /** Рынок: навес-прилавок, бидон, ценник - платишь за каждый литр. */
-function Market() {
+function Market({ animated }: VisualProps) {
+  const awning = {
+    className: "text-ink",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "1.5",
+    strokeLinejoin: "round" as const,
+  };
   return (
     <>
       {/* навес: штанги + фестоны */}
@@ -66,14 +84,15 @@ function Market() {
         stroke="currentColor"
         strokeWidth="1.5"
       />
-      <path
-        d="M52 14 L52 8 H228 V14 M52 14 Q63 22 74 14 Q85 22 96 14 Q107 22 118 14 Q129 22 140 14 Q151 22 162 14 Q173 22 184 14 Q195 22 206 14 Q217 22 228 14"
-        className="text-ink"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
+      {animated ? (
+        /* живая версия: крыша и фестоны - отдельные контуры, прорисовываются по очереди */
+        <>
+          <path d={AWNING_ROOF} pathLength={1} {...awning} />
+          <path d={AWNING_FESTOONS} pathLength={1} {...awning} />
+        </>
+      ) : (
+        <path d={`${AWNING_ROOF} ${AWNING_FESTOONS}`} {...awning} />
+      )}
       {/* прилавок */}
       <line
         x1="60"
@@ -92,81 +111,117 @@ function Market() {
         strokeWidth="1.5"
       />
       {/* монета ₸ → бидон: платишь за каждый литр */}
-      <circle
-        cx="92"
-        cy="56"
-        r="9"
-        className="text-surface-2"
-        fill="currentColor"
-      />
-      <circle
-        cx="92"
-        cy="56"
-        r="9"
-        className="text-ink"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <text
-        x="92"
-        y="60"
-        textAnchor="middle"
-        className="text-ink"
-        fill="currentColor"
-        fontSize="10"
-        fontWeight="600"
-      >
-        ₸
-      </text>
-      <path
-        d="M106 56 H122 M122 56 L117 52 M122 56 L117 60"
-        className="text-muted"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <Part on={animated}>
+        <circle
+          cx="92"
+          cy="56"
+          r="9"
+          className="text-surface-2"
+          fill="currentColor"
+        />
+        <circle
+          cx="92"
+          cy="56"
+          r="9"
+          className="text-ink"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+        <text
+          x="92"
+          y="60"
+          textAnchor="middle"
+          className="text-ink"
+          fill="currentColor"
+          fontSize="10"
+          fontWeight="600"
+        >
+          ₸
+        </text>
+      </Part>
+      {animated ? (
+        /* живая версия: древко прорисовывается, наконечник - отдельным контуром */
+        <g
+          className="text-muted"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M106 56 H122" pathLength={1} />
+          <path d="M117 52 L122 56 L117 60" />
+        </g>
+      ) : (
+        <path
+          d="M106 56 H122 M122 56 L117 52 M122 56 L117 60"
+          className="text-muted"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      )}
       {/* бидон на прилавке */}
-      <Can x={130} y={42} s={1.15} />
+      <Part on={animated}>
+        <Can x={130} y={42} s={1.15} />
+      </Part>
       {/* ценник */}
-      <rect
-        x="172"
-        y="46"
-        width="36"
-        height="18"
-        rx="3"
-        className="text-bg"
-        fill="currentColor"
-      />
-      <rect
-        x="172"
-        y="46"
-        width="36"
-        height="18"
-        rx="3"
-        className="text-border"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <text
-        x="190"
-        y="58.5"
-        textAnchor="middle"
-        className="text-muted"
-        fill="currentColor"
-        fontSize="10"
-      >
-        ₸/л
-      </text>
+      <Part on={animated}>
+        <rect
+          x="172"
+          y="46"
+          width="36"
+          height="18"
+          rx="3"
+          className="text-bg"
+          fill="currentColor"
+        />
+        <rect
+          x="172"
+          y="46"
+          width="36"
+          height="18"
+          rx="3"
+          className="text-border"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+        <text
+          x="190"
+          y="58.5"
+          textAnchor="middle"
+          className="text-muted"
+          fill="currentColor"
+          fontSize="10"
+        >
+          ₸/л
+        </text>
+      </Part>
     </>
   );
 }
 
+/* Штрихи линии роста (4 через 5, как strokeDasharray статики) - элемент на штрих:
+   живая версия проявляет их каскадом, линия «прорисовывается» по штрихам. */
+const TREND: [number, number, number, number][] = (() => {
+  const [x0, y0, x1, y1] = [30, 76, 250, 30];
+  const len = Math.hypot(x1 - x0, y1 - y0);
+  const ux = (x1 - x0) / len;
+  const uy = (y1 - y0) / len;
+  const r = (n: number) => Math.round(n * 100) / 100;
+  const out: [number, number, number, number][] = [];
+  for (let s = 0; s + 4 <= len; s += 9) {
+    out.push([r(x0 + ux * s), r(y0 + uy * s), r(x0 + ux * (s + 4)), r(y0 + uy * (s + 4))]);
+  }
+  return out;
+})();
+
 /** Своя корова → стадо: восходящая пунктирная линия, бидоны растут. */
-function Cow() {
+function Cow({ animated }: VisualProps) {
   return (
     <>
       {/* база */}
@@ -180,15 +235,28 @@ function Cow() {
         strokeWidth="1"
       />
       {/* восходящий пунктир роста */}
-      <path
-        d="M30 76 L250 30"
-        className="text-muted"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeDasharray="4 5"
-        strokeLinecap="round"
-      />
+      {animated ? (
+        <g
+          className="text-muted"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        >
+          {TREND.map(([xa, ya, xb, yb]) => (
+            <line key={`${xa}-${ya}`} x1={xa} y1={ya} x2={xb} y2={yb} />
+          ))}
+        </g>
+      ) : (
+        <path
+          d="M30 76 L250 30"
+          className="text-muted"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeDasharray="4 5"
+          strokeLinecap="round"
+        />
+      )}
       {/* стрелка на конце */}
       <path
         d="M250 30 L242.5 30.5 M250 30 L246 36.5"
@@ -199,9 +267,15 @@ function Cow() {
         strokeLinecap="round"
       />
       {/* бидоны: 1 → 2 → 3, каждый литр дешевле */}
-      <Can x={44} y={67} s={0.7} />
-      <Can x={118} y={56} s={1} />
-      <Can x={186} y={45} s={1.3} />
+      <Part on={animated}>
+        <Can x={44} y={67} s={0.7} />
+      </Part>
+      <Part on={animated}>
+        <Can x={118} y={56} s={1} />
+      </Part>
+      <Part on={animated}>
+        <Can x={186} y={45} s={1.3} />
+      </Part>
     </>
   );
 }
@@ -275,7 +349,7 @@ function Separator() {
   );
 }
 
-const VISUALS: Record<SystemVisual, () => React.ReactNode> = {
+const VISUALS: Record<SystemVisual, (p: VisualProps) => React.ReactNode> = {
   market: Market,
   cow: Cow,
   separator: Separator,
@@ -284,9 +358,13 @@ const VISUALS: Record<SystemVisual, () => React.ReactNode> = {
 export function SystemIllustration({
   variant,
   label,
+  animated = false,
 }: {
   variant: SystemVisual;
   label?: string;
+  /** Разметка под сценарий движения (MetaphorCallout): тот же финальный кадр,
+      движущиеся части в обёртках, прорисовка - отдельными контурами. */
+  animated?: boolean;
 }) {
   const Visual = VISUALS[variant];
   return (
@@ -295,7 +373,7 @@ export function SystemIllustration({
       className="h-auto w-full"
       {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}
     >
-      <Visual />
+      <Visual animated={animated} />
     </svg>
   );
 }

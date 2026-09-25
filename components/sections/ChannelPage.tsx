@@ -16,7 +16,13 @@ import { CaseGrid } from "@/components/sections/CaseGrid";
 import { FAQ } from "@/components/sections/FAQ";
 import { CTASection } from "@/components/sections/CTASection";
 import { Longread } from "@/components/sections/Longread";
+import { LinkGrid } from "@/components/sections/LinkGrid";
+import { MetaphorCallout } from "@/components/sections/MetaphorCallout";
 import { Reveal } from "@/components/motion/Reveal";
+import { HeroIllustration } from "@/components/illustrations/HeroIllustration";
+import { resolveHeroVisual } from "@/components/illustrations/resolve";
+import { SystemMini } from "@/components/illustrations/infographics/SystemMini";
+import { GuideSheet } from "@/components/illustrations/infographics/GuideSheet";
 import { cases } from "@/content/cases";
 import { channelForms, getChannel } from "@/content/services";
 import { cityLandingsOf, landings, subservicesOf } from "@/content/landings";
@@ -72,29 +78,6 @@ function uniqueLinks(links: (Cta | undefined)[], exclude: string): Cta[] {
   });
 }
 
-function LinkGrid({ title, links }: { title: string; links: Cta[] }) {
-  return (
-    <div>
-      <SectionHeader title={title} />
-      <Reveal stagger className="mt-8 grid gap-3 sm:grid-cols-2">
-        {links.map((l) => (
-          <Link
-            key={l.href}
-            href={l.href}
-            data-reveal
-            className="flex items-center justify-between gap-4 rounded-xl border border-border bg-bg px-5 py-4 text-base text-ink shadow-card transition duration-300 ease-osmo hover:border-ink hover:shadow-card-hover"
-          >
-            <span>{l.label}</span>
-            <span aria-hidden className="text-muted">
-              →
-            </span>
-          </Link>
-        ))}
-      </Reveal>
-    </div>
-  );
-}
-
 /**
  * Страница услуги. С `landing` та же страница работает посадочной внутри канала:
  * подуслугой (гео-нейтральная) или городовой. hero, ключевая фраза в H2, ответный
@@ -116,6 +99,8 @@ export function ChannelPage({
     ? cases.filter((c) => c.channels.includes(tag)).slice(0, 3)
     : [];
   const guideSlug = guideSlugMap[channel.slug];
+  // канал, выделенный на мини-схеме «Часть системы» (у лидгена карточки нет)
+  const systemChannel = (["seo", "context", "web"] as const).find((s) => s === channel.slug);
   const forms =
     landing?.keyPhrase ??
     channelForms[channel.slug] ?? {
@@ -179,6 +164,7 @@ export function ChannelPage({
         primary={{ label: "Получить бесплатный аудит", href: "/contacts" }}
         secondary={{ label: "Смотреть кейсы", href: "/cases" }}
         badges={channel.badges}
+        visual={<HeroIllustration visual={resolveHeroVisual(channel, landing)} />}
       />
 
       {/* Прямой ответ на запрос */}
@@ -194,20 +180,7 @@ export function ChannelPage({
 
       {/* Метафора - только у канала, на лендингах дубль */}
       {!landing && channel.metaphor && (
-        <div className="border-b border-border bg-surface">
-          <Container>
-            <div className="max-w-3xl py-8">
-              <div className="rounded-lg border-l-2 border-ink bg-surface-2 px-4 py-3.5">
-                <div className="text-xs uppercase tracking-wide text-muted">
-                  По-простому
-                </div>
-                <p className="mt-1 text-base leading-relaxed text-ink">
-                  {channel.metaphor}
-                </p>
-              </div>
-            </div>
-          </Container>
-        </div>
+        <MetaphorCallout channel={channel.slug} text={channel.metaphor} />
       )}
 
       {/* Для кого */}
@@ -258,7 +231,11 @@ export function ChannelPage({
             lead={channel.funnel.lead}
           />
           <div className="mt-10">
-            <FunnelChain chain={channel.funnel.chain} note={channel.funnel.note} />
+            <FunnelChain
+              chain={channel.funnel.chain}
+              note={channel.funnel.note}
+              channel={channel.slug}
+            />
           </div>
         </Section>
       )}
@@ -390,6 +367,7 @@ export function ChannelPage({
                   !guideSlug && "sm:col-span-2",
                 )}
               >
+                {systemChannel && <SystemMini highlight={systemChannel} />}
                 <h3 className="text-h3 text-ink">Часть системы</h3>
                 <p className="mt-3 max-w-3xl text-base leading-relaxed text-ink-2">
                   {channel.partOfSystem}
@@ -411,6 +389,7 @@ export function ChannelPage({
                   !channel.partOfSystem && "sm:col-span-2",
                 )}
               >
+                <GuideSheet />
                 <h3 className="text-h3 text-ink">Нет секретов</h3>
                 <p className="mt-3 max-w-3xl text-base leading-relaxed text-ink-2">
                   Хотите разобраться сами? Мы выложили полный гайд по этому каналу
@@ -434,6 +413,7 @@ export function ChannelPage({
       {landing && guideSlug && (
         <Section tone="surface">
           <Reveal className="flex flex-col gap-5 rounded-2xl border border-border bg-bg p-7 shadow-card transition duration-300 ease-osmo hover:border-ink hover:shadow-card-hover sm:flex-row sm:items-center sm:justify-between">
+            <GuideSheet compact />
             <div>
               <h2 className="text-h3 text-ink">Нет секретов</h2>
               <p className="mt-3 max-w-xl text-base leading-relaxed text-ink-2">

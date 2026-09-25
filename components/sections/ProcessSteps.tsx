@@ -3,9 +3,11 @@ import { cn } from "@/lib/utils";
 import type { Step } from "@/content/types";
 
 /**
- * Процесс как путь: 4 шага на связной линии с узлами, финальный узел —
- * акцент (цель «Масштаб»). Reveal-каскад слева-направо «прочерчивает»
- * линию. На мобилке линия скрыта, шаги стопкой.
+ * Процесс как путь: шаги на связной линии с узлами, финальный узел —
+ * акцент (цель «Масштаб»). На lg (4 колонки) каждый узел соединён со
+ * следующим в той же строке - отрезок живёт в шаге и появляется с ним;
+ * последний в строке и последний шаг без отрезка. На мобилке и sm линии
+ * нет, шаги стопкой / сеткой.
  */
 export function ProcessSteps({ steps }: { steps: Step[] }) {
   return (
@@ -13,15 +15,19 @@ export function ProcessSteps({ steps }: { steps: Step[] }) {
       stagger
       className="relative grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"
     >
-      {/* Связующая линия (только lg), по центру icon-бейджей */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-0 right-0 top-[18px] hidden h-px bg-border lg:block"
-      />
       {steps.map((s, i) => {
         const last = i === steps.length - 1;
+        const linked = !last && i % 4 !== 3;
         return (
           <div key={s.n} data-reveal className="relative">
+            {/* Отрезок до следующего узла строки (только lg): от края кружка через
+                колонку и зазор gap-x-8 до левого края соседнего кружка */}
+            {linked && (
+              <span
+                aria-hidden
+                className="pointer-events-none absolute -right-8 left-9 top-[18px] hidden h-px bg-border lg:block"
+              />
+            )}
             <div className="flex items-center gap-3">
               <span
                 className={cn(

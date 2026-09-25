@@ -26,9 +26,12 @@ export function Hero({
   badges?: string[];
   /** Пилюля над заголовком; null — без пилюли. */
   badge?: string | null;
-  /** Правая колонка с продающим визуалом (только десктоп). */
-  visual?: boolean;
+  /** Правая колонка: true - общий визуал главной (только десктоп); узел - свой
+   *  визуал страницы (сам решает мобильную версию); false - без визуала. */
+  visual?: React.ReactNode;
 }) {
+  const visualNode = visual === true ? <HeroVisual /> : visual;
+  const hasVisual = Boolean(visualNode);
   // Дефис-разделитель → em-dash, приклеенный к следующему слову (nbsp после
   // тире). Так тире не висит в конце строки, а ведёт value-prop на новой строке.
   const titleText = nbsp(title).replace(
@@ -41,7 +44,7 @@ export function Hero({
         <div
           className={cn(
             "grid items-center gap-10 py-14 sm:py-16 lg:gap-14 lg:py-24",
-            visual && "lg:grid-cols-[1.05fr_0.95fr]",
+            hasVisual && "lg:grid-cols-[1.05fr_0.95fr]",
           )}
         >
           {/* Левая колонка — текст. Появление на CSS (.rise): контент виден
@@ -61,7 +64,7 @@ export function Hero({
               <p
                 className={cn(
                   "rise rise-3 mt-6 text-base leading-relaxed text-ink-2",
-                  visual ? "max-w-md" : "max-w-2xl",
+                  hasVisual ? "max-w-md" : "max-w-2xl",
                 )}
               >
                 {nbsp(subtitle)}
@@ -103,10 +106,11 @@ export function Hero({
             )}
           </div>
 
-          {/* Правая колонка — визуал (на мобилке скрыт, текст важнее) */}
-          {visual && (
-            <div className="hidden lg:block">
-              <HeroVisual />
+          {/* Правая колонка — визуал. Общий визуал главной на мобилке скрыт;
+              тематический визуал страницы сам решает мобильную версию. */}
+          {hasVisual && (
+            <div className={visual === true ? "hidden lg:block" : undefined}>
+              {visualNode}
             </div>
           )}
         </div>

@@ -1,9 +1,10 @@
-import Link from "next/link";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Hero } from "@/components/sections/Hero";
 import { TrustBar } from "@/components/sections/TrustBar";
 import { CaseGrid } from "@/components/sections/CaseGrid";
 import { CTASection } from "@/components/sections/CTASection";
+import { LinkRow } from "@/components/sections/LinkGrid";
+import { CasesHero } from "@/components/illustrations/pages/CasesHero";
 import {
   kzCases,
   intlCases,
@@ -39,6 +40,7 @@ export default function CasesPage() {
       <Hero
         title="Кейсы по SEO, рекламе и сайтам в Казахстане и США"
         subtitle={`${casesIntro.title}. ${casesIntro.lead}`}
+        visual={<CasesHero />}
       />
 
       <TrustBar items={casesStats} />
@@ -79,16 +81,7 @@ export default function CasesPage() {
             </p>
             <div className="mt-6 space-y-3">
               {serviceChannelsNav.map((s) => (
-                <Link
-                  key={s.href}
-                  href={s.href}
-                  className="flex items-center justify-between gap-4 rounded-xl border border-border bg-bg px-5 py-4 text-base text-ink shadow-card transition duration-300 ease-osmo hover:border-ink hover:shadow-card-hover"
-                >
-                  <span>{s.label}</span>
-                  <span aria-hidden className="text-muted">
-                    →
-                  </span>
-                </Link>
+                <LinkRow key={s.href} href={s.href} label={s.label} />
               ))}
             </div>
           </div>
