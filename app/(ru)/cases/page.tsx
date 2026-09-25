@@ -13,7 +13,7 @@ import {
   casesIntro,
   casesStats,
 } from "@/content/cases";
-import { finalCta, serviceChannelsNav } from "@/content/site";
+import { serviceChannelsNav } from "@/content/site";
 import { breadcrumbLd, ldJson } from "@/lib/jsonld";
 import { pageMetadata } from "@/lib/metadata";
 
@@ -124,7 +124,7 @@ export default function CasesPage() {
         </Section>
       )}
 
-      <CTASection title={finalCta.title} lead={finalCta.lead} cta={finalCta.cta} />
+      <CTASection />
     </>
   );
 }

@@ -12,7 +12,6 @@ import { CTASection } from "@/components/sections/CTASection";
 import { HeroIllustration } from "@/components/illustrations/HeroIllustration";
 import { resolvePageVisual } from "@/components/illustrations/resolve";
 import { agencyAstana as page } from "@/content/agency-astana";
-import { finalCta } from "@/content/site";
 import {
   breadcrumbLd,
   faqLd,
@@ -30,7 +29,7 @@ export const generateMetadata = pageMetadata({
 
 const crumbs: Crumb[] = [
   { label: "Главная", href: "/" },
-  { label: page.hero.title, href: page.path },
+  { label: page.hero.title, href: page.path, short: "Астана" },
 ];
 
 /** Один канал с учётом обращений - как в интро страницы. */
@@ -62,9 +61,9 @@ export default function AgencyAstanaPage() {
         )}
       />
 
-      <Breadcrumbs items={crumbs} />
-
       <Hero
+        crumbs={<Breadcrumbs items={crumbs} />}
+        badge={null}
         title={page.hero.title}
         subtitle={page.hero.subtitle}
         primary={{ label: "Получить бесплатный аудит", href: "/contacts" }}
@@ -119,7 +118,7 @@ export default function AgencyAstanaPage() {
 
       <FaqSection title={page.faqTitle} items={page.faq} tone="surface" />
 
-      <CTASection title={finalCta.title} lead={finalCta.lead} cta={finalCta.cta} />
+      <CTASection />
     </>
   );
 }

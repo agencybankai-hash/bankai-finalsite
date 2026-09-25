@@ -1,37 +1,60 @@
 import { Section } from "@/components/ui/Section";
-import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
-import { Blobs } from "@/components/ui/Blobs";
 import { Reveal } from "@/components/motion/Reveal";
-import type { Cta } from "@/content/types";
+import { ContactForm } from "@/components/sections/ContactForm";
+import { contacts, finalCta } from "@/content/site";
+import { finalCtaEn } from "@/content/en/site";
+import type { Locale } from "@/content/types";
+import { nbsp } from "@/lib/utils";
 
+/**
+ * Финальный CTA - единственная тёмная полоса страницы: заголовок и короткий
+ * текст, под линией форма заявки в строку. Форма та же, что на /contacts, с
+ * той же защитой; метку формы она запрашивает сама - страницы статические.
+ * id="cta": по нему плавающая кнопка прячется, пока блок на экране.
+ */
 export function CTASection({
-  title,
-  lead,
-  cta,
+  locale = "ru",
+  service,
 }: {
-  title: string;
-  lead: string;
-  cta: Cta;
+  locale?: Locale;
+  /** Услуга заявки - на страницах услуг. */
+  service?: string;
 }) {
+  const c = locale === "en" ? finalCtaEn : finalCta;
   return (
-    <Section tone="ink" leading className="relative overflow-hidden">
-      <Blobs tone="dark" />
-      <Container>
-        <Reveal stagger className="relative mx-auto max-w-2xl text-center">
-          <h2 data-reveal className="text-h2 text-ink">
-            {title}
+    <Section id="cta" tone="ink">
+      <Reveal stagger>
+        <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:gap-16">
+          <h2 data-reveal className="max-w-2xl text-h2 text-balance text-ink">
+            {c.title}
           </h2>
-          <p data-reveal className="mt-4 text-lead text-ink-2">
-            {lead}
+          <p data-reveal className="max-w-md text-lead text-ink-2">
+            {nbsp(c.lead)}
           </p>
-          <div data-reveal className="mt-8 flex justify-center">
-            <Button href={cta.href} size="lg" variant="accent">
-              {cta.label}
-            </Button>
-          </div>
-        </Reveal>
-      </Container>
+        </div>
+        <div data-reveal className="mt-10 border-t border-border pt-10">
+          <ContactForm
+            variant="inline"
+            locale={locale}
+            service={service}
+            submitLabel={c.submit}
+            note={nbsp(c.note)}
+            aside={
+              <p className="shrink-0 text-ink-2">
+                {c.messenger.text}{" "}
+                <a
+                  href={contacts.telegramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium whitespace-nowrap text-ink underline decoration-border underline-offset-4 transition duration-300 ease-osmo hover:decoration-ink"
+                >
+                  {c.messenger.link}
+                </a>
+              </p>
+            }
+          />
+        </div>
+      </Reveal>
     </Section>
   );
 }

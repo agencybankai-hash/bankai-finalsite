@@ -45,7 +45,8 @@ export function Disclosure({
           buttonClassName,
         )}
       >
-        {label}
+        {/* Фрагмент не убирать: label с сервера может прийти ленивым RSC-чанком, и без обёртки React требует у него key. */}
+        <>{label}</>
         <span
           aria-hidden
           className={cn(
