@@ -9,10 +9,6 @@
   --seo-rail: max(8em, 68px);
   --seo-pad: 0.2em;
 }
-.seo-store {
-  --seo-row: 2.2em;
-  --seo-pad: 0.3em;
-}
 
 .seo-row {
   height: var(--seo-row);
@@ -30,27 +26,14 @@
   top: calc(3 * var(--seo-row) - var(--seo-pad));
   height: calc(var(--seo-row) + 2 * var(--seo-pad));
 }
-.seo-map {
-  height: calc(3 * var(--seo-row) - 0.9em);
-}
-/* Строка поиска и очередь регионов - в одну строку, запрос при нехватке места обрезается. */
-.seo-top {
-  flex-wrap: nowrap;
-}
 
 /* Телефон: строки 7-10 скрыты (ill-detail), оставшиеся крупнее, рельс шире -
-   подписи упираются в порог 10px; очередь регионов уходит под строку поиска. */
+   подписи упираются в порог 10px. */
 @container ill (max-width: 22rem) {
   .seo-scene {
     --seo-row: 3em;
     --seo-line: 2.2em;
     --seo-rail: 11em;
-  }
-  .seo-regions {
-    --seo-row: 2.75em;
-  }
-  .seo-top {
-    flex-wrap: wrap;
   }
 }
 
@@ -77,5 +60,170 @@
   }
   .seo-p2 {
     --i: 6;
+  }
+}
+
+/* ═══ Город (seo-city): карты слева, органика справа ═══ */
+/* Шаг строки органики, высота слота сайта, нахлёст карточки на плитку. */
+.seo-city {
+  --city-row: 3.85em;
+  --city-slot: 3.3em;
+  --city-overlap: 3.4em;
+}
+.city-body {
+  margin-top: 1.1em;
+}
+.city-map {
+  width: 46%;
+}
+/* Плитка и слой меток: низ плитки уходит под карточку. */
+.city-tile {
+  inset: 0 0 var(--city-overlap) 0;
+}
+.city-card {
+  left: 0.8em;
+  right: 0.8em;
+  bottom: 0;
+}
+.city-row {
+  height: var(--city-row);
+}
+/* Слот шире строки на свой отступ слева - фавиконы строк и слота на одной оси. */
+.city-slot {
+  left: -0.8em;
+  right: 0;
+  top: calc(var(--city-row) + (var(--city-row) - var(--city-slot)) / 2);
+  height: var(--city-slot);
+}
+/* Телефон: только блок карт на всю сцену, карточка по содержимому - справа
+   видна карта. */
+@container ill (max-width: 22rem) {
+  .city-body {
+    margin-top: 0;
+  }
+  .city-map {
+    width: 100%;
+  }
+  .city-card {
+    right: auto;
+  }
+}
+
+/* Движение: слот стартует с шестой строки и поднимается на вторую - 4 шага. */
+.city-slot {
+  --a-y: calc(4 * var(--city-row));
+}
+
+/* ═══ Регионы (seo-regions): схема городов и очередь ═══ */
+.reg-map {
+  width: 61%;
+}
+/* Сетка точек-ориентиров под схемой (не города: мельче и тусклее). */
+.reg-grid {
+  background-image: radial-gradient(var(--color-border) 0.09em, transparent 0.11em);
+  background-size: 1.5em 1.5em;
+  background-position: 0.75em 0.75em;
+}
+/* Точки и метки центрируются отступами: transform занят анимацией (a-pop). */
+.reg-dot {
+  --d: max(5px, 0.7em);
+  width: var(--d);
+  height: var(--d);
+  margin: calc(var(--d) / -2) 0 0 calc(var(--d) / -2);
+}
+.reg-mark {
+  --d: max(11px, 1.55em);
+  width: var(--d);
+  height: var(--d);
+  left: calc(var(--d) / -2);
+  top: calc(var(--d) / -2);
+}
+/* Подписи городов - от краёв метки: Алматы снизу, Астана сверху, Шымкент слева. */
+.reg-label-work {
+  left: 50%;
+  top: calc(100% + 0.4em);
+  transform: translateX(-50%);
+}
+.reg-label-next {
+  left: 50%;
+  bottom: calc(100% + 0.4em);
+  transform: translateX(-50%);
+}
+.reg-label-queue {
+  right: calc(100% + 0.5em);
+  top: 50%;
+  transform: translateY(-50%);
+}
+.reg-lead {
+  margin: calc(max(7px, 1em) / -2) 0 0 max(9px, 1.25em);
+}
+@container ill (max-width: 22rem) {
+  .reg-map {
+    width: 55%;
+  }
+}
+/* Узкий телефон (320): колонке очереди - ширина под чип «KZ-версия по данным». */
+@container ill (max-width: 17rem) {
+  .reg-map {
+    width: 45%;
+  }
+}
+
+/* ═══ Магазин (seo-store): категория слева, выдача справа ═══ */
+.store-body {
+  gap: 1.5em;
+}
+.store-site {
+  display: flex;
+  width: 42%;
+  flex-shrink: 0;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: 0.9em;
+  background: var(--color-surface);
+  padding: 1.1em;
+}
+.store-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5em;
+  margin-top: 1.4em;
+}
+/* Подпись группы - на всю строку: группы фильтров идут строками. */
+.store-caption {
+  width: 100%;
+}
+.store-filters > .store-caption:not(:first-child) {
+  margin-top: 0.9em;
+}
+.store-serp {
+  gap: 1.1em;
+}
+.store-card {
+  padding: 1em 1.1em;
+}
+/* Телефон: карточка результата сверху, под ней ряд фильтров без панели. */
+@container ill (max-width: 22rem) {
+  .store-body {
+    flex-direction: column-reverse;
+    justify-content: center;
+    gap: 1.2em;
+  }
+  .store-site {
+    width: auto;
+    border: 0;
+    background: none;
+    padding: 0;
+  }
+  .store-serp {
+    flex: none;
+  }
+  .store-card {
+    padding: 1.6em 1.8em;
+  }
+  .store-filters {
+    margin-top: 0;
+    flex-wrap: nowrap;
   }
 }
