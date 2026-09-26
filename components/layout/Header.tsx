@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { Emblem, hasEmblem } from "@/components/illustrations/emblems/Emblem";
+import { GuideSheet } from "@/components/illustrations/infographics/GuideSheet";
+import { SystemMini } from "@/components/illustrations/infographics/SystemMini";
 import { Button, MessengerButton } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Icon } from "@/components/ui/Icon";
@@ -63,9 +66,40 @@ function Typo({ text }: { text: string }) {
   return <span>{keepHyphens(nbsp(text))}</span>;
 }
 
-/** Маркер «вы здесь» - коралловая точка у текущей страницы. */
-function CurrentDot() {
-  return <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />;
+/** Маркер «вы здесь» - коралловая точка у текущей страницы (на коралловой
+ *  карточке под курсором - белая). Строчный: встаёт за последним словом. */
+function CurrentDot({ className }: { className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-accent align-middle group-hover/card:bg-accent-fg",
+        className,
+      )}
+    />
+  );
+}
+
+/** Хвост подписи (маркер, стрелка): якорь нулевой ширины сразу за последним
+ *  словом. Содержимое позиционируется от него абсолютно - места в строке не
+ *  занимает, поэтому хвост не переносится один и не раздувает заголовок. */
+function Trail({ children }: { children: React.ReactNode }) {
+  return <span className="relative inline-block w-0 align-middle">{children}</span>;
+}
+
+/** Подпись пункта; маркер текущей страницы - в конце последней строки, а не
+ *  сбоку от всего блока, когда подпись переносится. */
+function Label({ text, current }: { text: string; current?: boolean }) {
+  return (
+    <span className="min-w-0">
+      <Typo text={text} />
+      {current && (
+        <Trail>
+          <CurrentDot className="absolute left-2 top-1/2 -translate-y-1/2" />
+        </Trail>
+      )}
+    </span>
+  );
 }
 
 /** Марка (молния из app/icon.svg) и название. */
@@ -110,7 +144,55 @@ function LocaleSwitch({ locale, href }: { locale: Locale; href: string }) {
   );
 }
 
-/** Карточка главного пункта группы: название, описание, стрелка. */
+/* Плитка эмблемы под курсором ссылки - коралловая, глиф белый: ховер читается
+   сразу. Маски глифа (fill-surface) берут цвет из --color-surface, поэтому
+   переопределяем переменную - фон плитки и маски меняются вместе, без швов. */
+const emblemHover =
+  "group-hover:border-accent group-hover:text-accent-fg group-hover:[--color-surface:var(--color-accent)]";
+
+/** Эмблема пункта по ключу из контента; неизвестный ключ - без иллюстрации. */
+function ItemEmblem({
+  name,
+  size,
+  className,
+}: {
+  name?: string;
+  size: "sm" | "md";
+  className?: string;
+}) {
+  return name && hasEmblem(name) ? (
+    <Emblem name={name} size={size} className={cn(emblemHover, className)} />
+  ) : null;
+}
+
+/** Иллюстрация карточки главного пункта в десктоп-панели: у флагмана - вся
+ *  система заявок, у гайдов - лист с чек-листом. Анимация - при первом открытии. */
+function FeaturedArt({ emblem }: { emblem?: string }) {
+  if (emblem === "leadgen")
+    return (
+      <SystemMini className="mb-0 group-hover/card:[&_svg]:[--color-ink:var(--color-accent-fg)]" />
+    );
+  if (emblem === "guides") return <GuideSheet compact />;
+  return null;
+}
+
+/** Круглая стрелка карточки главного пункта. */
+function CardArrow({ compact }: { compact?: boolean }) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "inline-flex shrink-0 items-center justify-center rounded-full border border-border bg-bg text-ink transition-colors duration-300 ease-osmo group-hover/card:border-accent-fg group-hover/card:bg-accent-fg group-hover/card:text-accent",
+        compact ? "h-8 w-8" : "h-9 w-9",
+      )}
+    >
+      <Icon name="arrow" className="h-4 w-4" />
+    </span>
+  );
+}
+
+/** Карточка главного пункта группы. Десктоп: текст и стрелка сверху,
+ *  иллюстрация снизу. Мобилка (compact): эмблема, текст, стрелка в строку. */
 function FeaturedCard({
   item,
   current,
@@ -122,50 +204,56 @@ function FeaturedCard({
   compact?: boolean;
   className?: string;
 }) {
-  // Десктоп: текст сверху (в линию с колонками каналов), стрелка в нижнем углу -
-  // узкая карточка на lg не выдавливает её за край. Мобилка: стрелка справа.
+  const text = (
+    <span className={cn("block", compact && "min-w-0 flex-1")}>
+      <span
+        className={cn(
+          "block font-display font-semibold leading-tight tracking-tight text-ink transition-colors duration-300 ease-osmo group-hover/card:text-accent-fg",
+          compact ? "text-lg" : "text-xl",
+        )}
+      >
+        <Label text={item.label} current={current} />
+      </span>
+      {item.description && (
+        <span className="mt-1.5 block text-balance text-sm leading-snug text-ink-2 transition-colors duration-300 ease-osmo group-hover/card:text-accent-fg">
+          <Typo text={item.description} />
+        </span>
+      )}
+    </span>
+  );
   return (
     <Link
       href={item.href}
       aria-current={current ? "page" : undefined}
       className={cn(
-        "group/card flex justify-between gap-4 rounded-xl bg-surface transition-colors duration-300 ease-osmo hover:bg-surface-2",
-        compact ? "items-center p-4" : "flex-col p-6",
+        "group group/card flex rounded-xl bg-surface transition-colors duration-300 ease-osmo hover:bg-accent",
+        compact ? "items-center gap-3 p-4" : "flex-col justify-between gap-6 p-6",
         className,
       )}
     >
-      <span className="block">
-        <span
-          className={cn(
-            "flex items-center gap-2 font-display font-semibold leading-tight tracking-tight text-ink",
-            compact ? "text-lg" : "text-xl",
-          )}
-        >
-          <Typo text={item.label} />
-          {current && <CurrentDot />}
-        </span>
-        {item.description && (
-          <span className="mt-1.5 block text-balance text-sm leading-snug text-ink-2">
-            <Typo text={item.description} />
+      {compact ? (
+        <>
+          <ItemEmblem name={item.emblem} size="md" />
+          {text}
+          <CardArrow compact />
+        </>
+      ) : (
+        <>
+          <span className="flex items-start justify-between gap-4">
+            {text}
+            <CardArrow />
           </span>
-        )}
-      </span>
-      <span
-        aria-hidden
-        className={cn(
-          "inline-flex shrink-0 items-center justify-center rounded-full border border-border bg-bg text-ink transition-colors duration-300 ease-osmo group-hover/card:border-ink group-hover/card:bg-ink group-hover/card:text-bg",
-          compact ? "h-8 w-8" : "h-9 w-9 self-end",
-        )}
-      >
-        <Icon name="arrow" className="h-4 w-4" />
-      </span>
+          <FeaturedArt emblem={item.emblem} />
+        </>
+      )}
     </Link>
   );
 }
 
 /** Десктоп-панель группы: карточка главного пункта слева, справа - колонки
- *  каналов с подуслугами или строки ссылок. Колонки на subgrid: хайрлайн над
- *  подуслугами идёт одной линией, даже если название канала перенеслось. */
+ *  каналов с подуслугами или строки ссылок; у каждого пункта своя эмблема.
+ *  Колонки на subgrid: хайрлайн над подуслугами идёт одной линией, даже если
+ *  название или описание канала перенеслось. */
 function PanelContent({ group, isCurrent }: { group: NavItem; isCurrent: (href: string) => boolean }) {
   const { featured, rest, columns } = splitGroup(group);
   const current = (href: string) => (isCurrent(href) ? "page" : undefined);
@@ -173,26 +261,27 @@ function PanelContent({ group, isCurrent }: { group: NavItem; isCurrent: (href: 
   return (
     <div className="grid grid-cols-12 gap-8 py-8">
       {featured && (
-        <FeaturedCard
-          item={featured}
-          current={isCurrent(featured.href)}
-          className="col-span-3 xl:col-span-4"
-        />
+        <FeaturedCard item={featured} current={isCurrent(featured.href)} className="col-span-4" />
       )}
       {columns ? (
-        <div className="col-span-9 grid grid-cols-3 grid-rows-[auto_1fr] gap-x-8 xl:col-span-8">
+        <div className="col-span-8 grid grid-cols-3 grid-rows-[auto_1fr] gap-x-8">
           {rest.map((item) => (
             <div key={item.href} className="row-span-2 grid grid-rows-subgrid">
-              <Link href={item.href} aria-current={current(item.href)} className="group/item block">
-                <span className="flex items-center gap-2 text-base font-semibold text-ink">
-                  <Typo text={item.label} />
-                  {isCurrent(item.href) ? (
-                    <CurrentDot />
-                  ) : (
-                    <Icon
-                      name="arrow"
-                      className="h-4 w-4 -translate-x-1 opacity-0 transition duration-300 ease-osmo group-hover/item:translate-x-0 group-hover/item:opacity-100"
-                    />
+              <Link
+                href={item.href}
+                aria-current={current(item.href)}
+                className="group group/item block"
+              >
+                <ItemEmblem name={item.emblem} size="md" className="mb-4" />
+                <span className="block text-base font-semibold text-ink">
+                  <Label text={item.label} current={isCurrent(item.href)} />
+                  {!isCurrent(item.href) && (
+                    <Trail>
+                      <Icon
+                        name="arrow"
+                        className="absolute left-1 top-1/2 h-4 w-4 -translate-x-1 -translate-y-1/2 opacity-0 transition duration-300 ease-osmo group-hover/item:translate-x-0 group-hover/item:opacity-100"
+                      />
+                    </Trail>
                   )}
                 </span>
                 {item.description && (
@@ -208,10 +297,10 @@ function PanelContent({ group, isCurrent }: { group: NavItem; isCurrent: (href: 
                       <Link
                         href={sub.href}
                         aria-current={current(sub.href)}
-                        className="flex items-center gap-2 py-1.5 text-sm text-ink-2 transition-colors duration-300 ease-osmo hover:text-ink aria-[current=page]:font-medium aria-[current=page]:text-ink"
+                        className="group flex items-center gap-3 py-1.5 text-sm text-ink-2 transition-colors duration-300 ease-osmo hover:text-ink aria-[current=page]:font-medium aria-[current=page]:text-ink"
                       >
-                        <Typo text={sub.label} />
-                        {isCurrent(sub.href) && <CurrentDot />}
+                        <ItemEmblem name={sub.emblem} size="sm" />
+                        <Label text={sub.label} current={isCurrent(sub.href)} />
                       </Link>
                     </li>
                   ))}
@@ -221,17 +310,17 @@ function PanelContent({ group, isCurrent }: { group: NavItem; isCurrent: (href: 
           ))}
         </div>
       ) : (
-        <ul className="col-span-9 grid grid-cols-2 gap-x-8 self-start border-t border-border xl:col-span-8">
+        <ul className="col-span-8 grid grid-cols-2 gap-x-8 self-start border-t border-border">
           {rest.map((item) => (
             <li key={item.href}>
               <Link
                 href={item.href}
                 aria-current={current(item.href)}
-                className="group/item flex items-center justify-between gap-4 border-b border-border py-3.5 text-base font-medium text-ink"
+                className="group group/item flex items-center justify-between gap-4 border-b border-border py-2.5 text-base font-medium text-ink"
               >
-                <span className="flex items-center gap-2">
-                  <Typo text={item.label} />
-                  {isCurrent(item.href) && <CurrentDot />}
+                <span className="flex items-center gap-3">
+                  <ItemEmblem name={item.emblem} size="sm" />
+                  <Label text={item.label} current={isCurrent(item.href)} />
                 </span>
                 <Icon
                   name="arrow"
@@ -247,7 +336,7 @@ function PanelContent({ group, isCurrent }: { group: NavItem; isCurrent: (href: 
 }
 
 /** Раскрытая группа в мобильном меню: карточка главного пункта, каналы с
- *  подуслугами-чипами или список ссылок. */
+ *  подуслугами-чипами или список ссылок - с эмблемами пунктов. */
 function MobileGroupBody({ group, isCurrent }: { group: NavItem; isCurrent: (href: string) => boolean }) {
   const { featured, rest, columns } = splitGroup(group);
   const current = (href: string) => (isCurrent(href) ? "page" : undefined);
@@ -261,16 +350,17 @@ function MobileGroupBody({ group, isCurrent }: { group: NavItem; isCurrent: (hre
             <Link
               href={item.href}
               aria-current={current(item.href)}
-              className="flex items-center justify-between gap-4 py-1 text-base font-semibold text-ink"
+              className="group flex items-center justify-between gap-4 text-base font-semibold text-ink"
             >
-              <span className="flex items-center gap-2">
-                <Typo text={item.label} />
-                {isCurrent(item.href) && <CurrentDot />}
+              <span className="flex items-center gap-3">
+                <ItemEmblem name={item.emblem} size="sm" />
+                <Label text={item.label} current={isCurrent(item.href)} />
               </span>
               <Icon name="arrow" className="h-4 w-4 shrink-0 text-muted" />
             </Link>
+            {/* Чипы подуслуг - под названием канала, отступ = эмблема + зазор. */}
             {item.children && (
-              <div className="mt-2.5 flex flex-wrap gap-2">
+              <div className="mt-2.5 flex flex-wrap gap-2 pl-11">
                 {item.children.map((sub) => (
                   <Pill key={sub.href} href={sub.href} active={isCurrent(sub.href)}>
                     {sub.label}
@@ -287,11 +377,11 @@ function MobileGroupBody({ group, isCurrent }: { group: NavItem; isCurrent: (hre
               <Link
                 href={item.href}
                 aria-current={current(item.href)}
-                className="flex items-center justify-between gap-4 py-2.5 text-base text-ink-2 aria-[current=page]:text-ink"
+                className="group flex items-center justify-between gap-4 py-2 text-base text-ink-2 aria-[current=page]:text-ink"
               >
-                <span className="flex items-center gap-2">
-                  <Typo text={item.label} />
-                  {isCurrent(item.href) && <CurrentDot />}
+                <span className="flex items-center gap-3">
+                  <ItemEmblem name={item.emblem} size="sm" />
+                  <Label text={item.label} current={isCurrent(item.href)} />
                 </span>
                 <Icon name="arrow" className="h-4 w-4 shrink-0 text-muted" />
               </Link>

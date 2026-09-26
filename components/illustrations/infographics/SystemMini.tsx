@@ -94,10 +94,19 @@ function Stream({
 /**
  * Мини-схема «Реклама / SEO → Сайт → Заявки» для карточки «Часть системы»:
  * канал страницы выделен и подписан «вы здесь», его поток сплошной до заявок,
- * остальные - пунктиром. Полоса 96px; колонки потоков тянутся под ширину карточки.
+ * остальные - пунктиром. Без highlight - вся система (флагман в панели шапки):
+ * оба потока сплошные, узлы ровные. Полоса 96px; колонки потоков тянутся под
+ * ширину карточки.
  */
-export function SystemMini({ highlight }: { highlight: Channel }) {
-  const src = (ch: Exclude<Channel, "web">) => (highlight === ch ? tone.here : tone.other);
+export function SystemMini({
+  highlight,
+  className,
+}: {
+  highlight?: Channel;
+  className?: string;
+}) {
+  const src = (ch: Exclude<Channel, "web">) =>
+    !highlight ? tone.plain : highlight === ch ? tone.here : tone.other;
   const siteHere = highlight === "web";
   // точка-поток: у источника-канала - два отрезка, у сайта - один
   const toSite = siteHere ? undefined : FLOW_AT;
@@ -106,7 +115,10 @@ export function SystemMini({ highlight }: { highlight: Channel }) {
   return (
     <InView
       aria-hidden
-      className="ig-scope mb-6 grid h-24 grid-cols-[auto_minmax(1rem,1fr)_auto_minmax(1rem,1fr)_auto] items-center"
+      className={cn(
+        "ig-scope mb-6 grid h-24 grid-cols-[auto_minmax(1rem,1fr)_auto_minmax(1rem,1fr)_auto] items-center",
+        className,
+      )}
     >
       <div className="flex flex-col gap-3">
         <span className={cn(pill, "w-full", src("context"))}>
@@ -120,8 +132,8 @@ export function SystemMini({ highlight }: { highlight: Channel }) {
       </div>
 
       <svg className="h-24 w-full overflow-visible">
-        <Stream y1={30} y2={48} solid={highlight === "context"} flow={toSite} />
-        <Stream y1={66} y2={48} solid={highlight === "seo"} flow={toSite} />
+        <Stream y1={30} y2={48} solid={!highlight || highlight === "context"} flow={toSite} />
+        <Stream y1={66} y2={48} solid={!highlight || highlight === "seo"} flow={toSite} />
       </svg>
 
       <span className={cn(pill, siteHere ? tone.here : tone.plain)}>
