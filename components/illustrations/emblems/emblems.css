@@ -28,6 +28,16 @@
   transform: rotate(calc(var(--em-on, 0) * -8deg));
 }
 
+/* ai-seo: искра в линзе проворачивается на четверть оборота, малая - вспыхивает. */
+.em-spark {
+  transform-origin: center;
+  transform: rotate(calc(var(--em-on, 0) * 90deg));
+}
+.em-spark-sm {
+  transform-origin: center;
+  transform: scale(calc(1 + var(--em-on, 0) * 0.35));
+}
+
 /* seo-store: пакет приподнимается. */
 .em-bag {
   transform: translateY(calc(var(--em-on, 0) * -2px));
@@ -38,7 +48,7 @@
   transform: translate(calc(var(--em-on, 0) * -2px), calc(var(--em-on, 0) * -2px));
 }
 
-/* google-ads: ветки перерисовываются - штрих пробегает путь (pathLength=1). */
+/* google-ads, guides: ветки и галочки перерисовываются - штрих пробегает путь (pathLength=1). */
 .em-branch {
   stroke-dasharray: 1 1;
   stroke-dashoffset: calc(var(--em-on, 0) * -2px);

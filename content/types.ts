@@ -6,12 +6,14 @@ export type Locale = "ru" | "en";
  * группы - префикс раздела, по нему подсвечивается активный пункт (сам не ссылка).
  * description - строка под названием в панели, featured - главный пункт группы
  * (крупная карточка слева). children у пункта группы - его подуслуги.
+ * emblem - ключ эмблемы-иллюстрации (components/illustrations/emblems/names.ts).
  */
 export type NavItem = {
   label: string;
   href: string;
   description?: string;
   featured?: boolean;
+  emblem?: string;
   children?: NavItem[];
 };
 export type Cta = { label: string; href: string };

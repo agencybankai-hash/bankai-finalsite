@@ -1,8 +1,11 @@
 import type { HeroVisualKind } from "@/content/types";
 
-/** Эмблема услуги: плитка-глиф для списков ссылок. Город - значок-пин поверх. */
+/** Эмблема услуги: плитка-глиф для списков ссылок. Город - значок-пин поверх.
+ *  ai-seo и guides - только для гайдов в панели шапки, у страниц услуг их нет. */
 export type EmblemName =
   | "seo"
+  | "ai-seo"
+  | "guides"
   | "seo-store"
   | "context"
   | "google-ads"
