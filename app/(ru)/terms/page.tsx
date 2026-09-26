@@ -12,7 +12,7 @@ export default function TermsPage() {
   return (
     <Container>
       <article className="max-w-3xl py-16 sm:py-20">
-        <h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-ink min-[360px]:text-3xl sm:text-4xl">
           Условия использования
         </h1>
         <p className="mt-3 text-sm text-muted">

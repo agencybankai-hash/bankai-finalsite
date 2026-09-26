@@ -16,7 +16,7 @@ export default function EnPrivacyPage() {
   return (
     <Container>
       <article className="max-w-3xl py-16 sm:py-20">
-        <h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-ink min-[360px]:text-3xl sm:text-4xl">
           Privacy Policy
         </h1>
         <p className="mt-3 text-sm text-muted">Updated 21 August 2026</p>
