@@ -49,6 +49,16 @@ export default async function EnContactsPage() {
                 </li>
                 <li>
                   <a
+                    href={contacts.whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-ink"
+                  >
+                    WhatsApp {contacts.whatsapp}
+                  </a>
+                </li>
+                <li>
+                  <a
                     href={contacts.telegramUrl}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -65,7 +75,7 @@ export default async function EnContactsPage() {
               <p className="mt-2 text-sm leading-relaxed text-ink-2">
                 Almaty (GMT+5) - overlap with EU and US mornings. We reply within
                 one business day, usually sooner. If it is urgent, message us on
-                Telegram.
+                WhatsApp or Telegram.
               </p>
             </div>
 

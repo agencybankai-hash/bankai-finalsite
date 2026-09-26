@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { contacts } from "@/content/site";
+import { MessengerButton } from "@/components/ui/Button";
 import { ui } from "@/content/ui";
 import type { Locale } from "@/content/types";
 
 /* Скрываем там, где CTA избыточен: страница контактов (форма) и легал - см. floatingCta.hiddenOn. */
 export function FloatingCta({ locale = "ru" }: { locale?: Locale }) {
-  const { headerCta, floatingCta } = ui(locale);
+  const { headerCta, floatingCta, whatsappLabel, telegramLabel } = ui(locale);
   const pathname = usePathname();
   const [closed, setClosed] = useState(false);
   // Показываем после ухода hero (~0.8 экрана), чтобы не дублировать hero-CTA
@@ -110,14 +110,16 @@ export function FloatingCta({ locale = "ru" }: { locale?: Locale }) {
             >
               {headerCta.label}
             </Link>
-            <a
-              href={contacts.telegramUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-11 flex-1 items-center justify-center rounded-lg border border-border bg-bg px-4 text-sm font-medium text-ink hover:bg-surface"
-            >
-              Telegram
-            </a>
+            <MessengerButton
+              messenger="whatsapp"
+              ariaLabel={whatsappLabel}
+              className="h-11 w-11 rounded-lg"
+            />
+            <MessengerButton
+              messenger="telegram"
+              ariaLabel={telegramLabel}
+              className="h-11 w-11 rounded-lg"
+            />
           </div>
         </div>
       )}

@@ -220,5 +220,5 @@ export const finalCtaEn = {
   lead: "We show where you lose clients on your own numbers and lay out a plan for a steady flow of leads.",
   note: "The audit is free and comes with no obligations.",
   submit: "Get a free audit",
-  messenger: { text: "Prefer a messenger?", link: "Message us on Telegram" },
+  messenger: "Prefer a messenger?",
 };

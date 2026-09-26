@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/motion/Reveal";
 import { ContactForm } from "@/components/sections/ContactForm";
@@ -12,6 +13,12 @@ import { nbsp } from "@/lib/utils";
  * той же защитой; метку формы она запрашивает сама - страницы статические.
  * id="cta": по нему плавающая кнопка прячется, пока блок на экране.
  */
+/* Мессенджеры рядом с формой: WhatsApp первым - бизнес в KZ пишет туда. */
+const messengers = [
+  { label: "WhatsApp", href: contacts.whatsappUrl },
+  { label: "Telegram", href: contacts.telegramUrl },
+];
+
 export function CTASection({
   locale = "ru",
   service,
@@ -41,15 +48,20 @@ export function CTASection({
             note={nbsp(c.note)}
             aside={
               <p className="shrink-0 text-ink-2">
-                {c.messenger.text}{" "}
-                <a
-                  href={contacts.telegramUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium whitespace-nowrap text-ink underline decoration-border underline-offset-4 transition duration-300 ease-osmo hover:decoration-ink"
-                >
-                  {c.messenger.link}
-                </a>
+                {c.messenger}{" "}
+                {messengers.map((m, i) => (
+                  <Fragment key={m.label}>
+                    {i > 0 && <span aria-hidden> · </span>}
+                    <a
+                      href={m.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium whitespace-nowrap text-ink underline decoration-border underline-offset-4 transition duration-300 ease-osmo hover:decoration-ink"
+                    >
+                      {m.label}
+                    </a>
+                  </Fragment>
+                ))}
               </p>
             }
           />

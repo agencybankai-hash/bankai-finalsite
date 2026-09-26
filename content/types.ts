@@ -302,7 +302,8 @@ export type UiDict = {
   menuLabel: string;
   /** Подпись бургера при открытом меню. */
   closeLabel: string;
-  /** Быстрый контакт в шапке: aria-label иконки и подпись кнопки в мобильном меню. */
+  /** Быстрые контакты: aria-label кнопок-иконок мессенджеров (WhatsApp - первым). */
+  whatsappLabel: string;
   telegramLabel: string;
   footer: {
     slogan: string;
