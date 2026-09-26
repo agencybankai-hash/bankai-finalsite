@@ -437,6 +437,15 @@ html.lenis body {
   color: var(--color-ink);
   font-weight: 600;
 }
+/* Обёртка таблицы в гайде (GuideArticle): узкая колонка прокручивается сама.
+   Отступы несёт обёртка - внутри overflow они не схлопнулись бы с абзацами. */
+.guide-prose .gp-table {
+  overflow-x: auto;
+  margin: 1.25rem 0;
+}
+.guide-prose .gp-table > table {
+  margin: 0;
+}
 .guide-prose hr {
   border: 0;
   border-top: 1px solid var(--color-border);
