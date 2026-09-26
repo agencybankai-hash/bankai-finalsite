@@ -27,7 +27,10 @@ export function Stat({
     <div className={cn(fit && "@container", className)}>
       <div
         className={cn(
-          "text-h2 text-ink",
+          // Без fit цифра стоит в плитке 2×2 (TrustBar, /about): text-stat
+          // на телефоне мельче h2, иначе «до -40%» шире плитки
+          fit ? "text-h2" : "text-stat",
+          "text-ink",
           small &&
             "text-h3 text-balance break-words @max-[9rem]:[--text-h3:var(--text-xl)]",
         )}

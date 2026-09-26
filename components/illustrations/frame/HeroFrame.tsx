@@ -69,7 +69,8 @@ export function HeroFrame({
         </div>
 
         {copy.kpis && (
-          <div className="mt-5 grid grid-cols-2 gap-4 border-t border-border pt-4">
+          // Ниже 360px - столбиком: «еженедельно» шире половины панели
+          <div className="mt-5 grid grid-cols-1 gap-4 border-t border-border pt-4 min-[360px]:grid-cols-2">
             {copy.kpis.map((k, i) => (
               <div key={k.label} className="a-rise" style={anim({ delay: 2.5, i })}>
                 <div className="text-xl font-semibold tracking-tight text-ink tabular-nums sm:text-2xl">

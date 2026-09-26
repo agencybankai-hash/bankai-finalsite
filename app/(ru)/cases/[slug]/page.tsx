@@ -181,7 +181,9 @@ export default async function CaseDetailPage({ params }: Params) {
                 обновим после завершения и запуска.
               </p>
             )}
-            <dl className="mt-8 grid grid-cols-2 gap-6 border-t border-border pt-6 sm:grid-cols-4">
+            {/* «Благотворительность» шире колонки 320px-телефона и четверти
+                640px-планшета: ниже 360px - перенос по слогам, четыре колонки с md */}
+            <dl className="mt-8 grid grid-cols-2 gap-6 border-t border-border pt-6 max-[359px]:hyphens-auto md:grid-cols-4">
               <div>
                 <dt className="text-xs uppercase tracking-wide text-muted">
                   Индустрия

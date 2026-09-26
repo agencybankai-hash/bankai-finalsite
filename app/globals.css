@@ -72,6 +72,13 @@
   --text-h3--letter-spacing: -0.015em;
   --text-h3--font-weight: 600;
 
+  /* Цифра в плитке (TrustBar, /about) - h2, но ниже ~430px уменьшается
+     вместе с экраном (7vw): в плитке 2×2 телефона «до -40%» иначе шире плитки */
+  --text-stat: clamp(min(1.875rem, 7vw), 2.5vw + 0.75rem, 3rem);
+  --text-stat--line-height: 1.05;
+  --text-stat--letter-spacing: -0.02em;
+  --text-stat--font-weight: 600;
+
   --text-lead: clamp(1.125rem, 0.6vw + 1rem, 1.375rem);
   --text-lead--line-height: 1.5;
   --text-lead--letter-spacing: -0.01em;
