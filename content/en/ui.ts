@@ -15,13 +15,14 @@ export const siteMetaEn = {
 export const uiEn: UiDict = {
   locale: "en",
   home: "/en",
-  tagline: "Leads, not reports",
   nav: [
     { label: "Cases", href: "/en/cases" },
     { label: "Contacts", href: "/en/contacts" },
   ],
   headerCta: { label: "Get a free audit", href: "/en/contacts" },
   menuLabel: "Menu",
+  closeLabel: "Close",
+  telegramLabel: "Message us on Telegram",
   footer: {
     slogan: "Clients come to you - growth stops being a guessing game",
     description:

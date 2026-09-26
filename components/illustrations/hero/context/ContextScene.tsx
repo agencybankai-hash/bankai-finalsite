@@ -21,13 +21,11 @@ const BARS = [
   { clicks: "30%", leads: "20%" },
 ];
 
-function campaigns({ kind, city }: SceneProps["v"]): Row[] {
-  const names =
-    kind === "yandex-direct"
-      ? ["Поиск · ремонт", "Сети · ремонт", "Бренд"]
-      : kind === "context-city" && city
-        ? [`Ремонт · ${city}`, `Дизайн · ${city}`, "Бренд"]
-        : ["Ремонт · поиск", "Дизайн · поиск", "Бренд"];
+/** Хаб - кампании по типу, город без своей схемы (GeoScene) - по городу. */
+function campaigns({ city }: SceneProps["v"]): Row[] {
+  const names = city
+    ? [`Ремонт · ${city}`, `Дизайн · ${city}`, "Бренд"]
+    : ["Ремонт · поиск", "Дизайн · поиск", "Бренд"];
   return names.map((name, i) => ({ name, ...BARS[i] }));
 }
 
@@ -118,25 +116,12 @@ function OrganicRow() {
   );
 }
 
-function Ledger({ rows, conversions }: { rows: Row[]; conversions: boolean }) {
+function Ledger({ rows }: { rows: Row[] }) {
   return (
     <div
       className="a-fade relative mt-auto rounded-[1.1em] border border-border bg-surface px-[1.3em] py-[0.55em]"
       style={anim({ delay: 1.5 })}
     >
-      {conversions && (
-        <>
-          {/* Сдвиг бейджа - у обёртки, pop - у самой пилюли */}
-          <span className="ill-detail absolute right-[1.3em] top-0 flex -translate-y-1/2">
-            <Chip tone="outline" className="a-pop bg-surface" style={anim({ delay: 1.9 })}>
-              Конверсии ✓
-            </Chip>
-          </span>
-          {/* запас под бейдж, чтобы он не лёг на шапку */}
-          <span aria-hidden className="ill-detail block h-[0.65em]" />
-        </>
-      )}
-
       <div className="ill-t-sm flex items-center gap-[1em] pb-[0.3em] text-muted">
         <span className={COL.name}>Кампания</span>
         <span className={cn(COL.bar, "ill-detail")}>Клики</span>
@@ -190,7 +175,7 @@ export function ContextScene({ v }: SceneProps) {
         <AdCard />
         <OrganicRow />
       </div>
-      <Ledger rows={campaigns(v)} conversions={v.kind === "google-ads"} />
+      <Ledger rows={campaigns(v)} />
     </div>
   );
 }

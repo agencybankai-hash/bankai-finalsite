@@ -56,7 +56,9 @@
   --text-hero--letter-spacing: -0.02em;
   --text-hero--font-weight: 600;
 
-  --text-h2: clamp(1.875rem, 2.5vw + 0.75rem, 3rem);
+  /* ниже 360px h2 уменьшается вместе с экраном (30px при 360px): связка
+     nbsp() «Как мы выстраиваем» иначе шире строки 320px-экрана */
+  --text-h2: clamp(min(1.875rem, 100vw / 12), 2.5vw + 0.75rem, 3rem);
   --text-h2--line-height: 1.05;
   --text-h2--letter-spacing: -0.02em;
   --text-h2--font-weight: 600;
@@ -142,8 +144,8 @@ h6 {
   font-family: var(--font-display);
 }
 
-/* Плавный ховер ссылок шапки/подвала (на токенах моторики). */
-header a,
+/* Плавный ховер ссылок подвала (на токенах моторики). Шапку не трогаем:
+   правило вне @layer перебило бы transition-утилиты её ссылок. */
 footer a {
   transition: color var(--dur-fast) var(--ease-osmo);
 }

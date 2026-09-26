@@ -3,7 +3,6 @@ import type { ClientLogo, Cta, Feature, NavItem, StatItem, Step } from "./types"
 export const siteMeta = {
   name: "Bankai",
   fullName: "Bankai Agency",
-  tagline: "Лидогенерация под ключ",
   description:
     "Маркетинговое агентство в Алматы: лидогенерация под ключ. Сайт, SEO и контекстная реклама как одна система привлечения заявок. Казахстан и США.",
   url: "https://bankai.agency",
@@ -33,7 +32,7 @@ const webNav: NavItem = { label: "Разработка сайтов", href: "/se
 /** Четыре услуги: колонка футера. Городовых страниц здесь нет. */
 export const serviceChannelsNav: NavItem[] = [leadgenNav, seoNav, contextNav, webNav];
 
-/* Дропдаун «Услуги»: только услуги и подуслуги (indent - вложены под услугой).
+/* Панель «Услуги»: флагман (featured - карточка слева) и три канала с подуслугами.
    Городовые страницы в меню не попадают - на них ведут ссылки из текста
    лонгридов, со страниц услуг и из sitemap.xml. Подуслуги литералом, а не
    из content/landings.ts: Header клиентский, импорт лендингов утянул бы
@@ -42,41 +41,39 @@ export const serviceChannelsNav: NavItem[] = [leadgenNav, seoNav, contextNav, we
 export const nav: NavItem[] = [
   {
     label: "Услуги",
-    href: "/#services",
+    href: "/services",
     children: [
-      leadgenNav,
-      seoNav,
       {
-        label: "Продвижение интернет-магазинов",
-        href: "/services/seo/prodvizhenie-internet-magazina",
-        indent: true,
-      },
-      contextNav,
-      {
-        label: "Настройка Google Ads",
-        href: "/services/context/nastroika-google-ads",
-        indent: true,
+        ...leadgenNav,
+        featured: true,
+        description: "Сайт, SEO и реклама - одна система заявок",
       },
       {
-        label: "Яндекс Директ",
-        href: "/services/context/nastroika-yandex-direct",
-        indent: true,
-      },
-      webNav,
-      {
-        label: "Лендинги",
-        href: "/services/web/sozdanie-lendinga",
-        indent: true,
-      },
-      {
-        label: "Корпоративные сайты",
-        href: "/services/web/sozdanie-korporativnogo-saita",
-        indent: true,
+        ...seoNav,
+        description: "Свой поток клиентов из поиска - вдолгую",
+        children: [
+          {
+            label: "Продвижение интернет-магазинов",
+            href: "/services/seo/prodvizhenie-internet-magazina",
+          },
+        ],
       },
       {
-        label: "Интернет-магазины",
-        href: "/services/web/sozdanie-internet-magazina",
-        indent: true,
+        ...contextNav,
+        description: "Быстрые заявки из Google Ads и Директа",
+        children: [
+          { label: "Настройка Google Ads", href: "/services/context/nastroika-google-ads" },
+          { label: "Яндекс Директ", href: "/services/context/nastroika-yandex-direct" },
+        ],
+      },
+      {
+        ...webNav,
+        description: "Сайты, которые превращают трафик в заявки",
+        children: [
+          { label: "Лендинги", href: "/services/web/sozdanie-lendinga" },
+          { label: "Корпоративные сайты", href: "/services/web/sozdanie-korporativnogo-saita" },
+          { label: "Интернет-магазины", href: "/services/web/sozdanie-internet-magazina" },
+        ],
       },
     ],
   },
@@ -85,6 +82,12 @@ export const nav: NavItem[] = [
     label: "Гайды",
     href: "/guides",
     children: [
+      {
+        label: "Все гайды",
+        href: "/guides",
+        featured: true,
+        description: "Бесплатно: формулы, пороги и чек-листы",
+      },
       { label: "Маркетинг под заявки", href: "/guides/marketing" },
       { label: "Гайд по SEO", href: "/guides/seo" },
       { label: "ИИ для SEO-стратегии", href: "/guides/ai-seo" },
@@ -390,11 +393,14 @@ export const guarantee = {
   ] as Feature[],
 };
 
+/* Финальный CTA с формой заявки (CTASection): note - строка у кнопки,
+   messenger - ссылка на Telegram рядом с формой. */
 export const finalCta = {
   title: "Хотите выбирать клиентов, а не гоняться за ними?",
-  lead:
-    "Когда заявки идут стабильным потоком, вы планируете рост и работаете с теми, с кем хочется, а не соглашаетесь на любого. Первый шаг туда - увидеть, где вы теряете клиентов сейчас: покажем это по вашим цифрам и составим план стабильного потока заявок. Аудит бесплатный и без обязательств.",
-  cta: { label: "Получить бесплатный аудит", href: "/contacts" } as Cta,
+  lead: "Покажем по вашим цифрам, где вы теряете клиентов, и составим план стабильного потока заявок.",
+  note: "Аудит бесплатный и без обязательств.",
+  submit: "Получить бесплатный аудит",
+  messenger: { text: "Удобнее в мессенджере?", link: "Написать в Telegram" },
 };
 
 export const leadMagnet = {
