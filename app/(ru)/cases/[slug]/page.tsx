@@ -12,6 +12,7 @@ import { cases, getCase } from "@/content/cases";
 import { finalCta } from "@/content/site";
 import { ui } from "@/content/ui";
 import { pageMetadata } from "@/lib/metadata";
+import { nbspValue } from "@/lib/utils";
 import type { CaseChannel, CaseStudy, Cta, StatItem } from "@/content/types";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -337,14 +338,15 @@ export default async function CaseDetailPage({ params }: Params) {
                 {g.items.map((it) =>
                   it.before !== undefined && it.after !== undefined ? (
                     <div key={it.label}>
-                      <div className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+                      {/* Числа не рвутся, строка переносится только у стрелки */}
+                      <div className="flex flex-wrap items-baseline gap-x-1.5 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
                         <span className="text-xl text-muted sm:text-2xl">
-                          {it.before}
+                          {nbspValue(it.before)}
                         </span>
-                        <span aria-hidden className="mx-1.5 text-muted">
+                        <span aria-hidden className="text-muted">
                           →
                         </span>
-                        {it.after}
+                        <span>{nbspValue(it.after)}</span>
                       </div>
                       <div className="mt-1 text-sm text-ink-2">{it.label}</div>
                     </div>
@@ -353,6 +355,7 @@ export default async function CaseDetailPage({ params }: Params) {
                       key={it.label}
                       value={it.value ?? ""}
                       label={it.label}
+                      fit
                     />
                   ),
                 )}

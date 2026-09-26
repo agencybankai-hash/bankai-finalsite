@@ -72,6 +72,14 @@ export function GuideArticle({ markdown }: { markdown: string }) {
             if (steps) return <GuideChain steps={steps} />;
             return <p>{props.children}</p>;
           },
+          // Таблица шире колонки на телефоне прокручивается сама, а не вся страница
+          table({ children }) {
+            return (
+              <div className="gp-table">
+                <table>{children}</table>
+              </div>
+            );
+          },
           a({ href, children }) {
             const h = String(href ?? "#");
             return h.startsWith("/") ? (
