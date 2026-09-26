@@ -43,6 +43,16 @@ export default async function ContactsPage() {
                 </li>
                 <li>
                   <a
+                    href={contacts.whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-ink"
+                  >
+                    WhatsApp {contacts.whatsapp}
+                  </a>
+                </li>
+                <li>
+                  <a
                     href={contacts.telegramUrl}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -58,7 +68,7 @@ export default async function ContactsPage() {
               <div className="text-sm font-medium text-ink">Время ответа</div>
               <p className="mt-2 text-sm leading-relaxed text-ink-2">
                 Отвечаем в течение рабочего дня, обычно быстрее. Если срочно -
-                пишите в Telegram.
+                пишите в WhatsApp или Telegram.
               </p>
             </div>
 

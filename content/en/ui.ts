@@ -22,6 +22,7 @@ export const uiEn: UiDict = {
   headerCta: { label: "Get a free audit", href: "/en/contacts" },
   menuLabel: "Menu",
   closeLabel: "Close",
+  whatsappLabel: "Message us on WhatsApp",
   telegramLabel: "Message us on Telegram",
   footer: {
     slogan: "Clients come to you - growth stops being a guessing game",
@@ -80,7 +81,7 @@ export const uiEn: UiDict = {
     commentPlaceholder: "Your goal, website link, what you have tried",
     optional: "- optional",
     formError: "Fill in the required fields above.",
-    sendError: "Could not send. Try again or message us on Telegram.",
+    sendError: "Could not send. Try again or message us on WhatsApp or Telegram.",
     captchaError: "We could not verify you are human. Reload the page and try again.",
     submit: "Send request",
     submitting: "Sending…",
@@ -90,7 +91,7 @@ export const uiEn: UiDict = {
     privacyHref: "/en/privacy",
     successTitle: "Request sent",
     successText:
-      "Thanks. We reply within one business day - usually sooner. If it is urgent, message us on Telegram.",
+      "Thanks. We reply within one business day - usually sooner. If it is urgent, message us on WhatsApp or Telegram.",
   },
   cases: {
     /* Данные кейсов остаются на CaseChannel («SEO» | «Контекст» | «Сайт»), переводим только подпись. */

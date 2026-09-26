@@ -1,4 +1,5 @@
 import { Reveal } from "@/components/motion/Reveal";
+import { MessengerButton } from "@/components/ui/Button";
 import { Disclosure } from "@/components/ui/Disclosure";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { contacts } from "@/content/site";
@@ -32,26 +33,29 @@ function FaqContact({ className }: { className?: string }) {
       <h3 className="text-xl font-semibold tracking-tight text-ink">Не нашли ответ?</h3>
       <p className="mt-2 text-base leading-relaxed text-ink-2">
         {nbsp(
-          "Напишите в Telegram или на почту - ответим в течение рабочего дня, обычно быстрее.",
+          "Напишите в WhatsApp, Telegram или на почту - ответим в течение рабочего дня, обычно быстрее.",
         )}
       </p>
-      <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
-        <a
-          href={contacts.telegramUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          data-cursor
-          className="inline-flex h-12 items-center justify-center rounded-md bg-ink px-6 text-base font-medium whitespace-nowrap text-bg transition duration-300 ease-osmo hover:bg-ink-2"
-        >
-          Написать в Telegram
-        </a>
-        <a
-          href={`mailto:${contacts.email}`}
-          className="text-sm font-medium text-ink underline decoration-border underline-offset-4 transition duration-300 ease-osmo hover:decoration-ink"
-        >
-          {contacts.email}
-        </a>
+      <div className="mt-6 grid max-w-sm grid-cols-2 gap-3">
+        <MessengerButton
+          messenger="whatsapp"
+          label="WhatsApp"
+          ariaLabel="Написать в WhatsApp"
+          className="h-12"
+        />
+        <MessengerButton
+          messenger="telegram"
+          label="Telegram"
+          ariaLabel="Написать в Telegram"
+          className="h-12"
+        />
       </div>
+      <a
+        href={`mailto:${contacts.email}`}
+        className="mt-4 inline-block text-sm font-medium text-ink underline decoration-border underline-offset-4 transition duration-300 ease-osmo hover:decoration-ink"
+      >
+        {contacts.email}
+      </a>
     </Reveal>
   );
 }

@@ -11,6 +11,10 @@ export const siteMeta = {
 export const contacts = {
   city: "Алматы, Казахстан",
   email: "info@bankai.agency",
+  /* WhatsApp - первым среди мессенджеров: бизнес в Казахстане пишет туда,
+     Telegram - аудитория помоложе. */
+  whatsapp: "+7 700 979 33 41",
+  whatsappUrl: "https://wa.me/77009793341",
   telegram: "@may_work",
   telegramUrl: "https://t.me/may_work",
   /* Телефон в международном формате (+7...). Пустая строка - в разметку
@@ -394,13 +398,13 @@ export const guarantee = {
 };
 
 /* Финальный CTA с формой заявки (CTASection): note - строка у кнопки,
-   messenger - ссылка на Telegram рядом с формой. */
+   messenger - подпись к ссылкам на WhatsApp и Telegram рядом с формой. */
 export const finalCta = {
   title: "Хотите выбирать клиентов, а не гоняться за ними?",
   lead: "Покажем по вашим цифрам, где вы теряете клиентов, и составим план стабильного потока заявок.",
   note: "Аудит бесплатный и без обязательств.",
   submit: "Получить бесплатный аудит",
-  messenger: { text: "Удобнее в мессенджере?", link: "Написать в Telegram" },
+  messenger: "Удобнее в мессенджере?",
 };
 
 export const leadMagnet = {

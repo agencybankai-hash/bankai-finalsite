@@ -19,6 +19,7 @@ export const uiRu: UiDict = {
   headerCta,
   menuLabel: "Меню",
   closeLabel: "Закрыть",
+  whatsappLabel: "Написать в WhatsApp",
   telegramLabel: "Написать в Telegram",
   footer: {
     slogan,
@@ -75,7 +76,7 @@ export const uiRu: UiDict = {
     commentPlaceholder: "Задача, ссылка на сайт, что уже пробовали",
     optional: "— необязательно",
     formError: "Заполните обязательные поля выше.",
-    sendError: "Не удалось отправить. Попробуйте ещё раз или напишите в Telegram.",
+    sendError: "Не удалось отправить. Попробуйте ещё раз или напишите в WhatsApp либо Telegram.",
     captchaError: "Не удалось подтвердить, что вы не робот. Обновите страницу и попробуйте ещё раз.",
     submit: "Отправить заявку",
     submitting: "Отправляем…",
@@ -85,7 +86,7 @@ export const uiRu: UiDict = {
     privacyHref: "/privacy",
     successTitle: "Заявка отправлена",
     successText:
-      "Спасибо. Свяжемся в течение рабочего дня - обычно быстрее. Если срочно, напишите в Telegram.",
+      "Спасибо. Свяжемся в течение рабочего дня - обычно быстрее. Если срочно, напишите в WhatsApp или Telegram.",
   },
   cases: {
     channels: { SEO: "SEO", Контекст: "Контекст", Сайт: "Сайт" },

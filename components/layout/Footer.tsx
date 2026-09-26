@@ -54,6 +54,16 @@ export function Footer({ locale = "ru" }: { locale?: Locale }) {
               </li>
               <li>
                 <a
+                  href={contacts.whatsappUrl}
+                  className="hover:text-ink"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  WhatsApp {contacts.whatsapp}
+                </a>
+              </li>
+              <li>
+                <a
                   href={contacts.telegramUrl}
                   className="hover:text-ink"
                   target="_blank"

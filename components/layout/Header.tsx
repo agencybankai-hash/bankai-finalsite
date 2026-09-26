@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { Button, MessengerButton } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Icon } from "@/components/ui/Icon";
 import { Pill } from "@/components/ui/Pill";
-import { contacts, siteMeta } from "@/content/site";
+import { siteMeta } from "@/content/site";
 import { ui } from "@/content/ui";
 import type { Locale, NavItem } from "@/content/types";
 import { switchHref } from "@/lib/i18n";
@@ -305,7 +305,8 @@ function MobileGroupBody({ group, isCurrent }: { group: NavItem; isCurrent: (hre
 
 export function Header({ locale = "ru" }: { locale?: Locale }) {
   const pathname = usePathname();
-  const { nav, headerCta, home, menuLabel, closeLabel, telegramLabel } = ui(locale);
+  const { nav, headerCta, home, menuLabel, closeLabel, whatsappLabel, telegramLabel } =
+    ui(locale);
   const uid = useId();
   const headerRef = useRef<HTMLElement>(null);
   const burgerRef = useRef<HTMLButtonElement>(null);
@@ -597,16 +598,8 @@ export function Header({ locale = "ru" }: { locale?: Locale }) {
 
           <div className="hidden items-center gap-2 lg:flex">
             <LocaleSwitch locale={locale} href={otherLocaleHref} />
-            <a
-              href={contacts.telegramUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={telegramLabel}
-              title={telegramLabel}
-              className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-md border border-border text-ink transition-colors duration-300 ease-osmo hover:bg-surface"
-            >
-              <Icon name="send" className="h-4.5 w-4.5" />
-            </a>
+            <MessengerButton messenger="whatsapp" ariaLabel={whatsappLabel} className="ml-1" />
+            <MessengerButton messenger="telegram" ariaLabel={telegramLabel} />
             <Button href={headerCta.href} variant="accent" className="group">
               {headerCta.label}
               <Icon
@@ -747,15 +740,18 @@ export function Header({ locale = "ru" }: { locale?: Locale }) {
               <Icon name="arrow" className="h-4 w-4" />
             </Button>
             <div className="flex flex-wrap items-center gap-3">
-              <a
-                href={contacts.telegramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-11 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-border px-4 text-sm font-medium text-ink transition-colors duration-300 ease-osmo hover:bg-surface"
-              >
-                <Icon name="send" className="h-4 w-4" />
-                {telegramLabel}
-              </a>
+              <MessengerButton
+                messenger="whatsapp"
+                label="WhatsApp"
+                ariaLabel={whatsappLabel}
+                className="h-11 flex-1"
+              />
+              <MessengerButton
+                messenger="telegram"
+                label="Telegram"
+                ariaLabel={telegramLabel}
+                className="h-11 flex-1"
+              />
               <LocaleSwitch locale={locale} href={otherLocaleHref} />
             </div>
           </Container>
