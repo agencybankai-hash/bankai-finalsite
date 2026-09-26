@@ -17,6 +17,37 @@ const GLYPHS: Partial<Record<EmblemName, () => ReactNode>> = {
       <path d="M9.25 17.75h2.5v-2.5h2.5v-2.5h2.5v-2.5h1.5" />
     </g>
   ),
+  // лупа, внутри - искра ИИ, в углу - малая искра
+  "ai-seo": () => (
+    <>
+      <circle cx="13.75" cy="13.75" r="8.5" />
+      <path d="m19.75 19.75 7 7" />
+      <path
+        className="em-m em-spark"
+        fill="currentColor"
+        stroke="none"
+        d="M13.75 9q.5 4.25 4.75 4.75-4.25.5-4.75 4.75-.5-4.25-4.75-4.75 4.25-.5 4.75-4.75z"
+      />
+      <path
+        className="em-m em-spark-sm"
+        style={at(1)}
+        fill="currentColor"
+        stroke="none"
+        d="M25.5 4q.25 2.25 2.5 2.5-2.25.25-2.5 2.5-.25-2.25-2.5-2.5 2.25-.25 2.5-2.5z"
+      />
+    </>
+  ),
+  // лист с отогнутым углом и две отмеченные строки чек-листа
+  guides: () => (
+    <>
+      <path d="M18.75 4.75h-8.5a2 2 0 0 0-2 2v18.5a2 2 0 0 0 2 2h12.5a2 2 0 0 0 2-2v-14.5z" />
+      <path d="M18.75 4.75v4a2 2 0 0 0 2 2h4" />
+      <path className="em-m em-branch" style={at(0)} pathLength={1} d="m11.75 15.75 1.5 1.5 2.75-3" />
+      <path d="M18.25 15.75h3.5" />
+      <path className="em-m em-branch" style={at(1)} pathLength={1} d="m11.75 21.75 1.5 1.5 2.75-3" />
+      <path d="M18.25 21.75h3.5" />
+    </>
+  ),
   // пакет магазина, внутри - растущая линия
   "seo-store": () => (
     <g className="em-m em-bag">
@@ -120,9 +151,14 @@ const GLYPHS: Partial<Record<EmblemName, () => ReactNode>> = {
   ),
 };
 
-export function hasEmblem(name: EmblemName): boolean {
-  return Boolean(GLYPHS[name]);
+/** Есть ли глиф; заодно сужает строку (ключ из контента) до EmblemName. */
+export function hasEmblem(name: string): name is EmblemName {
+  return Boolean(GLYPHS[name as EmblemName]);
 }
+
+/* sm - строки списков (панели шапки), md - карточки ссылок, lg - сетка услуг. */
+const TILE = { sm: "h-8 w-8 rounded-lg", md: "h-12 w-12 rounded-xl", lg: "h-14 w-14 rounded-xl" };
+const GLYPH = { sm: "h-6 w-6", md: "h-8 w-8", lg: "h-9 w-9" };
 
 /**
  * Эмблема услуги для списков ссылок: плитка с line-глифом, коралла нет.
@@ -137,7 +173,7 @@ export function Emblem({
   name: EmblemName;
   /** Значок-пин городской страницы. */
   geo?: boolean;
-  size?: "md" | "lg";
+  size?: "sm" | "md" | "lg";
   className?: string;
 }) {
   const Glyph = GLYPHS[name];
@@ -147,14 +183,14 @@ export function Emblem({
       aria-hidden
       data-emblem={name}
       className={cn(
-        "relative inline-flex shrink-0 items-center justify-center rounded-xl border border-border bg-surface text-ink",
-        size === "lg" ? "h-14 w-14" : "h-12 w-12",
+        "relative inline-flex shrink-0 items-center justify-center border border-border bg-surface text-ink",
+        TILE[size],
         className,
       )}
     >
       <svg
         viewBox="0 0 32 32"
-        className={size === "lg" ? "h-9 w-9" : "h-8 w-8"}
+        className={GLYPH[size]}
         fill="none"
         stroke="currentColor"
         strokeWidth="1.5"
